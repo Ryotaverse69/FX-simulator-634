@@ -227,17 +227,22 @@
   }
 
   function renderChart(labels, series) {
-    const ctx = document.getElementById('equity-chart');
+    const canvas = document.getElementById('equity-chart');
+    const ctx2d = canvas.getContext('2d');
+    const gradient = ctx2d.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(83,215,255,.35)');
+    gradient.addColorStop(1, 'rgba(83,215,255,0)');
     if (!chart) {
-      chart = new Chart(ctx, {
+      chart = new Chart(canvas, {
         type: 'line',
         data: {
           labels,
           datasets: [{
             label: '資産推移',
             data: series,
-            borderColor: '#4cc9f0',
-            backgroundColor: 'rgba(76,201,240,.15)',
+            borderColor: '#53d7ff',
+            borderWidth: 2,
+            backgroundColor: gradient,
             fill: true,
             tension: 0.2,
             pointRadius: 2
@@ -247,20 +252,34 @@
           responsive: true,
           interaction: { mode: 'index', intersect: false },
           scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,.06)' },
+              ticks: { color: '#9aa0a6' }
+            },
             y: {
+              grid: { color: 'rgba(255,255,255,.06)' },
               ticks: {
+                color: '#9aa0a6',
                 callback: (v) => new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(v)
               }
             }
           },
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(18,22,33,.9)',
+              borderColor: '#2a3750',
+              borderWidth: 1,
+              titleColor: '#e6e6e6',
+              bodyColor: '#e6e6e6'
+            }
           }
         }
       });
     } else {
       chart.data.labels = labels;
       chart.data.datasets[0].data = series;
+      chart.data.datasets[0].backgroundColor = gradient;
       chart.update();
     }
   }

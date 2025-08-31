@@ -2,9 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>FX投資シミュレーター</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <!-- Chart.js CDN (loaded by the browser when opened) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="script.js"></script>
@@ -69,11 +74,15 @@
         <div class="field-inline">
           <div class="field">
             <label for="autoFetch">自動取得</label>
-            <label style="display:flex; gap:8px; align-items:center;">
-              <input type="checkbox" id="autoFetch" /> 有効にする
-            </label>
+            <div class="inline-input" style="justify-content: space-between; align-items:center;">
+              <div class="muted small" id="autoStatus">状態: 停止中</div>
+              <label class="switch" aria-label="自動取得">
+                <input type="checkbox" id="autoFetch" />
+                <span class="track"></span>
+                <span class="knob"></span>
+              </label>
+            </div>
             <small class="muted">ONにすると一定間隔で価格を取得します</small>
-            <small class="muted" id="autoStatus">状態: 停止中</small>
           </div>
           <div class="field">
             <label for="autoInterval">取得間隔（秒）</label>
@@ -120,7 +129,7 @@
 
         <div class="actions">
           <button type="button" id="run">シミュレーション</button>
-          <button type="button" id="reset">リセット</button>
+          <button type="button" id="reset" class="btn-secondary">リセット</button>
         </div>
       </form>
     </section>
@@ -157,5 +166,12 @@
       注意: 本ツールは教育目的の簡易シミュレーターであり、実売買の結果を保証するものではありません。
     </p>
   </footer>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+  </script>
 </body>
 </html>

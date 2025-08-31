@@ -123,8 +123,16 @@
             <label for="swapPer10kPerDay">スワップポイント（1万通貨/日）</label>
             <input id="swapPer10kPerDay" name="swapPer10kPerDay" type="number" step="0.1" value="5" />
             <small class="muted">売りでマイナスの場合は負値で入力</small>
+            <small class="muted" id="swapSource">参照: 手動入力</small>
           </div>
-          <div class="field"></div>
+          <div class="field">
+            <label for="broker">取引所 / ブローカー</label>
+            <select id="broker" name="broker">
+              <option value="">選択しない（手動入力）</option>
+              <!-- JSでbrokers.jsonから動的に追加 -->
+            </select>
+            <small class="muted">選択すると価格取得時にスワップも自動反映（参考値）</small>
+          </div>
         </div>
 
         <div class="actions">

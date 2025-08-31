@@ -22,7 +22,9 @@
     autoFetch: document.getElementById('autoFetch'),
     autoInterval: document.getElementById('autoInterval'),
     autoSim: document.getElementById('autoSim'),
-    autoStatus: document.getElementById('autoStatus')
+    autoStatus: document.getElementById('autoStatus'),
+    broker: document.getElementById('broker'),
+    swapSource: document.getElementById('swapSource')
   };
 
   const PAIRS = {
@@ -35,12 +37,73 @@
   };
 
   let chart = null;
+  let BROKERS = null; // loaded from brokers.json
 
   function fmtJPY(v) {
     return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(v);
   }
   function fmtNum(v, digits = 4) {
     return new Intl.NumberFormat('ja-JP', { maximumFractionDigits: digits }).format(v);
+  }
+
+  // Load brokers reference (static JSON in repo)
+  async function loadBrokers() {
+    if (BROKERS) return BROKERS;
+    try {
+      const res = await fetch('./brokers.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`brokers.json HTTP ${res.status}`);
+      BROKERS = await res.json();
+      return BROKERS;
+    } catch (e) {
+      console.warn('Failed to load brokers.json. Swap auto-fill disabled.', e);
+      BROKERS = {};
+      return BROKERS;
+    }
+  }
+
+  function populateBrokerOptions() {
+    if (!els.broker || !BROKERS) return;
+    // clear existing except first placeholder
+    while (els.broker.options.length > 1) els.broker.remove(1);
+    for (const key of Object.keys(BROKERS)) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = BROKERS[key]?.label || key;
+      els.broker.appendChild(opt);
+    }
+  }
+
+  function lookupSwap(brokerKey, pairKey, directionKey) {
+    if (!brokerKey || !BROKERS || !BROKERS[brokerKey]) return null;
+    const entry = BROKERS[brokerKey].pairs?.[pairKey];
+    if (!entry) return null;
+    const k = directionKey === 'short' ? 'short' : 'long';
+    const v = entry[k];
+    return Number.isFinite(v) ? v : null;
+  }
+
+  function setSwapSource(text) {
+    if (els.swapSource) els.swapSource.textContent = text || '';
+  }
+
+  async function updateSwapFromBroker() {
+    try {
+      await loadBrokers();
+      const brokerKey = els.broker?.value || '';
+      if (!brokerKey) { setSwapSource('参照: 手動入力'); return; }
+      const pairKey = els.pair?.value || 'USDJPY';
+      const directionKey = els.direction?.value || 'long';
+      const val = lookupSwap(brokerKey, pairKey, directionKey);
+      if (val == null) {
+        setSwapSource(`参照: ${BROKERS[brokerKey]?.label || brokerKey} - 該当データなし`);
+        return;
+      }
+      els.swapPer10kPerDay.value = String(val);
+      setSwapSource(`参照: ${BROKERS[brokerKey]?.label || brokerKey}（${directionKey === 'short' ? '売り' : '買い'}）`);
+    } catch (e) {
+      console.warn('Swap auto-fill error', e);
+      setSwapSource('参照: 手動入力（エラー）');
+    }
   }
 
   // Fetch helpers with timeout and provider fallback
@@ -102,6 +165,8 @@
       els.priceText.textContent = fmtNum(price, 5);
       const now = new Date();
       els.priceUpdated.textContent = `（更新: ${now.toLocaleTimeString('ja-JP')}）`;
+      // Also auto-fill swap if broker is selected
+      updateSwapFromBroker();
       if (els.autoSim?.checked) {
         // run simulation after price is updated
         simulate();
@@ -307,8 +372,12 @@
   });
   els.pair.addEventListener('change', () => {
     if (els.autoFetch.checked) fetchAndFillPrice();
+    updateSwapFromBroker();
   });
+  els.direction.addEventListener('change', updateSwapFromBroker);
+  els.broker?.addEventListener('change', updateSwapFromBroker);
 
   // Init
   // default: manual entry. Use 「取得」ボタンで反映。
+  loadBrokers().then(populateBrokerOptions);
 })();

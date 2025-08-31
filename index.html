@@ -10,6 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="mask-icon" href="icons/mask-icon.svg" color="#53d7ff" />
   <!-- Chart.js CDN (loaded by the browser when opened) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="script.js"></script>
@@ -18,8 +20,13 @@
 </head>
 <body>
   <header class="container">
-    <h1>FX投資シミュレーター</h1>
-    <p class="muted">通貨ペア: ドル円、ポンド円、ユーロ円、メキシコペソ円、南アフリカランド円、トルコリラ円</p>
+    <div class="brand">
+      <img src="icons/logo.svg" alt="" class="logo" />
+      <div>
+        <h1>FX投資シミュレーター</h1>
+        <p class="muted">通貨ペア: ドル円、ポンド円、ユーロ円、メキシコペソ円、南アフリカランド円、トルコリラ円</p>
+      </div>
+    </div>
   </header>
 
   <main class="container grid">

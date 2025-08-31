@@ -5,7 +5,11 @@ const ASSETS = [
   './styles.css',
   './script.js',
   './manifest.webmanifest',
-  './brokers.json'
+  './brokers.json',
+  './icons/logo.svg',
+  './icons/favicon.svg',
+  './icons/icon.svg',
+  './icons/mask-icon.svg'
 ];
 
 self.addEventListener('install', (event) => {

@@ -51,6 +51,8 @@ header.container {
   z-index: 10;
   padding-top: calc(16px + env(safe-area-inset-top));
 }
+header .brand { display: flex; gap: 14px; align-items: center; }
+img.logo { width: 40px; height: 40px; border-radius: 10px; box-shadow: 0 6px 16px rgba(124,77,255,.18), 0 4px 12px rgba(83,215,255,.16); }
 header.container h1 {
   display: inline-block;
   padding: 8px 14px;

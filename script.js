@@ -58,8 +58,10 @@
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     if (els.themeToggle) {
-      els.themeToggle.textContent = theme === 'dark' ? 'ダーク' : 'ライト';
-      els.themeToggle.ariaLabel = 'テーマ切替: ' + (theme === 'dark' ? 'ダーク' : 'ライト');
+      const next = theme === 'dark' ? 'light' : 'dark';
+      els.themeToggle.textContent = next === 'dark' ? 'ダークにする' : 'ライトにする';
+      els.themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+      els.themeToggle.ariaLabel = 'テーマ切替: ' + (next === 'dark' ? 'ダークにする' : 'ライトにする');
     }
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff');

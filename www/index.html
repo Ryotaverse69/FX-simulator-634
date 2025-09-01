@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>FX投資シミュレーター</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="mask-icon" href="icons/mask-icon.svg" color="#53d7ff" />
+  <!-- Chart.js CDN (loaded by the browser when opened) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="script.js"></script>
+  <meta name="description" content="リアルタイム価格 + レバレッジ・スワップ・入金・月利を考慮したFX投資シミュレーター" />
+  <meta name="color-scheme" content="light dark" />
+</head>
+<body>
+  <header class="container">
+    <div class="brand">
+      <img src="icons/logo.svg" alt="" class="logo" />
+      <div>
+        <h1>FX投資シミュレーター</h1>
+        <p class="muted">通貨ペア: ドル円、ポンド円、ユーロ円、メキシコペソ円、南アフリカランド円、トルコリラ円</p>
+      </div>
+      <button type="button" id="themeToggle" class="btn-secondary theme-toggle" aria-label="テーマ切替">ライトにする</button>
+    </div>
+  </header>
+
+  <main class="container grid">
+    <section class="card">
+      <h2>入力</h2>
+      <form id="sim-form">
+        <div class="field">
+          <label for="pair">通貨ペア</label>
+          <select id="pair" name="pair">
+            <option value="USDJPY">ドル円 (USD/JPY)</option>
+            <option value="GBPJPY">ポンド円 (GBP/JPY)</option>
+            <option value="EURJPY">ユーロ円 (EUR/JPY)</option>
+            <option value="MXNJPY">メキシコペソ円 (MXN/JPY)</option>
+            <option value="ZARJPY">南アフリカランド円 (ZAR/JPY)</option>
+            <option value="TRYJPY">トルコリラ円 (TRY/JPY)</option>
+          </select>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label for="direction">売買方向</label>
+            <select id="direction" name="direction">
+              <option value="long">買い</option>
+              <option value="short">売り</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="months">期間（月）</label>
+            <input id="months" name="months" type="number" min="1" max="360" step="1" value="24" />
+          </div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label for="currentPrice">現在価格（1ベース通貨あたりの円）</label>
+            <div class="inline-input">
+              <input id="currentPrice" name="currentPrice" type="number" min="0" step="0.0001" placeholder="例: USDJPYなら 150.1234" />
+              <button type="button" id="fetchPriceBtn">取得</button>
+            </div>
+            <small class="muted">通貨ペアを選んで「取得」を押すと反映。手動入力も可。</small>
+          </div>
+          <div class="field">
+            <label>取得結果</label>
+            <div class="quote">
+              <span>現在価格: </span>
+              <strong id="price">--</strong>
+              <span class="muted" id="price-updated"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label for="autoFetch">自動取得</label>
+            <div class="inline-input" style="justify-content: space-between; align-items:center;">
+              <div class="muted small" id="autoStatus">状態: 停止中</div>
+              <label class="switch" aria-label="自動取得">
+                <input type="checkbox" id="autoFetch" />
+                <span class="track"></span>
+                <span class="knob"></span>
+              </label>
+            </div>
+            <small class="muted">ONにすると一定間隔で価格を取得します</small>
+          </div>
+          <div class="field">
+            <label for="autoInterval">取得間隔（秒）</label>
+            <div class="inline-input">
+              <input id="autoInterval" name="autoInterval" type="number" min="5" step="5" value="30" />
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" id="autoSim" /> 取得時に自動でシミュレーション
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label for="capital">資金（円）</label>
+            <input id="capital" name="capital" type="number" min="0" step="1000" value="1000000" />
+          </div>
+          <div class="field">
+            <label for="deposit">毎月の入金（円）</label>
+            <input id="deposit" name="deposit" type="number" min="0" step="1000" value="50000" />
+          </div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label for="leverage">レバレッジ（倍）</label>
+              <input id="leverage" name="leverage" type="number" min="1" step="1" value="10" />
+          </div>
+          <div class="field">
+            <label for="monthlyPriceChange">月間価格変動（％）</label>
+            <input id="monthlyPriceChange" name="monthlyPriceChange" type="number" step="0.1" value="0" />
+            <small class="muted">買いで上昇=プラス、売りで下落=プラス</small>
+          </div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label for="swapPer10kPerDay">スワップポイント（1万通貨/日）</label>
+            <input id="swapPer10kPerDay" name="swapPer10kPerDay" type="number" step="0.1" value="5" />
+            <small class="muted">売りでマイナスの場合は負値で入力</small>
+            <small class="muted" id="swapSource">参照: 手動入力</small>
+          </div>
+          <div class="field">
+            <label for="broker">取引所 / ブローカー</label>
+            <select id="broker" name="broker">
+              <option value="">選択しない（手動入力）</option>
+              <!-- JSでbrokers.jsonから動的に追加 -->
+            </select>
+            <small class="muted">選択すると価格取得時にスワップも自動反映（参考値）</small>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="run">シミュレーション</button>
+          <button type="button" id="reset" class="btn-secondary">リセット</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>推移（グラフ）</h2>
+      <canvas id="equity-chart" height="240"></canvas>
+    </section>
+
+    <section class="card wide">
+      <h2>結果（表）</h2>
+      <div class="table-wrap">
+        <table id="result-table">
+          <thead>
+            <tr>
+              <th>月</th>
+              <th>価格</th>
+              <th>保有数量</th>
+              <th>価格損益</th>
+              <th>スワップ</th>
+              <th>入金</th>
+              <th>資産</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container muted small">
+    <p>
+      通貨ペアを選び「取得」を押すと価格を反映します（exchangerate.host）。<br/>
+      注意: 本ツールは教育目的の簡易シミュレーターであり、実売買の結果を保証するものではありません。
+    </p>
+  </footer>
+  <script>
+    // Skip Service Worker in native shells (Electron/Capacitor), as SW is not needed
+    const isElectron = navigator.userAgent.includes('Electron') || (window.process && window.process.versions && window.process.versions.electron);
+    const isCapacitor = !!window.Capacitor;
+    if ('serviceWorker' in navigator && !isElectron && !isCapacitor) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "DMM": {
+    "label": "DMM.com FX",
+    "pairs": {
+      "USDJPY": { "long": 40, "short": -80 },
+      "GBPJPY": { "long": 30, "short": -90 },
+      "EURJPY": { "long": 0, "short": -40 },
+      "MXNJPY": { "long": 150, "short": -220 },
+      "ZARJPY": { "long": 80, "short": -120 },
+      "TRYJPY": { "long": 300, "short": -450 }
+    }
+  },
+  "GMO": {
+    "label": "GMOクリック証券",
+    "pairs": {
+      "USDJPY": { "long": 45, "short": -85 },
+      "GBPJPY": { "long": 35, "short": -95 },
+      "EURJPY": { "long": 5, "short": -45 },
+      "MXNJPY": { "long": 160, "short": -230 },
+      "ZARJPY": { "long": 85, "short": -130 },
+      "TRYJPY": { "long": 320, "short": -470 }
+    }
+  },
+  "MINNA": {
+    "label": "みんなのFX",
+    "pairs": {
+      "USDJPY": { "long": 55, "short": -90 },
+      "GBPJPY": { "long": 40, "short": -100 },
+      "EURJPY": { "long": 10, "short": -50 },
+      "MXNJPY": { "long": 180, "short": -250 },
+      "ZARJPY": { "long": 95, "short": -140 },
+      "TRYJPY": { "long": 350, "short": -500 }
+    }
+  },
+  "OANDA": {
+    "label": "OANDA Japan",
+    "pairs": {
+      "USDJPY": { "long": 20, "short": -70 },
+      "GBPJPY": { "long": 15, "short": -80 },
+      "EURJPY": { "long": -5, "short": -35 },
+      "MXNJPY": { "long": 120, "short": -200 },
+      "ZARJPY": { "long": 60, "short": -110 },
+      "TRYJPY": { "long": 250, "short": -430 }
+    }
+  },
+  "XM": {
+    "label": "XM",
+    "pairs": {
+      "USDJPY": { "long": 25, "short": -75 },
+      "GBPJPY": { "long": 20, "short": -85 },
+      "EURJPY": { "long": 0, "short": -40 },
+      "MXNJPY": { "long": 130, "short": -210 },
+      "ZARJPY": { "long": 70, "short": -120 },
+      "TRYJPY": { "long": 270, "short": -450 }
+    }
+  }
+}
+

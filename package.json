@@ -9,7 +9,8 @@
     "app:android": "cap open android",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
-    "cap:sync": "cap sync"
+    "cap:sync": "cap sync",
+    "assets:ios": "@capacitor/assets generate --ios"
   },
   "devDependencies": {
     "electron": "^29.0.0"
@@ -19,4 +20,3 @@
     "@capacitor/core": "^5.0.0"
   }
 }
-

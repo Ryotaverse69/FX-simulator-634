@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Icon & Splash Generator</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px;line-height:1.5;background:#f6f8fc;color:#0f172a}
+    h1{margin:0 0 8px}
+    .muted{color:#64748b}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+    button{cursor:pointer;border:none;background:linear-gradient(180deg,#0ea5e9,#23b9eb);color:#001018;font-weight:700;border-radius:12px;padding:10px 14px}
+    input[type="color"]{width:44px;height:36px;border-radius:8px;border:1px solid #e5e7eb}
+    label{font-weight:600}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  </style>
+</head>
+<body>
+  <h1>アイコン/スプラッシュ 生成ツール</h1>
+  <p class="muted">SVGロゴからPNGを生成してダウンロードできます（ローカルのみ）。</p>
+
+  <div class="row">
+    <div class="card">
+      <h2>設定</h2>
+      <div class="grid">
+        <label>背景色<input type="color" id="bg" value="#f6f8fc"></label>
+        <label>グラデ開始<input type="color" id="g1" value="#7c4dff"></label>
+        <label>グラデ終了<input type="color" id="g2" value="#53d7ff"></label>
+        <label>文字色<input type="color" id="fg" value="#ffffff"></label>
+      </div>
+      <p class="muted">出力サイズ: 180, 192, 512, 1024（正方形）/ 2732（スプラッシュ）</p>
+      <button id="gen">生成してダウンロード</button>
+    </div>
+    <div class="card">
+      <h2>プレビュー</h2>
+      <canvas id="c" width="512" height="512" style="width:256px;height:256px;border-radius:24px;border:1px solid #e5e7eb"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const c = document.getElementById('c');
+    const ctx = c.getContext('2d');
+    const bg = document.getElementById('bg');
+    const g1 = document.getElementById('g1');
+    const g2 = document.getElementById('g2');
+    const fg = document.getElementById('fg');
+
+    function drawIcon(ctx, size, opts){
+      const {bg,g1,g2,fg} = opts;
+      ctx.clearRect(0,0,size,size);
+      // background
+      ctx.fillStyle = bg; ctx.fillRect(0,0,size,size);
+      // rounded rect gradient
+      const r = size*0.18; // radius
+      const grad = ctx.createLinearGradient(0,0,size,size);
+      grad.addColorStop(0,g1); grad.addColorStop(1,g2);
+      roundRect(ctx, size*0.04, size*0.04, size*0.92, size*0.92, r);
+      ctx.fillStyle = grad; ctx.fill();
+      // FX text
+      ctx.fillStyle = fg; ctx.font = `${Math.round(size*0.48)}px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('FX', size/2, size/2+size*0.04);
+    }
+    function drawSplash(ctx, size, opts){
+      const {bg,g1,g2,fg} = opts; // size 2732
+      ctx.clearRect(0,0,size,size);
+      // soft radial gradients
+      ctx.fillStyle = bg; ctx.fillRect(0,0,size,size);
+      const rg1 = ctx.createRadialGradient(size*0.85, size*0.15, size*0.05, size*0.85, size*0.15, size*0.6);
+      rg1.addColorStop(0, hexA(g2,0.22)); rg1.addColorStop(1, hexA(g2,0));
+      ctx.fillStyle = rg1; ctx.beginPath(); ctx.rect(0,0,size,size); ctx.fill();
+      const rg2g = ctx.createRadialGradient(size*0.1, size*0.3, size*0.05, size*0.1, size*0.3, size*0.6);
+      rg2g.addColorStop(0, hexA(g1,0.22)); rg2g.addColorStop(1, hexA(g1,0));
+      ctx.fillStyle = rg2g; ctx.beginPath(); ctx.rect(0,0,size,size); ctx.fill();
+      // center logo
+      const iconSize = Math.round(size*0.35);
+      const off = (size-iconSize)/2;
+      const offCanvas = new OffscreenCanvas(iconSize, iconSize);
+      const octx = offCanvas.getContext('2d');
+      drawIcon(octx, iconSize, opts);
+      ctx.drawImage(offCanvas, off, off);
+    }
+    function hexA(hex, a){
+      // convert #rrggbb to rgba string with alpha a
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      if(!m) return hex;
+      const r = parseInt(m[1],16), g = parseInt(m[2],16), b = parseInt(m[3],16);
+      return `rgba(${r},${g},${b},${a})`;
+    }
+    function roundRect(ctx, x, y, w, h, r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);
+      ctx.closePath();
+    }
+    function updatePreview(){
+      drawIcon(ctx, c.width, {bg:bg.value, g1:g1.value, g2:g2.value, fg:fg.value});
+    }
+    bg.oninput = g1.oninput = g2.oninput = fg.oninput = updatePreview;
+    updatePreview();
+
+    async function downloadPng(name, size, draw){
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const c2 = canvas.getContext('2d');
+      draw(c2, size, {bg:bg.value, g1:g1.value, g2:g2.value, fg:fg.value});
+      const blob = await new Promise(res=>canvas.toBlob(res, 'image/png'));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+    document.getElementById('gen').addEventListener('click', async ()=>{
+      await downloadPng('apple-touch-icon-180.png',180, drawIcon);
+      await downloadPng('icon-192.png',192, drawIcon);
+      await downloadPng('icon-512.png',512, drawIcon);
+      await downloadPng('icon-1024.png',1024, drawIcon);
+      await downloadPng('splash-2732.png',2732, drawSplash);
+      alert('ダウンロード完了: PNGファイルをicons/resourcesへ配置してください。');
+    });
+  </script>
+</body>
+</html>
+

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fx-sim-cache-v2';
+const CACHE_NAME = 'fx-sim-cache-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -9,7 +9,8 @@ const ASSETS = [
   './icons/logo.svg',
   './icons/favicon.svg',
   './icons/icon.svg',
-  './icons/mask-icon.svg'
+  './icons/mask-icon.svg',
+  './tools/icon-factory.html'
 ];
 
 self.addEventListener('install', (event) => {

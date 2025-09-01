@@ -39,15 +39,17 @@ Notes
 - `capacitor.config.json` sets `webDir` to `.` so native apps serve the existing files.
 - Service worker is disabled inside Capacitor by runtime detection.
 - App icons/splash (iOS first):
-  - 生成ツール: `tools/icon-factory.html` をブラウザで開き、PNGを出力
-    - 出力物: `apple-touch-icon-180.png`, `icon-192.png`, `icon-512.png`, `icon-1024.png`, `splash-2732.png`
-  - 配置:
-    - PWA用: `icons/apple-touch-icon.png` にリネームして `icons/` へ（180×180）
-    - PWA用: `icons/icon-192.png`, `icons/icon-512.png` を `icons/` へ
-    - ネイティブiOS生成用: `resources/icon.png` に `icon-1024.png` をリネームして配置、`resources/splash.png` に `splash-2732.png` をリネームして配置
+  - すぐ使えるデフォルト（推奨）
+    - 既に `resources/icon.svg` と `resources/splash.svg` を用意済み → 下の「生成」を実行するだけでOK
+  - カスタムPNGで上書きする場合
+    - 生成ツール: `tools/icon-factory.html` をブラウザで開き、PNGを出力
+      - 出力物: `apple-touch-icon-180.png`, `icon-192.png`, `icon-512.png`, `icon-1024.png`, `splash-2732.png`
+    - 配置:
+      - PWA用: `icons/apple-touch-icon.png`（180×180）、`icons/icon-192.png`、`icons/icon-512.png`
+      - ネイティブiOS用: `resources/icon.png`（= icon-1024.png）、`resources/splash.png`（= splash-2732.png）
   - 生成（Capacitor Assets）:
     - インストール: `npm i -D @capacitor/assets`
-    - 生成: `npx @capacitor/assets generate --ios`
+    - 生成: `npx @capacitor/assets generate --ios`（または `npm run assets:ios`）
     - これで `ios/App/App/Assets.xcassets/` にAppIcon/LaunchImageが自動作成されます
   - 参考: https://capacitorjs.com/docs/guides/splash-screens-and-icons
 

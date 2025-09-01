@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#0b0c10",
   "theme_color": "#0f172a",
-  "description": "レバレッジ・スワップ・入金・月利を考慮したFX投資シミュレーター",
+  "description": "アゲアゲFX — レバレッジ・スワップ・積立で未来の資産設計をシミュレーション",
   "icons": [
     { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },

@@ -24,7 +24,8 @@
     autoSim: document.getElementById('autoSim'),
     autoStatus: document.getElementById('autoStatus'),
     broker: document.getElementById('broker'),
-    swapSource: document.getElementById('swapSource')
+    swapSource: document.getElementById('swapSource'),
+    themeToggle: document.getElementById('themeToggle')
   };
 
   const PAIRS = {
@@ -38,12 +39,35 @@
 
   let chart = null;
   let BROKERS = null; // loaded from brokers.json
+  const THEME_KEY = 'theme';
 
   function fmtJPY(v) {
     return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(v);
   }
   function fmtNum(v, digits = 4) {
     return new Intl.NumberFormat('ja-JP', { maximumFractionDigits: digits }).format(v);
+  }
+
+  // Theme control
+  function getPreferredTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+    // default to light if no saved preference
+    return 'light';
+  }
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (els.themeToggle) {
+      els.themeToggle.textContent = theme === 'dark' ? 'ダーク' : 'ライト';
+      els.themeToggle.ariaLabel = 'テーマ切替: ' + (theme === 'dark' ? 'ダーク' : 'ライト');
+    }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff');
+  }
+  function toggleTheme() {
+    const next = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
   }
 
   // Load brokers reference (static JSON in repo)
@@ -376,8 +400,11 @@
   });
   els.direction.addEventListener('change', updateSwapFromBroker);
   els.broker?.addEventListener('change', updateSwapFromBroker);
+  els.themeToggle?.addEventListener('click', toggleTheme);
 
   // Init
   // default: manual entry. Use 「取得」ボタンで反映。
   loadBrokers().then(populateBrokerOptions);
+  // Theme init
+  applyTheme(getPreferredTheme());
 })();

@@ -10,7 +10,9 @@
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
     "cap:sync": "cap sync",
-    "assets:ios": "@capacitor/assets generate --ios"
+    "assets:ios": "@capacitor/assets generate --ios",
+    "sync:www": "mkdir -p www/icons www/tools && cp -f index.html styles.css script.js manifest.webmanifest service-worker.js brokers.json www/ && cp -f icons/* www/icons/ 2>/dev/null || true && cp -f tools/icon-factory.html www/tools/ 2>/dev/null || true",
+    "sync:ios": "npm run sync:www && cap copy ios"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.0",

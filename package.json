@@ -1,0 +1,22 @@
+{
+  "name": "fx-simulator-634",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FX投資シミュレーター: Web + PWA + Mobile(Capacitor) + Desktop(Electron)",
+  "scripts": {
+    "app:desktop": "electron desktop/electron/main.js",
+    "app:ios": "cap open ios",
+    "app:android": "cap open android",
+    "cap:add:ios": "cap add ios",
+    "cap:add:android": "cap add android",
+    "cap:sync": "cap sync"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0"
+  },
+  "dependencies": {
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0"
+  }
+}
+

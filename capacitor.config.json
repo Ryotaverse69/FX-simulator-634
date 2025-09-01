@@ -1,0 +1,10 @@
+{
+  "appId": "com.ryotaverse.fxsim",
+  "appName": "FX投資シミュレーター",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
+

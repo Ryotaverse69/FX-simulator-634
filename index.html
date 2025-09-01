@@ -183,7 +183,10 @@
     </p>
   </footer>
   <script>
-    if ('serviceWorker' in navigator) {
+    // Skip Service Worker in native shells (Electron/Capacitor), as SW is not needed
+    const isElectron = navigator.userAgent.includes('Electron') || (window.process && window.process.versions && window.process.versions.electron);
+    const isCapacitor = !!window.Capacitor;
+    if ('serviceWorker' in navigator && !isElectron && !isCapacitor) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').catch(console.error);
       });

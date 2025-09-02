@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fx-sim-cache-v7';
+const CACHE_NAME = 'fx-sim-cache-v8';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,8 @@ const ASSETS = [
   './brokers.json',
   './icons/logo.svg',
   './icons/favicon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './icons/icon.svg',
   './icons/mask-icon.svg',
   './tools/icon-factory.html',

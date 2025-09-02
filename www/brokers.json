@@ -32,6 +32,17 @@
       "TRYJPY": { "long": 350, "short": -500 }
     }
   },
+  "MINNA_LIGHT": {
+    "label": "みんなのFX ライトペア",
+    "pairs": {
+      "USDJPY": { "long": 55, "short": -90 },
+      "GBPJPY": { "long": 40, "short": -100 },
+      "EURJPY": { "long": 10, "short": -50 },
+      "MXNJPY": { "long": 180, "short": -250 },
+      "ZARJPY": { "long": 95, "short": -140 },
+      "TRYJPY": { "long": 350, "short": -500 }
+    }
+  },
   "OANDA": {
     "label": "OANDA Japan",
     "pairs": {
@@ -55,4 +66,3 @@
     }
   }
 }
-

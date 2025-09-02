@@ -190,7 +190,9 @@
       els.currentPrice.value = String(price.toFixed(5));
       els.priceText.textContent = fmtNum(price, 5);
       const now = new Date();
-      els.priceUpdated.textContent = `（更新: ${now.toLocaleTimeString('ja-JP')}）`;
+      const brokerKey = els.broker?.value || '';
+      const src = brokerKey && BROKERS && BROKERS[brokerKey]?.label ? BROKERS[brokerKey].label : '為替API';
+      els.priceUpdated.textContent = `（更新: ${now.toLocaleTimeString('ja-JP')}｜ソース: ${src}）`;
       // Also auto-fill swap if broker is selected
       updateSwapFromBroker();
       if (els.autoSim?.checked) {

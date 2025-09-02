@@ -37,9 +37,14 @@
       </div>
       <button type="button" id="themeToggle" class="btn-secondary theme-toggle" aria-label="テーマ切替">ライトにする</button>
     </div>
+    <nav class="tabs">
+      <button type="button" class="tab-btn active" data-tab="portfolio">資産シミュレーター</button>
+      <button type="button" class="tab-btn" data-tab="leverage">実行レバレッジシミュレーター</button>
+    </nav>
   </header>
 
-  <main class="container grid">
+  <main>
+    <div id="tab-portfolio" class="container grid tab-view active">
     <section class="card">
       <h2>入力</h2>
       <form id="sim-form">
@@ -183,6 +188,64 @@
         </table>
       </div>
     </section>
+    </div>
+
+    <div id="tab-leverage" class="container tab-view">
+      <section class="card">
+        <h2>実行レバレッジ計算</h2>
+        <form id="lev-form">
+          <div class="field">
+            <label for="pair2">通貨ペア</label>
+            <select id="pair2" name="pair2">
+              <option value="USDJPY">ドル円 (USD/JPY)</option>
+              <option value="GBPJPY">ポンド円 (GBP/JPY)</option>
+              <option value="EURJPY">ユーロ円 (EUR/JPY)</option>
+              <option value="MXNJPY">メキシコペソ円 (MXN/JPY)</option>
+              <option value="ZARJPY">南アフリカランド円 (ZAR/JPY)</option>
+              <option value="TRYJPY">トルコリラ円 (TRY/JPY)</option>
+            </select>
+          </div>
+
+          <div class="field-inline">
+            <div class="field">
+              <label for="lev_price">現在価格（円）</label>
+              <div class="inline-input">
+                <input id="lev_price" type="number" step="0.0001" placeholder="例: 150.1234" />
+                <button type="button" id="fetchPriceBtn2">取得</button>
+              </div>
+              <small class="muted">通貨ペアを選んで「取得」を押すと反映。手動入力も可。</small>
+            </div>
+            <div class="field">
+              <label for="lev_equity">資金（円）</label>
+              <input id="lev_equity" type="number" min="0" step="1000" value="1000000" />
+            </div>
+          </div>
+
+          <div class="field-inline">
+            <div class="field">
+              <label for="lev_units">保有数量（通貨）</label>
+              <input id="lev_units" type="number" min="0" step="1" placeholder="例: 100000（=10万通貨）" />
+              <small class="muted">1万通貨=10,000。数量は買い/売りに関わらず絶対値。</small>
+            </div>
+            <div class="field">
+              <label for="targetLev">目標レバレッジ（倍）</label>
+              <input id="targetLev" type="number" min="0" step="0.1" placeholder="例: 5" />
+              <small class="muted">入力すると、目標に必要な保有数量を計算します。</small>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="lev_run">計算</button>
+            <button type="button" id="lev_clear" class="btn-secondary">クリア</button>
+          </div>
+
+          <div class="result-grid">
+            <div class="kv"><div class="k">実行レバレッジ</div><div class="v"><strong id="lev_effective">--</strong></div></div>
+            <div class="kv"><div class="k">目標に必要な数量</div><div class="v" id="lev_required_units">--</div></div>
+          </div>
+        </form>
+      </section>
+    </div>
   </main>
 
   <footer class="container muted small">

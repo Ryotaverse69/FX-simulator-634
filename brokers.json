@@ -1,6 +1,7 @@
 {
   "DMM": {
     "label": "DMM.com FX",
+    "minUnit": 10000,
     "pairs": {
       "USDJPY": { "long": 40, "short": -80 },
       "GBPJPY": { "long": 30, "short": -90 },
@@ -12,6 +13,7 @@
   },
   "GMO": {
     "label": "GMOクリック証券",
+    "minUnit": 10000,
     "pairs": {
       "USDJPY": { "long": 45, "short": -85 },
       "GBPJPY": { "long": 35, "short": -95 },
@@ -23,6 +25,7 @@
   },
   "MINNA": {
     "label": "みんなのFX",
+    "minUnit": 1000,
     "pairs": {
       "USDJPY": { "long": 55, "short": -90 },
       "GBPJPY": { "long": 40, "short": -100 },
@@ -34,6 +37,7 @@
   },
   "MINNA_LIGHT": {
     "label": "みんなのFX ライトペア",
+    "minUnit": 1000,
     "pairs": {
       "USDJPY": { "long": 55, "short": -90 },
       "GBPJPY": { "long": 40, "short": -100 },
@@ -45,6 +49,7 @@
   },
   "OANDA": {
     "label": "OANDA Japan",
+    "minUnit": 1,
     "pairs": {
       "USDJPY": { "long": 20, "short": -70 },
       "GBPJPY": { "long": 15, "short": -80 },
@@ -56,6 +61,7 @@
   },
   "XM": {
     "label": "XM",
+    "minUnit": 1000,
     "pairs": {
       "USDJPY": { "long": 25, "short": -75 },
       "GBPJPY": { "long": 20, "short": -85 },

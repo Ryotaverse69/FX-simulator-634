@@ -25,7 +25,18 @@
     autoStatus: document.getElementById('autoStatus'),
     broker: document.getElementById('broker'),
     swapSource: document.getElementById('swapSource'),
-    themeToggle: document.getElementById('themeToggle')
+    themeToggle: document.getElementById('themeToggle'),
+    // Tabs - leverage simulator
+    pair2: document.getElementById('pair2'),
+    fetchPriceBtn2: document.getElementById('fetchPriceBtn2'),
+    levPrice: document.getElementById('lev_price'),
+    levEquity: document.getElementById('lev_equity'),
+    levUnits: document.getElementById('lev_units'),
+    targetLev: document.getElementById('targetLev'),
+    levRun: document.getElementById('lev_run'),
+    levClear: document.getElementById('lev_clear'),
+    levEffective: document.getElementById('lev_effective'),
+    levReqUnits: document.getElementById('lev_required_units')
   };
 
   const PAIRS = {
@@ -46,6 +57,10 @@
   }
   function fmtNum(v, digits = 4) {
     return new Intl.NumberFormat('ja-JP', { maximumFractionDigits: digits }).format(v);
+  }
+  function fmtX(v, digits = 2) {
+    if (!Number.isFinite(v)) return '--';
+    return `${fmtNum(v, digits)}x`;
   }
 
   // Theme control
@@ -205,6 +220,16 @@
       els.priceUpdated.textContent = '（価格取得エラー）';
       console.error(e);
       setAutoStatus(true);
+    }
+  }
+
+  async function fetchAndFillPrice2() {
+    try {
+      const pairKey = els.pair2.value;
+      const price = await fetchPrice(pairKey);
+      els.levPrice.value = String(price.toFixed(5));
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -377,6 +402,31 @@
     }
   }
 
+  // Leverage simulator
+  function computeEffectiveLeverage() {
+    const equity = Math.max(0, valNum(els.levEquity, 0));
+    const price = Math.max(0, valNum(els.levPrice, 0));
+    const units = Math.max(0, valNum(els.levUnits, 0));
+    if (!(equity > 0 && price > 0 && units > 0)) {
+      els.levEffective.textContent = '--';
+      els.levReqUnits.textContent = '--';
+      return;
+    }
+    const eff = (units * price) / equity;
+    els.levEffective.textContent = fmtX(eff, 2);
+
+    const tgt = Math.max(0, valNum(els.targetLev, 0));
+    if (tgt > 0) {
+      const reqUnits = (tgt * equity) / price;
+      const lots10k = reqUnits / 10000;
+      let diff = reqUnits - units;
+      const sign = diff >= 0 ? '+' : '';
+      els.levReqUnits.textContent = `${fmtNum(reqUnits, 0)} 通貨（約 ${fmtNum(lots10k, 2)} 万通貨、差分 ${sign}${fmtNum(diff, 0)}）`;
+    } else {
+      els.levReqUnits.textContent = '--';
+    }
+  }
+
   // Event bindings
   els.run.addEventListener('click', simulate);
   els.reset.addEventListener('click', () => {
@@ -405,6 +455,29 @@
   els.direction.addEventListener('change', updateSwapFromBroker);
   els.broker?.addEventListener('change', updateSwapFromBroker);
   els.themeToggle?.addEventListener('click', toggleTheme);
+
+  // Tab: leverage
+  els.fetchPriceBtn2?.addEventListener('click', fetchAndFillPrice2);
+  els.levRun?.addEventListener('click', computeEffectiveLeverage);
+  els.levClear?.addEventListener('click', () => {
+    els.levPrice.value = '';
+    els.levEquity.value = 1_000_000;
+    els.levUnits.value = '';
+    els.targetLev.value = '';
+    els.levEffective.textContent = '--';
+    els.levReqUnits.textContent = '--';
+  });
+
+  // Tabs switching
+  function activateTab(name) {
+    const views = document.querySelectorAll('.tab-view');
+    views.forEach(v => v.classList.toggle('active', v.id === `tab-${name}`));
+    const btns = document.querySelectorAll('.tab-btn');
+    btns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === name));
+  }
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => activateTab(btn.getAttribute('data-tab')));
+  });
 
   // Init
   // default: manual entry. Use 「取得」ボタンで反映。

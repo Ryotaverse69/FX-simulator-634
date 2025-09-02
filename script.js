@@ -27,6 +27,8 @@
     swapSource: document.getElementById('swapSource'),
     themeToggle: document.getElementById('themeToggle'),
     // Tabs - leverage simulator
+    levBroker: document.getElementById('lev_broker'),
+    levMinUnit: document.getElementById('lev_min_unit'),
     pair2: document.getElementById('pair2'),
     fetchPriceBtn2: document.getElementById('fetchPriceBtn2'),
     levPrice: document.getElementById('lev_price'),
@@ -36,7 +38,9 @@
     levRun: document.getElementById('lev_run'),
     levClear: document.getElementById('lev_clear'),
     levEffective: document.getElementById('lev_effective'),
-    levReqUnits: document.getElementById('lev_required_units')
+    levReqUnits: document.getElementById('lev_required_units'),
+    levReqUnitsCeil: document.getElementById('lev_required_units_ceil'),
+    levReqUnitsFloor: document.getElementById('lev_required_units_floor')
   };
 
   const PAIRS = {
@@ -61,6 +65,26 @@
   function fmtX(v, digits = 2) {
     if (!Number.isFinite(v)) return '--';
     return `${fmtNum(v, digits)}x`;
+  }
+  function roundToMultiple(x, m, mode = 'nearest') {
+    if (!m || m <= 0) return Math.round(x);
+    if (mode === 'up') return Math.ceil(x / m) * m;
+    if (mode === 'down') return Math.floor(x / m) * m;
+    const up = Math.ceil(x / m) * m;
+    const down = Math.floor(x / m) * m;
+    return (x - down) <= (up - x) ? down : up;
+  }
+  function getMinUnitForBroker(brokerKey) {
+    if (!brokerKey || !BROKERS || !BROKERS[brokerKey]) return 10000;
+    const v = BROKERS[brokerKey].minUnit;
+    return Number.isFinite(v) && v > 0 ? v : 10000;
+  }
+  function setLevMinUnitLabel() {
+    if (!els.levMinUnit) return;
+    const key = els.levBroker?.value || '';
+    const mu = getMinUnitForBroker(key);
+    const label = key && BROKERS?.[key]?.label ? `${BROKERS[key].label} 最小単位: ${fmtNum(mu, 0)} 通貨` : `既定最小単位: ${fmtNum(mu, 0)} 通貨`;
+    els.levMinUnit.textContent = `（${label}）`;
   }
 
   // Theme control
@@ -103,15 +127,18 @@
   }
 
   function populateBrokerOptions() {
-    if (!els.broker || !BROKERS) return;
-    // clear existing except first placeholder
-    while (els.broker.options.length > 1) els.broker.remove(1);
-    for (const key of Object.keys(BROKERS)) {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = BROKERS[key]?.label || key;
-      els.broker.appendChild(opt);
+    if (!BROKERS) return;
+    const fills = [els.broker, els.levBroker].filter(Boolean);
+    for (const select of fills) {
+      while (select.options.length > 1) select.remove(1);
+      for (const key of Object.keys(BROKERS)) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = BROKERS[key]?.label || key;
+        select.appendChild(opt);
+      }
     }
+    setLevMinUnitLabel();
   }
 
   function lookupSwap(brokerKey, pairKey, directionKey) {
@@ -410,6 +437,8 @@
     if (!(equity > 0 && price > 0 && units > 0)) {
       els.levEffective.textContent = '--';
       els.levReqUnits.textContent = '--';
+      els.levReqUnitsCeil.textContent = '--';
+      els.levReqUnitsFloor.textContent = '--';
       return;
     }
     const eff = (units * price) / equity;
@@ -422,8 +451,19 @@
       let diff = reqUnits - units;
       const sign = diff >= 0 ? '+' : '';
       els.levReqUnits.textContent = `${fmtNum(reqUnits, 0)} 通貨（約 ${fmtNum(lots10k, 2)} 万通貨、差分 ${sign}${fmtNum(diff, 0)}）`;
+
+      // Broker-aware rounding
+      const mu = getMinUnitForBroker(els.levBroker?.value || '');
+      const ceilU = roundToMultiple(reqUnits, mu, 'up');
+      const floorU = roundToMultiple(reqUnits, mu, 'down');
+      const ceilEff = (ceilU * price) / equity;
+      const floorEff = floorU > 0 ? (floorU * price) / equity : 0;
+      els.levReqUnitsCeil.textContent = `${fmtNum(ceilU, 0)} 通貨（最小単位=${fmtNum(mu,0)}、実行レバ: ${fmtX(ceilEff,2)}）`;
+      els.levReqUnitsFloor.textContent = floorU > 0 ? `${fmtNum(floorU, 0)} 通貨（最小単位=${fmtNum(mu,0)}、実行レバ: ${fmtX(floorEff,2)}）` : '--';
     } else {
       els.levReqUnits.textContent = '--';
+      els.levReqUnitsCeil.textContent = '--';
+      els.levReqUnitsFloor.textContent = '--';
     }
   }
 
@@ -466,7 +506,10 @@
     els.targetLev.value = '';
     els.levEffective.textContent = '--';
     els.levReqUnits.textContent = '--';
+    els.levReqUnitsCeil.textContent = '--';
+    els.levReqUnitsFloor.textContent = '--';
   });
+  els.levBroker?.addEventListener('change', () => { setLevMinUnitLabel(); computeEffectiveLeverage(); });
 
   // Tabs switching
   function activateTab(name) {

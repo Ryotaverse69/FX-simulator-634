@@ -195,6 +195,15 @@
         <h2>実行レバレッジ計算</h2>
         <form id="lev-form">
           <div class="field">
+            <label for="lev_broker">取引所 / ブローカー</label>
+            <select id="lev_broker" name="lev_broker">
+              <option value="">選択しない（既定ロット: 1万通貨）</option>
+              <!-- JSでbrokers.jsonから動的に追加 -->
+            </select>
+            <small class="muted">ブローカーの最小取引単位に合わせて数量を丸めます。<span id="lev_min_unit" class="muted"></span></small>
+          </div>
+
+          <div class="field">
             <label for="pair2">通貨ペア</label>
             <select id="pair2" name="pair2">
               <option value="USDJPY">ドル円 (USD/JPY)</option>
@@ -242,6 +251,8 @@
           <div class="result-grid">
             <div class="kv"><div class="k">実行レバレッジ</div><div class="v"><strong id="lev_effective">--</strong></div></div>
             <div class="kv"><div class="k">目標に必要な数量</div><div class="v" id="lev_required_units">--</div></div>
+            <div class="kv"><div class="k">（切上げ: 目標以上）</div><div class="v" id="lev_required_units_ceil">--</div></div>
+            <div class="kv"><div class="k">（切下げ: 目標未満）</div><div class="v" id="lev_required_units_floor">--</div></div>
           </div>
         </form>
       </section>

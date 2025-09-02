@@ -191,3 +191,4 @@ th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: l
 .kv { display: flex; justify-content: space-between; align-items: baseline; background: var(--card); border: 1px solid var(--card-border); padding: 10px 12px; border-radius: 12px; }
 .kv .k { color: var(--muted); }
 .kv .v { font-variant-numeric: tabular-nums; }
+.kv .v strong { font-weight: 800; }

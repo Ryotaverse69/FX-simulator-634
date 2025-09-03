@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fx-sim-cache-v13';
+const CACHE_NAME = 'fx-sim-cache-v14';
 const ASSETS = [
   './',
   './index.html',

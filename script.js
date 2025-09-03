@@ -41,7 +41,11 @@
     levEffective: document.getElementById('lev_effective'),
     levReqUnits: document.getElementById('lev_required_units'),
     levReqUnitsCeil: document.getElementById('lev_required_units_ceil'),
-    levReqUnitsFloor: document.getElementById('lev_required_units_floor')
+    levReqUnitsFloor: document.getElementById('lev_required_units_floor'),
+    // KPIs
+    kpiPrice: document.getElementById('kpi-price'),
+    kpiSwap: document.getElementById('kpi-swap'),
+    kpiLev: document.getElementById('kpi-lev')
   };
 
   const PAIRS = {
@@ -56,6 +60,20 @@
   let chart = null;
   let BROKERS = null; // loaded from brokers.json
   const THEME_KEY = 'theme';
+  const glowPlugin = {
+    id: 'glow',
+    afterDatasetsDraw(chart, args, opts) {
+      const meta = chart.getDatasetMeta(0);
+      if (!meta || meta.hidden) return;
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.shadowColor = (opts && opts.color) || 'rgba(124,77,255,.45)';
+      ctx.shadowBlur = (opts && opts.blur) || 12;
+      ctx.globalCompositeOperation = 'lighter';
+      meta.dataset.draw(ctx);
+      ctx.restore();
+    }
+  };
 
   function fmtJPY(v) {
     return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(v);
@@ -168,6 +186,7 @@
         return;
       }
       els.swapPer10kPerDay.value = String(val);
+      if (els.kpiSwap) els.kpiSwap.textContent = `${fmtNum(val, 0)} 円`;
       setSwapSource(`参照: ${BROKERS[brokerKey]?.label || brokerKey}（${directionKey === 'short' ? '売り' : '買い'}）`);
     } catch (e) {
       console.warn('Swap auto-fill error', e);
@@ -228,10 +247,12 @@
 
   async function fetchAndFillPrice() {
     try {
+      els.priceText?.classList.add('skeleton');
       const pairKey = els.pair.value;
       const price = await fetchPrice(pairKey);
       els.currentPrice.value = String(price.toFixed(5));
       els.priceText.textContent = fmtNum(price, 5);
+      if (els.kpiPrice) els.kpiPrice.textContent = fmtNum(price, 5);
       const now = new Date();
       const brokerKey = els.broker?.value || '';
       const src = brokerKey && BROKERS && BROKERS[brokerKey]?.label ? BROKERS[brokerKey].label : '為替API';
@@ -248,7 +269,7 @@
       els.priceUpdated.textContent = '（価格取得エラー）';
       console.error(e);
       setAutoStatus(true);
-    }
+    } finally { els.priceText?.classList.remove('skeleton'); }
   }
 
   async function fetchAndFillPrice2() {
@@ -379,6 +400,7 @@
     gradient.addColorStop(0, 'rgba(83,215,255,.35)');
     gradient.addColorStop(1, 'rgba(83,215,255,0)');
     if (!chart) {
+      Chart.register(glowPlugin);
       chart = new Chart(canvas, {
         type: 'line',
         data: {
@@ -418,7 +440,8 @@
               borderWidth: 1,
               titleColor: '#e6e6e6',
               bodyColor: '#e6e6e6'
-            }
+            },
+            glow: { color: 'rgba(124,77,255,.45)', blur: 12 }
           }
         }
       });
@@ -508,6 +531,9 @@
     if (els.autoFetch.checked) fetchAndFillPrice();
     updateSwapFromBroker();
   });
+  els.leverage.addEventListener('change', () => {
+    if (els.kpiLev) els.kpiLev.textContent = `x${fmtNum(valNum(els.leverage, 10), 0)}`;
+  });
   els.direction.addEventListener('change', updateSwapFromBroker);
   els.broker?.addEventListener('change', updateSwapFromBroker);
   els.themeToggle?.addEventListener('click', toggleTheme);
@@ -544,4 +570,7 @@
   loadBrokers().then(populateBrokerOptions);
   // Theme init
   applyTheme(getPreferredTheme());
+  // KPIs init
+  if (els.kpiLev) els.kpiLev.textContent = `x${fmtNum(valNum(els.leverage, 10), 0)}`;
+  if (els.kpiSwap) els.kpiSwap.textContent = `${fmtNum(valNum(els.swapPer10kPerDay, 0), 0)} 円`;
 })();

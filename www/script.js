@@ -36,6 +36,7 @@
     levUnits: document.getElementById('lev_units'),
     targetLev: document.getElementById('targetLev'),
     levRun: document.getElementById('lev_run'),
+    levBackcalc: document.getElementById('lev_backcalc'),
     levClear: document.getElementById('lev_clear'),
     levEffective: document.getElementById('lev_effective'),
     levReqUnits: document.getElementById('lev_required_units'),
@@ -467,6 +468,21 @@
     }
   }
 
+  function backcalcUnitsFromTarget() {
+    const equity = Math.max(0, valNum(els.levEquity, 0));
+    const price = Math.max(0, valNum(els.levPrice, 0));
+    const tgt = Math.max(0, valNum(els.targetLev, 0));
+    if (!(equity > 0 && price > 0 && tgt > 0)) {
+      alert('資金・価格・目標レバレッジを入力してください');
+      return;
+    }
+    const reqUnits = (tgt * equity) / price;
+    const mu = getMinUnitForBroker(els.levBroker?.value || '');
+    const ceilU = roundToMultiple(reqUnits, mu, 'up');
+    els.levUnits.value = String(Math.max(0, Math.round(ceilU)));
+    computeEffectiveLeverage();
+  }
+
   // Event bindings
   els.run.addEventListener('click', simulate);
   els.reset.addEventListener('click', () => {
@@ -499,6 +515,7 @@
   // Tab: leverage
   els.fetchPriceBtn2?.addEventListener('click', fetchAndFillPrice2);
   els.levRun?.addEventListener('click', computeEffectiveLeverage);
+  els.levBackcalc?.addEventListener('click', backcalcUnitsFromTarget);
   els.levClear?.addEventListener('click', () => {
     els.levPrice.value = '';
     els.levEquity.value = 1_000_000;

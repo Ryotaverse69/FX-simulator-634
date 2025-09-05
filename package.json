@@ -11,6 +11,9 @@
     "cap:add:android": "cap add android",
     "cap:sync": "cap sync",
     "assets:ios": "@capacitor/assets generate --ios",
+    "desktop:icons": "node tools/gen-desktop-icons.js",
+    "desktop:pack": "electron-builder --dir",
+    "desktop:dist": "electron-builder",
     "icons:generate": "node tools/gen-icons.js",
     "sync:www": "mkdir -p www/icons www/tools && cp -f index.html styles.css script.js manifest.webmanifest service-worker.js brokers.json www/ && cp -f icons/* www/icons/ 2>/dev/null || true && cp -f tools/icon-factory.html www/tools/ 2>/dev/null || true",
     "sync:ios": "npm run sync:www && cap copy ios"
@@ -19,10 +22,41 @@
     "@capacitor/assets": "^3.0.0",
     "@capacitor/ios": "^7.4.3",
     "electron": "^29.0.0",
+    "electron-builder": "^24.9.1",
     "sharp": "^0.33.5"
   },
   "dependencies": {
     "@capacitor/cli": "^7.4.0",
     "@capacitor/core": "^7.4.0"
+  },
+  "build": {
+    "appId": "com.ryotaverse.ageagefx",
+    "productName": "アゲアゲFX",
+    "files": [
+      "index.html",
+      "styles.css",
+      "script.js",
+      "brokers.json",
+      "icons/**",
+      "manifest.webmanifest",
+      "desktop/electron/**"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "mac": {
+      "category": "public.app-category.finance",
+      "icon": "build/icon.png",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": ["nsis", "zip"]
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Finance",
+      "target": ["AppImage", "tar.gz"]
+    }
   }
 }

@@ -194,6 +194,11 @@ button::after { content:""; position:absolute; inset:-1px; background: linear-gr
 }
 button:hover { transform: translateY(-1px); }
 button:active { transform: translateY(0); box-shadow: 0 4px 12px rgba(124,77,255,.2), inset 0 1px 0 rgba(255,255,255,.12); }
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
 .btn-secondary {
   background: #ffffff;
@@ -201,6 +206,7 @@ button:active { transform: translateY(0); box-shadow: 0 4px 12px rgba(124,77,255
   border: 1px solid var(--control-border);
   box-shadow: 0 4px 12px rgba(0,0,0,.05), inset 0 1px 0 rgba(255,255,255,.9);
 }
+.btn-compact { padding: 6px 10px; font-size: .85rem; }
 
 .inline-input { display: flex; gap: 8px; align-items: center; }
 .inline-input input { flex: 1; }
@@ -216,6 +222,13 @@ thead th { position: sticky; top: 0; background: var(--table-head-bg); z-index: 
 th, td { padding: 10px 12px; border-bottom: 1px solid var(--table-border); text-align: right; }
 tbody tr:nth-child(odd) td { background: rgba(0,0,0,0.02); }
 th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+
+#multi-positions th,
+#multi-positions td { text-align: left; }
+#multi-positions th:last-child,
+#multi-positions td:last-child { text-align: center; }
+#multi-positions input,
+#multi-positions select { width: 100%; }
 
 .pos { color: var(--ok); }
 .neg { color: #ef476f; }

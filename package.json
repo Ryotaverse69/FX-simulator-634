@@ -27,7 +27,9 @@
   },
   "dependencies": {
     "@capacitor/cli": "^7.4.0",
-    "@capacitor/core": "^7.4.0"
+    "@capacitor/core": "^7.4.0",
+    "electron-log": "^5.2.0",
+    "electron-updater": "^6.1.7"
   },
   "build": {
     "appId": "com.ryotaverse.ageagefx",
@@ -58,5 +60,13 @@
       "category": "Finance",
       "target": ["AppImage", "tar.gz"]
     }
+    ,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Ryotaverse69",
+        "repo": "FX-simulator-634"
+      }
+    ]
   }
 }

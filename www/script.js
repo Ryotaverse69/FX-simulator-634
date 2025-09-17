@@ -45,7 +45,48 @@
     // KPIs
     kpiPrice: document.getElementById('kpi-price'),
     kpiSwap: document.getElementById('kpi-swap'),
-    kpiLev: document.getElementById('kpi-lev')
+    kpiLev: document.getElementById('kpi-lev'),
+    // Compare tab
+    cmpBroker: document.getElementById('cmp_broker'),
+    cmpMonths: document.getElementById('cmp_months'),
+    cmpLeverage: document.getElementById('cmp_leverage'),
+    cmpCapital: document.getElementById('cmp_capital'),
+    cmpDeposit: document.getElementById('cmp_deposit'),
+    cmpMonthlyPriceChange: document.getElementById('cmp_monthlyPriceChange'),
+    cmpPair1: document.getElementById('cmp_pair1'),
+    cmpPair2: document.getElementById('cmp_pair2'),
+    cmpPair3: document.getElementById('cmp_pair3'),
+    cmpDir1: document.getElementById('cmp_dir1'),
+    cmpDir2: document.getElementById('cmp_dir2'),
+    cmpDir3: document.getElementById('cmp_dir3'),
+    cmpSwap1: document.getElementById('cmp_swap1'),
+    cmpSwap2: document.getElementById('cmp_swap2'),
+    cmpSwap3: document.getElementById('cmp_swap3'),
+    cmpSwapSrc1: document.getElementById('cmp_swapSrc1'),
+    cmpSwapSrc2: document.getElementById('cmp_swapSrc2'),
+    cmpSwapSrc3: document.getElementById('cmp_swapSrc3'),
+    cmpPrice1: document.getElementById('cmp_price1'),
+    cmpPrice2: document.getElementById('cmp_price2'),
+    cmpPrice3: document.getElementById('cmp_price3'),
+    cmpRun: document.getElementById('cmp_run'),
+    cmpReset: document.getElementById('cmp_reset'),
+    cmpSummaryBody: document.querySelector('#cmp-summary tbody'),
+    // Multi positions tab
+    multiForm: document.getElementById('multi-form'),
+    multiMonths: document.getElementById('multi_months'),
+    multiCapital: document.getElementById('multi_capital'),
+    multiDeposit: document.getElementById('multi_deposit'),
+    multiBroker: document.getElementById('multi_broker'),
+    multiAdd: document.getElementById('multi_add'),
+    multiFetch: document.getElementById('multi_fetch'),
+    multiRun: document.getElementById('multi_run'),
+    multiReset: document.getElementById('multi_reset'),
+    multiPositionsBody: document.getElementById('multi_positions_body'),
+    multiResultBody: document.querySelector('#multi-result-table tbody'),
+    multiNotional: document.getElementById('multi_notional'),
+    multiInitialLev: document.getElementById('multi_initial_lev'),
+    multiFinalLev: document.getElementById('multi_final_lev'),
+    multiFinalEquity: document.getElementById('multi_final_equity')
   };
 
   const PAIRS = {
@@ -57,8 +98,25 @@
     TRYJPY: { base: 'TRY', quote: 'JPY' }
   };
 
+  const PAIR_LABELS = {
+    USDJPY: 'ドル円 (USD/JPY)',
+    GBPJPY: 'ポンド円 (GBP/JPY)',
+    EURJPY: 'ユーロ円 (EUR/JPY)',
+    MXNJPY: 'メキシコペソ円 (MXN/JPY)',
+    ZARJPY: '南アフリカランド円 (ZAR/JPY)',
+    TRYJPY: 'トルコリラ円 (TRY/JPY)'
+  };
+  const LOT_SIZE = 10_000;
+  const DEFAULT_MULTI_ROWS = [
+    { pair: 'MXNJPY', direction: 'long', lots: 1, monthlyChange: 0, swap: 0 },
+    { pair: 'TRYJPY', direction: 'long', lots: 2, monthlyChange: 0, swap: 0 }
+  ];
+
   let chart = null;
+  let cmpChart = null;
+  let multiChart = null;
   let BROKERS = null; // loaded from brokers.json
+  let multiRowSeq = 0;
   const THEME_KEY = 'theme';
   const glowPlugin = {
     id: 'glow',
@@ -147,7 +205,7 @@
 
   function populateBrokerOptions() {
     if (!BROKERS) return;
-    const fills = [els.broker, els.levBroker].filter(Boolean);
+    const fills = [els.broker, els.levBroker, els.cmpBroker, els.multiBroker].filter(Boolean);
     for (const select of fills) {
       while (select.options.length > 1) select.remove(1);
       for (const key of Object.keys(BROKERS)) {
@@ -173,6 +231,11 @@
     if (els.swapSource) els.swapSource.textContent = text || '';
   }
 
+  function setCmpSwapSource(idx, text) {
+    const m = {1: els.cmpSwapSrc1, 2: els.cmpSwapSrc2, 3: els.cmpSwapSrc3};
+    if (m[idx]) m[idx].textContent = text || '';
+  }
+
   async function updateSwapFromBroker() {
     try {
       await loadBrokers();
@@ -192,6 +255,63 @@
       console.warn('Swap auto-fill error', e);
       setSwapSource('参照: 手動入力（エラー）');
     }
+  }
+
+  async function updateCmpSwapFromBroker() {
+    try {
+      await loadBrokers();
+      const brokerKey = els.cmpBroker?.value || '';
+      if (!brokerKey) {
+        setCmpSwapSource(1, '参照: 手動入力');
+        setCmpSwapSource(2, '参照: 手動入力');
+        setCmpSwapSource(3, '参照: 手動入力');
+        return;
+      }
+      const entries = [
+        { idx: 1, pair: els.cmpPair1?.value || 'USDJPY', dir: els.cmpDir1?.value || 'long', el: els.cmpSwap1 },
+        { idx: 2, pair: els.cmpPair2?.value || 'GBPJPY', dir: els.cmpDir2?.value || 'long', el: els.cmpSwap2 },
+        { idx: 3, pair: els.cmpPair3?.value || 'EURJPY', dir: els.cmpDir3?.value || 'long', el: els.cmpSwap3 }
+      ];
+      for (const e of entries) {
+        const val = lookupSwap(brokerKey, e.pair, e.dir);
+        if (val == null) {
+          setCmpSwapSource(e.idx, `参照: ${BROKERS[brokerKey]?.label || brokerKey} - 該当データなし`);
+        } else {
+          if (e.el) e.el.value = String(val);
+          setCmpSwapSource(e.idx, `参照: ${BROKERS[brokerKey]?.label || brokerKey}（${e.dir === 'short' ? '売り' : '買い'}）`);
+        }
+      }
+    } catch (e) {
+      console.warn('Compare swap auto-fill error', e);
+      setCmpSwapSource(1, '参照: 手動入力（エラー）');
+      setCmpSwapSource(2, '参照: 手動入力（エラー）');
+      setCmpSwapSource(3, '参照: 手動入力（エラー）');
+    }
+  }
+
+  async function applySwapFromBrokerToRow(row) {
+    if (!row) return;
+    const brokerKey = els.multiBroker?.value || '';
+    if (!brokerKey) return;
+    try {
+      await loadBrokers();
+      const pairSel = row.querySelector('.multi-pair');
+      const dirSel = row.querySelector('.multi-dir');
+      const swapInput = row.querySelector('.multi-swap');
+      if (!pairSel || !dirSel || !swapInput) return;
+      const val = lookupSwap(brokerKey, pairSel.value, dirSel.value);
+      if (val != null) swapInput.value = String(val);
+    } catch (e) {
+      console.warn('Multi swap auto-fill error', e);
+    }
+  }
+
+  async function updateMultiSwapFromBroker() {
+    const brokerKey = els.multiBroker?.value || '';
+    if (!brokerKey) return;
+    const rows = els.multiPositionsBody?.querySelectorAll('tr');
+    if (!rows || !rows.length) return;
+    await Promise.all(Array.from(rows, (row) => applySwapFromBrokerToRow(row)));
   }
 
   // Fetch helpers with timeout and provider fallback
@@ -279,6 +399,24 @@
       els.levPrice.value = String(price.toFixed(5));
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async function fetchComparePrices(pairs) {
+    // pairs: [{pair, idx}]
+    const previews = {1: els.cmpPrice1, 2: els.cmpPrice2, 3: els.cmpPrice3};
+    for (const p of pairs) { previews[p.idx]?.classList.add('skeleton'); previews[p.idx].textContent = '--'; }
+    try {
+      const results = await Promise.all(pairs.map(async (p) => {
+        const price = await fetchPrice(p.pair);
+        return { idx: p.idx, pair: p.pair, price };
+      }));
+      for (const r of results) {
+        if (previews[r.idx]) previews[r.idx].textContent = `${r.pair}: ${fmtNum(r.price, 5)}`;
+      }
+      return results;
+    } finally {
+      for (const p of pairs) { previews[p.idx]?.classList.remove('skeleton'); }
     }
   }
 
@@ -453,6 +591,478 @@
     }
   }
 
+  function renderCompareChart(labels, datasets) {
+    const canvas = document.getElementById('cmp-chart');
+    const ctx2d = canvas.getContext('2d');
+    const palette = [
+      { border: '#53d7ff', bg: 'rgba(83,215,255,0.30)' },
+      { border: '#7c4dff', bg: 'rgba(124,77,255,0.28)' },
+      { border: '#ff4d87', bg: 'rgba(255,77,135,0.22)' }
+    ];
+    const ds = datasets.map((d, i) => {
+      const grad = ctx2d.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, palette[i % palette.length].bg);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      return {
+        label: d.label,
+        data: d.series,
+        borderColor: palette[i % palette.length].border,
+        borderWidth: 2,
+        backgroundColor: grad,
+        fill: true,
+        tension: 0.2,
+        pointRadius: 2
+      };
+    });
+    if (!cmpChart) {
+      cmpChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels, datasets: ds },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#9aa0a6' } },
+            y: {
+              grid: { color: 'rgba(255,255,255,.06)' },
+              ticks: { color: '#9aa0a6', callback: (v) => new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(v) }
+            }
+          },
+          plugins: {
+            legend: { display: true, labels: { color: '#9aa0a6' } },
+            tooltip: { backgroundColor: 'rgba(18,22,33,.9)', borderColor: '#2a3750', borderWidth: 1, titleColor: '#e6e6e6', bodyColor: '#e6e6e6' }
+          }
+        }
+      });
+    } else {
+      cmpChart.data.labels = labels;
+      cmpChart.data.datasets = ds;
+      cmpChart.update();
+    }
+  }
+
+  function simulateSeriesSimple({ months, direction, capital0, deposit, leverage, swapPer10kPerDay, price0, priceChange }) {
+    const daysPerMonth = 30;
+    let equity = capital0;
+    let price = price0;
+    const series = [];
+    for (let m = 1; m <= months; m++) {
+      const units = (equity * leverage) / price;
+      const nextPrice = price * (1 + priceChange);
+      const pricePnl = direction * units * (nextPrice - price);
+      const swapPnl = (units / 10_000) * swapPer10kPerDay * daysPerMonth;
+      const nextEquity = equity + deposit + pricePnl + swapPnl;
+      series.push(nextEquity);
+      equity = nextEquity;
+      price = nextPrice;
+    }
+    return series;
+  }
+
+  function collectMultiPositions() {
+    if (!els.multiPositionsBody) return [];
+    const rows = Array.from(els.multiPositionsBody.querySelectorAll('tr'));
+    return rows.map((row, idx) => {
+      const pairSel = row.querySelector('.multi-pair');
+      const dirSel = row.querySelector('.multi-dir');
+      const lotsInput = row.querySelector('.multi-lots');
+      const priceInput = row.querySelector('.multi-price');
+      const changeInput = row.querySelector('.multi-change');
+      const swapInput = row.querySelector('.multi-swap');
+
+      const pair = (pairSel?.value && PAIR_LABELS[pairSel.value]) ? pairSel.value : 'USDJPY';
+      const direction = dirSel?.value === 'short' ? 'short' : 'long';
+      const lots = Number(lotsInput?.value);
+      const price = Number(priceInput?.value);
+      const changePct = Number(changeInput?.value);
+      const swapPer10k = Number(swapInput?.value);
+
+      const lotsVal = Number.isFinite(lots) ? Math.max(0, lots) : 0;
+      const priceVal = Number.isFinite(price) ? price : 0;
+      const changeVal = Number.isFinite(changePct) ? changePct : 0;
+      const swapVal = Number.isFinite(swapPer10k) ? swapPer10k : 0;
+      const units = lotsVal * LOT_SIZE;
+
+      return {
+        idx: idx + 1,
+        pair,
+        label: PAIR_LABELS[pair] || pair,
+        direction,
+        lots: lotsVal,
+        units,
+        price: priceVal,
+        monthlyChange: changeVal / 100,
+        swapPer10k: swapVal
+      };
+    });
+  }
+
+  function simulateMultiPortfolio() {
+    const months = clampInt(valNum(els.multiMonths, 24), 1, 360);
+    const capital0 = Math.max(0, valNum(els.multiCapital, 1_000_000));
+    const deposit = Math.max(0, valNum(els.multiDeposit, 0));
+
+    const allPositions = collectMultiPositions();
+    const activePositions = allPositions.filter(p => p.units > 0);
+    if (!activePositions.length) {
+      alert('ロット数が0のポジションは除外されます。少なくとも1件のポジションを設定してください。');
+      return;
+    }
+    const missingPrice = activePositions.find(p => !(p.price > 0));
+    if (missingPrice) {
+      alert(`${missingPrice.label} の現在価格を入力してください。`);
+      return;
+    }
+
+    const states = activePositions.map(p => ({
+      pair: p.pair,
+      label: p.label,
+      direction: p.direction,
+      sign: p.direction === 'short' ? -1 : 1,
+      units: p.units,
+      price: p.price,
+      startPrice: p.price,
+      monthlyChange: p.monthlyChange,
+      swapPer10k: p.swapPer10k
+    }));
+
+    const daysPerMonth = 30;
+    let equity = capital0;
+    const rows = [];
+    const labels = [];
+    const equitySeries = [];
+
+    for (let m = 1; m <= months; m++) {
+      let pricePnl = 0;
+      let swapPnl = 0;
+      for (const s of states) {
+        const nextPrice = s.price * (1 + s.monthlyChange);
+        pricePnl += s.sign * s.units * (nextPrice - s.price);
+        swapPnl += (s.units / LOT_SIZE) * s.swapPer10k * daysPerMonth;
+        s.price = nextPrice;
+      }
+      const nextEquity = equity + deposit + pricePnl + swapPnl;
+      const notional = states.reduce((sum, s) => sum + Math.abs(s.units * s.price), 0);
+      const leverage = nextEquity > 0 ? notional / nextEquity : NaN;
+
+      rows.push({ month: m, equity: nextEquity, notional, leverage, pricePnl, swapPnl, deposit });
+      labels.push(`${m}ヶ月`);
+      equitySeries.push(nextEquity);
+
+      equity = nextEquity;
+    }
+
+    renderMultiPortfolioTable(rows);
+    renderMultiPortfolioChart(labels, equitySeries);
+
+    const initialNotional = states.reduce((sum, s) => sum + Math.abs(s.units * s.startPrice), 0);
+    const finalNotional = states.reduce((sum, s) => sum + Math.abs(s.units * s.price), 0);
+    const finalEquity = rows.length ? rows[rows.length - 1].equity : capital0;
+    const finalLev = rows.length ? rows[rows.length - 1].leverage : (finalEquity > 0 ? finalNotional / finalEquity : NaN);
+    const initialLev = capital0 > 0 ? initialNotional / capital0 : NaN;
+
+    updateMultiSummary({
+      initialNotional,
+      initialLev,
+      finalNotional,
+      finalLev,
+      finalEquity
+    });
+  }
+
+  function renderMultiPortfolioTable(rows) {
+    const tbody = els.multiResultBody;
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.month}</td>
+        <td><strong>${fmtJPY(r.equity)}</strong></td>
+        <td>${fmtJPY(r.notional)}</td>
+        <td>${fmtX(r.leverage, 2)}</td>
+        <td class="${r.pricePnl >= 0 ? 'pos' : 'neg'}">${fmtJPY(r.pricePnl)}</td>
+        <td class="${r.swapPnl >= 0 ? 'pos' : 'neg'}">${fmtJPY(r.swapPnl)}</td>
+        <td>${fmtJPY(r.deposit)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function renderMultiPortfolioChart(labels, series) {
+    const canvas = document.getElementById('multi-chart');
+    if (!canvas) return;
+    const ctx2d = canvas.getContext('2d');
+    const gradient = ctx2d.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(255,77,135,0.28)');
+    gradient.addColorStop(1, 'rgba(255,77,135,0)');
+    if (!multiChart) {
+      Chart.register(glowPlugin);
+      multiChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: '複数ポジション資産',
+            data: series,
+            borderColor: '#ff4d87',
+            borderWidth: 2,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.2,
+            pointRadius: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,.06)' },
+              ticks: { color: '#9aa0a6' }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,.06)' },
+              ticks: {
+                color: '#9aa0a6',
+                callback: (v) => new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(v)
+              }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(18,22,33,.9)',
+              borderColor: '#2a3750',
+              borderWidth: 1,
+              titleColor: '#e6e6e6',
+              bodyColor: '#e6e6e6'
+            },
+            glow: { color: 'rgba(255,77,135,0.35)', blur: 12 }
+          }
+        }
+      });
+    } else {
+      multiChart.data.labels = labels;
+      multiChart.data.datasets[0].data = series;
+      multiChart.data.datasets[0].backgroundColor = gradient;
+      multiChart.update();
+    }
+  }
+
+  function updateMultiSummary(summary) {
+    if (!els.multiNotional || !els.multiInitialLev || !els.multiFinalLev || !els.multiFinalEquity) return;
+    if (!summary) {
+      els.multiNotional.textContent = '--';
+      els.multiInitialLev.textContent = '--';
+      els.multiFinalLev.textContent = '--';
+      els.multiFinalEquity.textContent = '--';
+      return;
+    }
+    els.multiNotional.textContent = fmtJPY(summary.initialNotional);
+    els.multiInitialLev.textContent = fmtX(summary.initialLev, 2);
+    els.multiFinalLev.textContent = fmtX(summary.finalLev, 2);
+    els.multiFinalEquity.textContent = fmtJPY(summary.finalEquity);
+  }
+
+  function pairOptionsMarkup(selected) {
+    const keys = Object.keys(PAIR_LABELS);
+    const fallback = keys[0];
+    const selectedKey = (selected && PAIR_LABELS[selected]) ? selected : fallback;
+    return keys.map(key => `<option value="${key}" ${key === selectedKey ? 'selected' : ''}>${PAIR_LABELS[key]}</option>`).join('');
+  }
+
+  function createMultiRow(data = {}) {
+    multiRowSeq += 1;
+    const tr = document.createElement('tr');
+    tr.dataset.rowId = String(multiRowSeq);
+
+    const pair = data.pair && PAIR_LABELS[data.pair] ? data.pair : 'USDJPY';
+    const direction = data.direction === 'short' ? 'short' : 'long';
+    const lots = Number.isFinite(data.lots) ? Math.max(0, data.lots) : 1;
+    const priceVal = (typeof data.price === 'number' && Number.isFinite(data.price)) ? String(data.price) : '';
+    const changeVal = Number.isFinite(data.monthlyChange) ? data.monthlyChange : 0;
+    const swapVal = Number.isFinite(data.swap) ? data.swap : 0;
+
+    const pairTd = document.createElement('td');
+    const pairSelect = document.createElement('select');
+    pairSelect.className = 'multi-pair';
+    pairSelect.innerHTML = pairOptionsMarkup(pair);
+    pairTd.appendChild(pairSelect);
+
+    const dirTd = document.createElement('td');
+    const dirSelect = document.createElement('select');
+    dirSelect.className = 'multi-dir';
+    dirSelect.innerHTML = `<option value="long" ${direction === 'long' ? 'selected' : ''}>買い</option><option value="short" ${direction === 'short' ? 'selected' : ''}>売り</option>`;
+    dirTd.appendChild(dirSelect);
+
+    const lotsTd = document.createElement('td');
+    const lotsInput = document.createElement('input');
+    lotsInput.type = 'number';
+    lotsInput.min = '0';
+    lotsInput.step = '0.01';
+    lotsInput.className = 'multi-lots';
+    lotsInput.value = String(lots);
+    lotsTd.appendChild(lotsInput);
+
+    const priceTd = document.createElement('td');
+    const priceInput = document.createElement('input');
+    priceInput.type = 'number';
+    priceInput.min = '0';
+    priceInput.step = '0.0001';
+    priceInput.placeholder = '取得可';
+    priceInput.className = 'multi-price';
+    priceInput.value = priceVal;
+    priceTd.appendChild(priceInput);
+
+    const changeTd = document.createElement('td');
+    const changeInput = document.createElement('input');
+    changeInput.type = 'number';
+    changeInput.step = '0.1';
+    changeInput.className = 'multi-change';
+    changeInput.value = String(changeVal);
+    changeTd.appendChild(changeInput);
+
+    const swapTd = document.createElement('td');
+    const swapInput = document.createElement('input');
+    swapInput.type = 'number';
+    swapInput.step = '0.1';
+    swapInput.className = 'multi-swap';
+    swapInput.value = String(swapVal);
+    swapTd.appendChild(swapInput);
+
+    const actionTd = document.createElement('td');
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn-secondary btn-compact multi-remove';
+    removeBtn.textContent = '削除';
+    actionTd.appendChild(removeBtn);
+
+    tr.appendChild(pairTd);
+    tr.appendChild(dirTd);
+    tr.appendChild(lotsTd);
+    tr.appendChild(priceTd);
+    tr.appendChild(changeTd);
+    tr.appendChild(swapTd);
+    tr.appendChild(actionTd);
+
+    pairSelect.addEventListener('change', () => { applySwapFromBrokerToRow(tr); });
+    dirSelect.addEventListener('change', () => { applySwapFromBrokerToRow(tr); });
+
+    return tr;
+  }
+
+  function addMultiRow(data = {}) {
+    if (!els.multiPositionsBody) return;
+    const row = createMultiRow(data);
+    els.multiPositionsBody.appendChild(row);
+    applySwapFromBrokerToRow(row);
+  }
+
+  async function fetchMultiPrices() {
+    if (!els.multiPositionsBody) return;
+    const rows = Array.from(els.multiPositionsBody.querySelectorAll('tr'));
+    if (!rows.length) {
+      alert('ポジションを追加してください。');
+      return;
+    }
+    const btn = els.multiFetch;
+    let prevLabel = '';
+    if (btn) {
+      prevLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '取得中...';
+    }
+    let hadError = false;
+    try {
+      for (const row of rows) {
+        const pairSel = row.querySelector('.multi-pair');
+        const priceInput = row.querySelector('.multi-price');
+        if (!pairSel || !priceInput) continue;
+        try {
+          const price = await fetchPrice(pairSel.value);
+          priceInput.value = String(price.toFixed(5));
+        } catch (e) {
+          console.warn('Multi price fetch error', e);
+          hadError = true;
+        }
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = prevLabel || '全ペアの現在価格を取得';
+      }
+    }
+    if (hadError) {
+      alert('一部の価格データの取得に失敗しました。通信状況をご確認ください。');
+    }
+  }
+
+  function resetMultiPortfolio() {
+    if (els.multiMonths) els.multiMonths.value = 24;
+    if (els.multiCapital) els.multiCapital.value = 1_000_000;
+    if (els.multiDeposit) els.multiDeposit.value = 50_000;
+    if (els.multiBroker) els.multiBroker.value = '';
+    if (els.multiPositionsBody) {
+      els.multiPositionsBody.innerHTML = '';
+      multiRowSeq = 0;
+      DEFAULT_MULTI_ROWS.forEach(cfg => addMultiRow(cfg));
+    }
+    if (els.multiResultBody) els.multiResultBody.innerHTML = '';
+    updateMultiSummary(null);
+    if (multiChart) {
+      multiChart.destroy();
+      multiChart = null;
+    }
+  }
+
+  async function compareSimulate() {
+    const months = clampInt(valNum(els.cmpMonths, 24), 1, 360);
+    const capital0 = Math.max(0, valNum(els.cmpCapital, 1_000_000));
+    const deposit = Math.max(0, valNum(els.cmpDeposit, 0));
+    const leverage = Math.max(1, valNum(els.cmpLeverage, 10));
+    const priceChange = valNum(els.cmpMonthlyPriceChange, 0) / 100;
+
+    const groups = [
+      { idx: 1, pair: els.cmpPair1?.value || 'USDJPY', dir: els.cmpDir1?.value || 'long', swapEl: els.cmpSwap1 },
+      { idx: 2, pair: els.cmpPair2?.value || 'GBPJPY', dir: els.cmpDir2?.value || 'long', swapEl: els.cmpSwap2 },
+      { idx: 3, pair: els.cmpPair3?.value || 'EURJPY', dir: els.cmpDir3?.value || 'long', swapEl: els.cmpSwap3 }
+    ];
+
+    // Fetch current prices
+    let prices;
+    try {
+      prices = await fetchComparePrices(groups.map(g => ({ idx: g.idx, pair: g.pair })));
+    } catch (e) {
+      alert('価格データの取得に失敗しました。通信環境をご確認ください。');
+      return;
+    }
+    const priceByIdx = Object.fromEntries(prices.map(r => [r.idx, r.price]));
+
+    // Build labels once
+    const labels = Array.from({ length: months }, (_, i) => `${i + 1}ヶ月`);
+    const datasets = [];
+    const summaryTbody = els.cmpSummaryBody;
+    if (summaryTbody) summaryTbody.innerHTML = '';
+
+    for (const g of groups) {
+      const direction = g.dir === 'short' ? -1 : 1;
+      const swapPer10kPerDay = valNum(g.swapEl, 0);
+      const price0 = priceByIdx[g.idx];
+      if (!(price0 > 0)) continue;
+      const series = simulateSeriesSimple({ months, direction, capital0, deposit, leverage, swapPer10kPerDay, price0, priceChange });
+      const label = `${g.pair}（${direction > 0 ? '買い' : '売り'}）`;
+      datasets.push({ label, series });
+      if (summaryTbody) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${g.pair}</td><td>${direction > 0 ? '買い' : '売り'}</td><td><strong>${fmtJPY(series[series.length - 1])}</strong></td>`;
+        summaryTbody.appendChild(tr);
+      }
+    }
+
+    renderCompareChart(labels, datasets);
+  }
+
   // Leverage simulator
   function computeEffectiveLeverage() {
     const equity = Math.max(0, valNum(els.levEquity, 0));
@@ -554,6 +1164,49 @@
   });
   els.levBroker?.addEventListener('change', () => { setLevMinUnitLabel(); computeEffectiveLeverage(); });
 
+  // Tab: multi positions
+  els.multiAdd?.addEventListener('click', () => addMultiRow());
+  els.multiFetch?.addEventListener('click', fetchMultiPrices);
+  els.multiRun?.addEventListener('click', simulateMultiPortfolio);
+  els.multiReset?.addEventListener('click', resetMultiPortfolio);
+  els.multiBroker?.addEventListener('change', updateMultiSwapFromBroker);
+  els.multiPositionsBody?.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.multi-remove');
+    if (!btn) return;
+    const row = btn.closest('tr');
+    if (row) row.remove();
+    if (els.multiPositionsBody && !els.multiPositionsBody.querySelector('tr')) addMultiRow();
+  });
+
+  // Tab: compare
+  els.cmpRun?.addEventListener('click', compareSimulate);
+  els.cmpReset?.addEventListener('click', () => {
+    els.cmpMonths.value = 24;
+    els.cmpLeverage.value = 10;
+    els.cmpCapital.value = 1_000_000;
+    els.cmpDeposit.value = 50_000;
+    els.cmpMonthlyPriceChange.value = 0;
+    els.cmpBroker.value = '';
+    els.cmpPair1.value = 'USDJPY'; els.cmpDir1.value = 'long'; els.cmpSwap1.value = '';
+    els.cmpPair2.value = 'GBPJPY'; els.cmpDir2.value = 'long'; els.cmpSwap2.value = '';
+    els.cmpPair3.value = 'EURJPY'; els.cmpDir3.value = 'long'; els.cmpSwap3.value = '';
+    setCmpSwapSource(1, '参照: 手動入力');
+    setCmpSwapSource(2, '参照: 手動入力');
+    setCmpSwapSource(3, '参照: 手動入力');
+    if (els.cmpPrice1) els.cmpPrice1.textContent = '--';
+    if (els.cmpPrice2) els.cmpPrice2.textContent = '--';
+    if (els.cmpPrice3) els.cmpPrice3.textContent = '--';
+    if (els.cmpSummaryBody) els.cmpSummaryBody.innerHTML = '';
+    if (cmpChart) { cmpChart.destroy(); cmpChart = null; }
+  });
+  els.cmpBroker?.addEventListener('change', updateCmpSwapFromBroker);
+  els.cmpPair1?.addEventListener('change', updateCmpSwapFromBroker);
+  els.cmpPair2?.addEventListener('change', updateCmpSwapFromBroker);
+  els.cmpPair3?.addEventListener('change', updateCmpSwapFromBroker);
+  els.cmpDir1?.addEventListener('change', updateCmpSwapFromBroker);
+  els.cmpDir2?.addEventListener('change', updateCmpSwapFromBroker);
+  els.cmpDir3?.addEventListener('change', updateCmpSwapFromBroker);
+
   // Tabs switching
   function activateTab(name) {
     const views = document.querySelectorAll('.tab-view');
@@ -566,6 +1219,7 @@
   });
 
   // Init
+  resetMultiPortfolio();
   // default: manual entry. Use 「取得」ボタンで反映。
   loadBrokers().then(populateBrokerOptions);
   // Theme init

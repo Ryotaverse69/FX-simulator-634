@@ -1,107 +1,180 @@
-// GMOクリック証券の通貨ペアデータ（2025年1月時点の参考値）
-const currencyPairs = [
+// 証券会社情報
+const brokers = {
+  gmo: {
+    name: 'GMOクリック証券',
+    subtitle: 'GMOクリック証券（FXネオ）対応',
+    swapUrl: 'https://www.click-sec.com/corp/guide/fxneo/swplog/'
+  },
+  minnano: {
+    name: 'みんなのFX',
+    subtitle: 'みんなのFX（トレイダーズ証券）対応',
+    swapUrl: 'https://min-fx.jp/market/swap/'
+  },
+  lightfx: {
+    name: 'LIGHT FX',
+    subtitle: 'LIGHT FX（トレイダーズ証券）対応',
+    swapUrl: 'https://lightfx.jp/service/swappoint/'
+  }
+};
+
+// 各証券会社のスワップポイントデータ（参考値 - 最新は公式サイトで確認）
+// GMO: TRY/USD/EUR/CHFは1万通貨、MXN/ZAR/HUF/CZKは10万通貨単位
+// みんなのFX/LIGHT FX: TRY/USD/EUR/CHFは1万通貨、MXN/ZAR/HUF/CZKは10万通貨単位
+const brokerSwapData = {
+  gmo: {
+    TRY_JPY: { swapBuy: 30, swapSell: -60, unit: 10000 },
+    MXN_JPY: { swapBuy: 140, swapSell: -240, unit: 100000 },
+    ZAR_JPY: { swapBuy: 120, swapSell: -220, unit: 100000 },
+    HUF_JPY: { swapBuy: 60, swapSell: -110, unit: 100000 },
+    USD_JPY: { swapBuy: 162, swapSell: -162, unit: 10000 },
+    EUR_JPY: { swapBuy: 120, swapSell: -120, unit: 10000 },
+    CHF_JPY: { swapBuy: 45, swapSell: -75, unit: 10000 },
+    CZK_JPY: { swapBuy: 90, swapSell: -140, unit: 100000 }
+  },
+  minnano: {
+    // 2026年1月2日時点の実データ（1Lot = 1万通貨 or 10万通貨）
+    TRY_JPY: { swapBuy: 29.5, swapSell: -29.5, unit: 10000 },
+    MXN_JPY: { swapBuy: 141, swapSell: -141, unit: 100000 },
+    ZAR_JPY: { swapBuy: 121, swapSell: -121, unit: 100000 },
+    HUF_JPY: { swapBuy: 60, swapSell: -60, unit: 100000 },
+    USD_JPY: { swapBuy: 155, swapSell: -155, unit: 10000 },
+    EUR_JPY: { swapBuy: 115, swapSell: -115, unit: 10000 },
+    CHF_JPY: { swapBuy: 50, swapSell: -50, unit: 10000 },
+    CZK_JPY: { swapBuy: 100, swapSell: -100, unit: 100000 }
+  },
+  lightfx: {
+    // LIGHT FXはみんなのFXと同等〜やや高めのスワップ
+    TRY_JPY: { swapBuy: 31, swapSell: -31, unit: 10000 },
+    MXN_JPY: { swapBuy: 166, swapSell: -166, unit: 100000 },
+    ZAR_JPY: { swapBuy: 166, swapSell: -166, unit: 100000 },
+    HUF_JPY: { swapBuy: 65, swapSell: -65, unit: 100000 },
+    USD_JPY: { swapBuy: 160, swapSell: -160, unit: 10000 },
+    EUR_JPY: { swapBuy: 120, swapSell: -120, unit: 10000 },
+    CHF_JPY: { swapBuy: 55, swapSell: -55, unit: 10000 },
+    CZK_JPY: { swapBuy: 105, swapSell: -105, unit: 100000 }
+  }
+};
+
+// 現在選択中の証券会社
+let currentBroker = 'gmo';
+
+// 通貨ペアの基本データ（レート、ボラティリティは共通）
+const baseCurrencyPairs = [
   {
     id: 'TRY_JPY',
     name: 'TRY/JPY',
     fullName: 'トルコリラ/円',
     rate: 4.45,
-    swapBuy: 42,      // 買いスワップ（円/1万通貨/日）
-    swapSell: -72,    // 売りスワップ
-    volatility: 25,   // 年率ボラティリティ(%)
-    unit: 10000,      // 取引単位
-    marginRate: 0.04, // 必要証拠金率（4%＝レバ25倍）
-    enabled: true,
-    position: 'long'
+    volatility: 25,
+    marginRate: 0.04,
+    defaultEnabled: true,
+    defaultPosition: 'long'
   },
   {
     id: 'MXN_JPY',
     name: 'MXN/JPY',
     fullName: 'メキシコペソ/円',
     rate: 7.50,
-    swapBuy: 26,
-    swapSell: -46,
     volatility: 15,
-    unit: 100000,
     marginRate: 0.04,
-    enabled: true,
-    position: 'long'
+    defaultEnabled: true,
+    defaultPosition: 'long'
   },
   {
     id: 'ZAR_JPY',
     name: 'ZAR/JPY',
     fullName: '南アフリカランド/円',
     rate: 8.20,
-    swapBuy: 18,
-    swapSell: -38,
     volatility: 18,
-    unit: 100000,
     marginRate: 0.04,
-    enabled: true,
-    position: 'long'
+    defaultEnabled: true,
+    defaultPosition: 'long'
   },
   {
     id: 'HUF_JPY',
     name: 'HUF/JPY',
     fullName: 'ハンガリーフォリント/円',
     rate: 0.39,
-    swapBuy: 22,      // 10万通貨あたり
-    swapSell: -42,
     volatility: 12,
-    unit: 100000,
     marginRate: 0.04,
-    enabled: true,
-    position: 'long'
+    defaultEnabled: true,
+    defaultPosition: 'long'
+  },
+  {
+    id: 'CZK_JPY',
+    name: 'CZK/JPY',
+    fullName: 'チェココルナ/円',
+    rate: 6.50,
+    volatility: 10,
+    marginRate: 0.04,
+    defaultEnabled: false,
+    defaultPosition: 'long'
   },
   {
     id: 'USD_JPY',
     name: 'USD/JPY',
     fullName: '米ドル/円',
     rate: 157.50,
-    swapBuy: 205,
-    swapSell: -235,
     volatility: 10,
-    unit: 10000,
     marginRate: 0.04,
-    enabled: false,
-    position: 'short'
+    defaultEnabled: false,
+    defaultPosition: 'short'
   },
   {
     id: 'EUR_JPY',
     name: 'EUR/JPY',
     fullName: 'ユーロ/円',
     rate: 164.00,
-    swapBuy: 145,
-    swapSell: -175,
     volatility: 9,
-    unit: 10000,
     marginRate: 0.04,
-    enabled: false,
-    position: 'short'
+    defaultEnabled: false,
+    defaultPosition: 'short'
   },
   {
     id: 'CHF_JPY',
     name: 'CHF/JPY',
     fullName: 'スイスフラン/円',
     rate: 175.00,
-    swapBuy: 50,
-    swapSell: -80,
     volatility: 8,
-    unit: 10000,
     marginRate: 0.04,
-    enabled: false,
-    position: 'long'
+    defaultEnabled: false,
+    defaultPosition: 'long'
   }
 ];
 
+// 実際に使用する通貨ペアデータ（証券会社のスワップデータを反映）
+let currencyPairs = [];
+
+function initializeCurrencyPairs() {
+  const swapData = brokerSwapData[currentBroker];
+  currencyPairs = baseCurrencyPairs
+    .filter(pair => {
+      const data = swapData[pair.id];
+      return data && data.available !== false;
+    })
+    .map(pair => {
+      const data = swapData[pair.id];
+      return {
+        ...pair,
+        swapBuy: data.swapBuy,
+        swapSell: data.swapSell,
+        unit: data.unit,
+        enabled: pair.defaultEnabled,
+        position: pair.defaultPosition
+      };
+    });
+}
+
 // デフォルトの相関係数マトリクス（概算値）
 const defaultCorrelations = {
-  'TRY_JPY': { 'TRY_JPY': 1.0, 'MXN_JPY': 0.6, 'ZAR_JPY': 0.65, 'HUF_JPY': 0.5, 'USD_JPY': 0.3, 'EUR_JPY': 0.35, 'CHF_JPY': 0.2 },
-  'MXN_JPY': { 'TRY_JPY': 0.6, 'MXN_JPY': 1.0, 'ZAR_JPY': 0.7, 'HUF_JPY': 0.55, 'USD_JPY': 0.5, 'EUR_JPY': 0.45, 'CHF_JPY': 0.3 },
-  'ZAR_JPY': { 'TRY_JPY': 0.65, 'MXN_JPY': 0.7, 'ZAR_JPY': 1.0, 'HUF_JPY': 0.5, 'USD_JPY': 0.45, 'EUR_JPY': 0.4, 'CHF_JPY': 0.25 },
-  'HUF_JPY': { 'TRY_JPY': 0.5, 'MXN_JPY': 0.55, 'ZAR_JPY': 0.5, 'HUF_JPY': 1.0, 'USD_JPY': 0.4, 'EUR_JPY': 0.7, 'CHF_JPY': 0.6 },
-  'USD_JPY': { 'TRY_JPY': 0.3, 'MXN_JPY': 0.5, 'ZAR_JPY': 0.45, 'HUF_JPY': 0.4, 'USD_JPY': 1.0, 'EUR_JPY': 0.85, 'CHF_JPY': 0.75 },
-  'EUR_JPY': { 'TRY_JPY': 0.35, 'MXN_JPY': 0.45, 'ZAR_JPY': 0.4, 'HUF_JPY': 0.7, 'USD_JPY': 0.85, 'EUR_JPY': 1.0, 'CHF_JPY': 0.8 },
-  'CHF_JPY': { 'TRY_JPY': 0.2, 'MXN_JPY': 0.3, 'ZAR_JPY': 0.25, 'HUF_JPY': 0.6, 'USD_JPY': 0.75, 'EUR_JPY': 0.8, 'CHF_JPY': 1.0 }
+  'TRY_JPY': { 'TRY_JPY': 1.0, 'MXN_JPY': 0.6, 'ZAR_JPY': 0.65, 'HUF_JPY': 0.5, 'CZK_JPY': 0.45, 'USD_JPY': 0.3, 'EUR_JPY': 0.35, 'CHF_JPY': 0.2 },
+  'MXN_JPY': { 'TRY_JPY': 0.6, 'MXN_JPY': 1.0, 'ZAR_JPY': 0.7, 'HUF_JPY': 0.55, 'CZK_JPY': 0.5, 'USD_JPY': 0.5, 'EUR_JPY': 0.45, 'CHF_JPY': 0.3 },
+  'ZAR_JPY': { 'TRY_JPY': 0.65, 'MXN_JPY': 0.7, 'ZAR_JPY': 1.0, 'HUF_JPY': 0.5, 'CZK_JPY': 0.45, 'USD_JPY': 0.45, 'EUR_JPY': 0.4, 'CHF_JPY': 0.25 },
+  'HUF_JPY': { 'TRY_JPY': 0.5, 'MXN_JPY': 0.55, 'ZAR_JPY': 0.5, 'HUF_JPY': 1.0, 'CZK_JPY': 0.75, 'USD_JPY': 0.4, 'EUR_JPY': 0.7, 'CHF_JPY': 0.6 },
+  'CZK_JPY': { 'TRY_JPY': 0.45, 'MXN_JPY': 0.5, 'ZAR_JPY': 0.45, 'HUF_JPY': 0.75, 'CZK_JPY': 1.0, 'USD_JPY': 0.45, 'EUR_JPY': 0.72, 'CHF_JPY': 0.65 },
+  'USD_JPY': { 'TRY_JPY': 0.3, 'MXN_JPY': 0.5, 'ZAR_JPY': 0.45, 'HUF_JPY': 0.4, 'CZK_JPY': 0.45, 'USD_JPY': 1.0, 'EUR_JPY': 0.85, 'CHF_JPY': 0.75 },
+  'EUR_JPY': { 'TRY_JPY': 0.35, 'MXN_JPY': 0.45, 'ZAR_JPY': 0.4, 'HUF_JPY': 0.7, 'CZK_JPY': 0.72, 'USD_JPY': 0.85, 'EUR_JPY': 1.0, 'CHF_JPY': 0.8 },
+  'CHF_JPY': { 'TRY_JPY': 0.2, 'MXN_JPY': 0.3, 'ZAR_JPY': 0.25, 'HUF_JPY': 0.6, 'CZK_JPY': 0.65, 'USD_JPY': 0.75, 'EUR_JPY': 0.8, 'CHF_JPY': 1.0 }
 };
 
 let correlations = JSON.parse(JSON.stringify(defaultCorrelations));
@@ -110,10 +183,48 @@ let frontierChart = null;
 
 // DOM要素
 document.addEventListener('DOMContentLoaded', () => {
+  initializeCurrencyPairs();
   initializeCurrencyTable();
   initializeCorrelationMatrix();
   setupEventListeners();
+  setupBrokerButtons();
 });
+
+// 証券会社選択ボタンのセットアップ
+function setupBrokerButtons() {
+  const buttons = document.querySelectorAll('.broker-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const broker = btn.dataset.broker;
+      if (broker === currentBroker) return;
+
+      // ボタンのアクティブ状態を更新
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // 証券会社を変更
+      currentBroker = broker;
+
+      // サブタイトルを更新
+      document.getElementById('brokerSubtitle').textContent =
+        brokers[broker].subtitle + ' - リスク・リターン最適化シミュレーター';
+
+      // 公式スワップリンクを更新
+      const brokerLink = document.getElementById('brokerLink');
+      if (brokerLink) {
+        brokerLink.href = brokers[broker].swapUrl;
+      }
+
+      // 通貨ペアデータを再初期化
+      initializeCurrencyPairs();
+      initializeCurrencyTable();
+      initializeCorrelationMatrix();
+
+      // 結果セクションを非表示
+      document.getElementById('resultSection').style.display = 'none';
+    });
+  });
+}
 
 function initializeCurrencyTable() {
   const tbody = document.getElementById('currencyBody');

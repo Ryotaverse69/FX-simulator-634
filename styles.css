@@ -361,3 +361,210 @@ footer {
   border-radius: var(--radius);
   font-size: 1.1rem;
 }
+
+/* Broker Selection */
+.broker-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.broker-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.broker-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.broker-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.broker-btn.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+}
+
+.broker-btn .broker-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.broker-btn .broker-feature {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.broker-btn.active .broker-feature {
+  opacity: 0.9;
+}
+
+/* GMO specific color */
+.broker-btn[data-broker="gmo"].active {
+  background: linear-gradient(135deg, #0066cc, #004499);
+}
+
+/* みんなのFX specific color */
+.broker-btn[data-broker="minnano"].active {
+  background: linear-gradient(135deg, #e60012, #b3000e);
+}
+
+/* LIGHT FX specific color */
+.broker-btn[data-broker="lightfx"].active {
+  background: linear-gradient(135deg, #ff6600, #cc5200);
+}
+
+/* Swap info bar */
+.swap-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--radius);
+  border: 1px solid #f59e0b;
+}
+
+.swap-update-date {
+  font-size: 0.85rem;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.swap-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.swap-link:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Sharpe Ratio Explanation */
+.sharpe-explanation {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #0ea5e9;
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.sharpe-explanation h4 {
+  margin: 0 0 12px 0;
+  color: #0369a1;
+  font-size: 1.1rem;
+}
+
+.sharpe-explanation p {
+  margin: 0 0 12px 0;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.sharpe-formula {
+  background: white;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.sharpe-formula code {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 0.95rem;
+  color: #0369a1;
+}
+
+.sharpe-guide {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.guide-item {
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 6px;
+  color: white;
+}
+
+.guide-item .guide-value {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.guide-item .guide-label {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.guide-item.poor {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.guide-item.fair {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.guide-item.good {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.guide-item.excellent {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.sharpe-note {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  cursor: help;
+  margin-left: 4px;
+}
+
+@media (max-width: 600px) {
+  .sharpe-guide {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

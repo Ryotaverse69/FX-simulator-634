@@ -11,10 +11,29 @@
   <div class="container">
     <header>
       <h1>多通貨スワップポートフォリオ最適化</h1>
-      <p class="subtitle">GMOクリック証券対応 - リスク・リターン最適化シミュレーター</p>
+      <p class="subtitle" id="brokerSubtitle">GMOクリック証券対応 - リスク・リターン最適化シミュレーター</p>
     </header>
 
     <main>
+      <!-- 証券会社選択 -->
+      <section class="card broker-section">
+        <h2>証券会社選択</h2>
+        <div class="broker-buttons">
+          <button class="broker-btn active" data-broker="gmo">
+            <span class="broker-name">GMOクリック証券</span>
+            <span class="broker-feature">FXネオ</span>
+          </button>
+          <button class="broker-btn" data-broker="minnano">
+            <span class="broker-name">みんなのFX</span>
+            <span class="broker-feature">トレイダーズ証券</span>
+          </button>
+          <button class="broker-btn" data-broker="lightfx">
+            <span class="broker-name">LIGHT FX</span>
+            <span class="broker-feature">トレイダーズ証券</span>
+          </button>
+        </div>
+      </section>
+
       <!-- 投資条件入力 -->
       <section class="card">
         <h2>投資条件</h2>
@@ -31,6 +50,12 @@
       <!-- 通貨ペア設定 -->
       <section class="card">
         <h2>通貨ペア設定</h2>
+        <div class="swap-info-bar">
+          <span class="swap-update-date">参考値（最新のスワップは公式サイトで確認）</span>
+          <a id="brokerLink" href="https://www.click-sec.com/corp/guide/fxneo/swplog/" target="_blank" class="swap-link">
+            📊 公式スワップポイント確認
+          </a>
+        </div>
         <div class="table-responsive">
           <table id="currencyTable">
             <thead>
@@ -102,14 +127,48 @@
             <span class="label">ポートフォリオリスク（年率）</span>
             <span class="value" id="portfolioRisk">-</span>
           </div>
-          <div class="result-item">
-            <span class="label">シャープレシオ</span>
+          <div class="result-item has-tooltip">
+            <span class="label">シャープレシオ <span class="info-icon" title="詳細を見る">?</span></span>
             <span class="value" id="sharpeRatio">-</span>
           </div>
           <div class="result-item">
             <span class="label">年間スワップ収益（税前）</span>
             <span class="value" id="annualSwap">-</span>
           </div>
+        </div>
+
+        <!-- シャープレシオ説明 -->
+        <div class="sharpe-explanation">
+          <h4>📊 シャープレシオとは？</h4>
+          <p>
+            <strong>シャープレシオ</strong>は、リスク1単位あたりのリターンを示す指標です。
+            値が高いほど「効率的な投資」と言えます。
+          </p>
+          <div class="sharpe-formula">
+            <code>シャープレシオ = (期待リターン − 無リスク金利) ÷ リスク（標準偏差）</code>
+          </div>
+          <div class="sharpe-guide">
+            <div class="guide-item poor">
+              <span class="guide-value">&lt; 0.5</span>
+              <span class="guide-label">低い</span>
+            </div>
+            <div class="guide-item fair">
+              <span class="guide-value">0.5〜1.0</span>
+              <span class="guide-label">普通</span>
+            </div>
+            <div class="guide-item good">
+              <span class="guide-value">1.0〜2.0</span>
+              <span class="guide-label">良い</span>
+            </div>
+            <div class="guide-item excellent">
+              <span class="guide-value">&gt; 2.0</span>
+              <span class="guide-label">優秀</span>
+            </div>
+          </div>
+          <p class="sharpe-note">
+            ※ 一般的に1.0以上であれば良好、2.0以上は非常に優秀とされています。
+            ただし、高すぎる値は計算条件の見直しが必要な場合もあります。
+          </p>
         </div>
 
         <!-- 最適ポジション -->

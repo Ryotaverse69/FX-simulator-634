@@ -409,6 +409,16 @@ footer {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
+.swap-data-badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted, #94a3b8);
+  background: var(--border, #e2e8f0);
+  padding: 2px 8px;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+
 .broker-buttons {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -467,6 +477,107 @@ footer {
 /* LIGHT FX specific color */
 .broker-btn[data-broker="lightfx"].active {
   background: linear-gradient(135deg, #ff6600, #cc5200);
+}
+
+/* GMO外貨ex specific color */
+.broker-btn[data-broker="gaikaex"].active {
+  background: linear-gradient(135deg, #00a0e9, #0077b3);
+}
+
+/* DMM FX specific color */
+.broker-btn[data-broker="dmm"].active {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+/* SBI FXトレード specific color */
+.broker-btn[data-broker="sbi"].active {
+  background: linear-gradient(135deg, #00693e, #004d2e);
+}
+
+/* セントラル短資FX specific color */
+.broker-btn[data-broker="central"].active {
+  background: linear-gradient(135deg, #8b0000, #660000);
+}
+
+/* 取扱なし通貨ペア */
+.pair-unavailable {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.pair-unavailable td {
+  color: var(--text-muted, #94a3b8);
+}
+
+.unavailable-badge {
+  display: inline-block;
+  background: #ef4444;
+  color: white;
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* 折りたたみセクション */
+.collapsible-section {
+  border: none;
+}
+
+.collapsible-section summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsible-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.collapsible-header h2 {
+  margin: 0;
+}
+
+.collapsible-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+  background: var(--border, #e2e8f0);
+  padding: 2px 10px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.collapsible-section[open] .collapsible-hint {
+  display: none;
+}
+
+.collapsible-header::after {
+  content: '▶';
+  font-size: 0.7rem;
+  color: var(--text-muted, #94a3b8);
+  transition: transform 0.2s;
+  margin-left: auto;
+}
+
+.collapsible-section[open] .collapsible-header::after {
+  transform: rotate(90deg);
+}
+
+.collapsible-body {
+  margin-top: 12px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Swap info bar */

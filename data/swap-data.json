@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "lastUpdated": "2026-02-08T00:00:00+09:00",
+    "source": "manual",
+    "version": 1
+  },
+  "brokers": {
+    "gmo": {
+      "TRY_JPY": { "swapBuy": 12, "swapSell": -12, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 16, "swapSell": -16, "unit": 10000 },
+      "ZAR_JPY": { "swapBuy": 15, "swapSell": -15, "unit": 10000 },
+      "HUF_JPY": { "swapBuy": 2, "swapSell": -2, "unit": 10000 },
+      "USD_JPY": { "swapBuy": 140, "swapSell": -140, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 105, "swapSell": -105, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -12, "swapSell": 12, "unit": 10000 },
+      "CZK_JPY": { "swapBuy": 12, "swapSell": -12, "unit": 10000 }
+    },
+    "minnano": {
+      "TRY_JPY": { "swapBuy": 29.5, "swapSell": -29.5, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 141, "swapSell": -141, "unit": 100000 },
+      "ZAR_JPY": { "swapBuy": 121, "swapSell": -121, "unit": 100000 },
+      "HUF_JPY": { "swapBuy": 60, "swapSell": -60, "unit": 100000 },
+      "USD_JPY": { "swapBuy": 155, "swapSell": -155, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 55, "swapSell": -55, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -47, "swapSell": 47, "unit": 10000 },
+      "CZK_JPY": { "swapBuy": 12, "swapSell": -12, "unit": 10000 }
+    },
+    "lightfx": {
+      "TRY_JPY": { "swapBuy": 29.5, "swapSell": -29.5, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 141, "swapSell": -141, "unit": 100000 },
+      "ZAR_JPY": { "swapBuy": 121, "swapSell": -121, "unit": 100000 },
+      "HUF_JPY": { "swapBuy": 60, "swapSell": -60, "unit": 100000 },
+      "USD_JPY": { "swapBuy": 155, "swapSell": -155, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 55, "swapSell": -55, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -47, "swapSell": 47, "unit": 10000 },
+      "CZK_JPY": { "swapBuy": 12, "swapSell": -12, "unit": 10000 }
+    },
+    "gaikaex": {
+      "TRY_JPY": { "swapBuy": 28, "swapSell": -28, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 14.5, "swapSell": -14.5, "unit": 10000 },
+      "ZAR_JPY": { "swapBuy": 12.6, "swapSell": -12.6, "unit": 10000 },
+      "HUF_JPY": null,
+      "USD_JPY": { "swapBuy": 149, "swapSell": -149, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 101, "swapSell": -101, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -5, "swapSell": 5, "unit": 10000 },
+      "CZK_JPY": null
+    },
+    "dmm": {
+      "TRY_JPY": { "swapBuy": 28, "swapSell": -31, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 12, "swapSell": -15, "unit": 10000 },
+      "ZAR_JPY": { "swapBuy": 12, "swapSell": -15, "unit": 10000 },
+      "HUF_JPY": null,
+      "USD_JPY": { "swapBuy": 135, "swapSell": -138, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 107, "swapSell": -110, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -9, "swapSell": 6, "unit": 10000 },
+      "CZK_JPY": null
+    },
+    "sbi": {
+      "TRY_JPY": { "swapBuy": 26, "swapSell": -24, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 12.1, "swapSell": -14, "unit": 10000 },
+      "ZAR_JPY": { "swapBuy": 10.4, "swapSell": -9.6, "unit": 10000 },
+      "HUF_JPY": null,
+      "USD_JPY": { "swapBuy": 131, "swapSell": -129, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 103, "swapSell": -104, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -34, "swapSell": 24, "unit": 10000 },
+      "CZK_JPY": null
+    },
+    "central": {
+      "TRY_JPY": { "swapBuy": 29, "swapSell": -29, "unit": 10000 },
+      "MXN_JPY": { "swapBuy": 12.5, "swapSell": -14.5, "unit": 10000 },
+      "ZAR_JPY": { "swapBuy": 12.9, "swapSell": -17.8, "unit": 10000 },
+      "HUF_JPY": { "swapBuy": 1, "swapSell": -1, "unit": 10000 },
+      "USD_JPY": { "swapBuy": 153, "swapSell": -252, "unit": 10000 },
+      "EUR_JPY": { "swapBuy": 98, "swapSell": -103, "unit": 10000 },
+      "CHF_JPY": { "swapBuy": -36, "swapSell": 26, "unit": 10000 },
+      "CZK_JPY": null
+    }
+  }
+}

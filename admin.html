@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX Swap Data Admin</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+    "Noto Sans JP", sans-serif;
+  background: #f4f5f7;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+/* ---------- Password overlay ---------- */
+#auth-overlay {
+  position: fixed; inset: 0;
+  background: #f4f5f7;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+#auth-overlay.hidden { display: none; }
+
+#auth-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.1);
+  padding: 40px 36px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+}
+#auth-box h2 { margin-bottom: 8px; font-size: 1.2rem; }
+#auth-box p { color: #666; font-size: .85rem; margin-bottom: 20px; }
+#auth-box input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+#auth-box input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+#auth-box button {
+  width: 100%;
+  padding: 10px;
+  background: #1e293b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+#auth-box button:hover { background: #334155; }
+#auth-error { color: #dc2626; font-size: .8rem; margin-top: 8px; display: none; }
+
+/* ---------- Header ---------- */
+header {
+  background: #1e293b;
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+header h1 { font-size: 1.1rem; font-weight: 600; white-space: nowrap; }
+#meta-info {
+  font-size: .78rem;
+  color: #94a3b8;
+  display: flex; gap: 18px; flex-wrap: wrap;
+}
+#meta-info span { white-space: nowrap; }
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  padding: 14px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.toolbar button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s;
+}
+.btn-download { background: #2563eb; color: #fff; }
+.btn-download:hover { background: #1d4ed8; }
+.btn-github  { background: #24292f; color: #fff; }
+.btn-github:hover { background: #3b3f45; }
+.toolbar .spacer { flex: 1; }
+.toolbar .status-msg {
+  font-size: .8rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: none;
+}
+.toolbar .status-msg.success { display: inline-block; background: #dcfce7; color: #166534; }
+.toolbar .status-msg.error   { display: inline-block; background: #fee2e2; color: #991b1b; }
+
+/* ---------- GitHub modal ---------- */
+#gh-modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none; align-items: center; justify-content: center;
+  z-index: 5000;
+}
+#gh-modal-bg.visible { display: flex; }
+#gh-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.2);
+  padding: 28px 32px;
+  max-width: 480px;
+  width: 92%;
+}
+#gh-modal h3 { font-size: 1rem; margin-bottom: 16px; }
+#gh-modal label { display: block; font-size: .8rem; color: #475569; margin-bottom: 4px; margin-top: 12px; }
+#gh-modal input, #gh-modal textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: .88rem;
+  font-family: inherit;
+}
+#gh-modal input:focus, #gh-modal textarea:focus { outline: none; border-color: #2563eb; }
+#gh-modal .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+#gh-modal .modal-actions button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: .85rem;
+  cursor: pointer;
+}
+#gh-commit-btn { background: #24292f; color: #fff; }
+#gh-commit-btn:hover { background: #3b3f45; }
+#gh-cancel-btn { background: #e2e8f0; color: #1e293b; }
+#gh-cancel-btn:hover { background: #cbd5e1; }
+#gh-status { font-size: .8rem; margin-top: 12px; }
+
+/* ---------- Table wrapper ---------- */
+.table-wrap {
+  overflow-x: auto;
+  padding: 16px 24px 40px;
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  font-size: .82rem;
+}
+thead th {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  padding: 10px 8px;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 2px solid #cbd5e1;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 30;
+  background: #e2e8f0;
+}
+tbody td {
+  padding: 6px 6px;
+  vertical-align: top;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  font-weight: 600;
+  text-align: left;
+  padding-left: 12px;
+  white-space: nowrap;
+  min-width: 100px;
+}
+tbody tr:nth-child(odd) td { background: #fff; }
+tbody tr:nth-child(even) td { background: #f8fafc; }
+tbody tr:nth-child(odd) td:first-child { background: #f1f5f9; }
+tbody tr:nth-child(even) td:first-child { background: #e8ecf1; }
+
+/* ---------- Cell inputs ---------- */
+.cell-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 140px;
+}
+.cell-group .inputs {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.cell-group .inputs label {
+  font-size: .7rem;
+  color: #64748b;
+  width: 28px;
+  text-align: right;
+}
+.cell-group input[type="number"] {
+  width: 64px;
+  padding: 4px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: .82rem;
+  text-align: right;
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+.cell-group input[type="number"]:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.12); }
+.cell-group .unit-label { font-size: .68rem; color: #94a3b8; }
+.cell-group .na-row {
+  display: flex; align-items: center; gap: 4px;
+  font-size: .72rem; color: #94a3b8;
+}
+.cell-group .na-row input[type="checkbox"] { accent-color: #64748b; }
+.cell-group.disabled input[type="number"] { background: #f1f5f9; color: #94a3b8; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 700px) {
+  header { padding: 10px 14px; }
+  .toolbar { padding: 10px 14px; }
+  .table-wrap { padding: 10px 8px 30px; }
+  .cell-group { min-width: 120px; }
+  .cell-group input[type="number"] { width: 56px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Password Gate ===== -->
+<div id="auth-overlay">
+  <div id="auth-box">
+    <h2>FX Swap Data Admin</h2>
+    <p>管理画面にアクセスするにはパスワードを入力してください</p>
+    <input type="password" id="auth-pw" placeholder="パスワード" autofocus>
+    <button id="auth-submit">ログイン</button>
+    <div id="auth-error">パスワードが正しくありません</div>
+  </div>
+</div>
+
+<!-- ===== Main UI (hidden until auth) ===== -->
+<div id="main-app" style="display:none;">
+  <header>
+    <h1>FX Swap Data Admin</h1>
+    <div id="meta-info">
+      <span>最終更新: <span id="m-updated">--</span></span>
+      <span>ソース: <span id="m-source">--</span></span>
+      <span>バージョン: <span id="m-version">--</span></span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn-download" id="btn-download">JSON ダウンロード</button>
+    <button class="btn-github" id="btn-github">GitHub 直接コミット</button>
+    <div class="spacer"></div>
+    <span class="status-msg" id="status-msg"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="swap-table">
+      <thead><tr id="thead-row"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== GitHub Commit Modal ===== -->
+<div id="gh-modal-bg">
+  <div id="gh-modal">
+    <h3>GitHub に直接コミット</h3>
+    <label for="gh-repo">リポジトリ (owner/repo)</label>
+    <input id="gh-repo" type="text" placeholder="owner/repo">
+    <label for="gh-token">Personal Access Token</label>
+    <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx">
+    <label for="gh-msg">コミットメッセージ</label>
+    <textarea id="gh-msg" rows="2"></textarea>
+    <div id="gh-status"></div>
+    <div class="modal-actions">
+      <button id="gh-cancel-btn">キャンセル</button>
+      <button id="gh-commit-btn">コミット</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Constants
+   ============================================================ */
+const PASSWORD_HASH = "c7acca8ab6f48ead82c9d54e65c1a11ef7c15c3ee2a9fb8061d053265565efcf";
+
+const PAIRS = [
+  "TRY_JPY", "MXN_JPY", "ZAR_JPY", "HUF_JPY",
+  "USD_JPY", "EUR_JPY", "CHF_JPY", "CZK_JPY"
+];
+
+const BROKERS = ["gmo", "minnano", "lightfx", "gaikaex", "dmm", "sbi", "central"];
+
+const BROKER_NAMES = {
+  gmo: "GMOクリック",
+  minnano: "みんなのFX",
+  lightfx: "LIGHT FX",
+  gaikaex: "GMO外貨ex",
+  dmm: "DMM FX",
+  sbi: "SBI FXトレード",
+  central: "セントラル短資"
+};
+
+function pairDisplay(key) {
+  return key.replace("_", "/");
+}
+
+/* ============================================================
+   Authentication
+   ============================================================ */
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+(function initAuth() {
+  const overlay = document.getElementById("auth-overlay");
+  const pwInput = document.getElementById("auth-pw");
+  const errEl   = document.getElementById("auth-error");
+
+  async function tryLogin() {
+    const hash = await sha256(pwInput.value);
+    if (hash === PASSWORD_HASH) {
+      overlay.classList.add("hidden");
+      document.getElementById("main-app").style.display = "";
+      loadData();
+    } else {
+      errEl.style.display = "block";
+      pwInput.value = "";
+      pwInput.focus();
+    }
+  }
+
+  document.getElementById("auth-submit").addEventListener("click", tryLogin);
+  pwInput.addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
+})();
+
+/* ============================================================
+   Data loading
+   ============================================================ */
+let swapData = null; // holds the full JSON object
+
+async function loadData() {
+  try {
+    const res = await fetch("./data/swap-data.json");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    swapData = await res.json();
+  } catch (err) {
+    // Build empty skeleton so the editor still works
+    swapData = {
+      meta: { lastUpdated: new Date().toISOString(), source: "manual", version: 1 },
+      brokers: {}
+    };
+    BROKERS.forEach(b => {
+      swapData.brokers[b] = {};
+      PAIRS.forEach(p => {
+        swapData.brokers[b][p] = { swapBuy: 0, swapSell: 0, unit: 10000 };
+      });
+    });
+    showStatus("swap-data.json を取得できませんでした。空データで開始します。", true);
+  }
+  renderMeta();
+  renderTable();
+}
+
+/* ============================================================
+   Meta info
+   ============================================================ */
+function renderMeta() {
+  const m = swapData.meta || {};
+  document.getElementById("m-updated").textContent = m.lastUpdated || "--";
+  document.getElementById("m-source").textContent  = m.source || "--";
+  document.getElementById("m-version").textContent  = m.version ?? "--";
+}
+
+/* ============================================================
+   Table rendering
+   ============================================================ */
+function renderTable() {
+  // Header
+  const headRow = document.getElementById("thead-row");
+  headRow.innerHTML = "";
+  const thPair = document.createElement("th");
+  thPair.textContent = "通貨ペア";
+  headRow.appendChild(thPair);
+  BROKERS.forEach(b => {
+    const th = document.createElement("th");
+    th.textContent = BROKER_NAMES[b];
+    headRow.appendChild(th);
+  });
+
+  // Body
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  PAIRS.forEach(pair => {
+    const tr = document.createElement("tr");
+    const tdPair = document.createElement("td");
+    tdPair.textContent = pairDisplay(pair);
+    tr.appendChild(tdPair);
+
+    BROKERS.forEach(broker => {
+      const td = document.createElement("td");
+      td.appendChild(buildCell(broker, pair));
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+function buildCell(broker, pair) {
+  const entry = (swapData.brokers[broker] || {})[pair];
+  const isNull = entry === null || entry === undefined;
+  const buy  = isNull ? "" : entry.swapBuy;
+  const sell = isNull ? "" : entry.swapSell;
+  const unit = isNull ? 10000 : entry.unit;
+
+  const wrap = document.createElement("div");
+  wrap.className = "cell-group" + (isNull ? " disabled" : "");
+  wrap.dataset.broker = broker;
+  wrap.dataset.pair   = pair;
+
+  // Buy row
+  const rowBuy = document.createElement("div");
+  rowBuy.className = "inputs";
+  const lblB = document.createElement("label");
+  lblB.textContent = "Buy";
+  const inpB = document.createElement("input");
+  inpB.type = "number"; inpB.step = "any";
+  inpB.value = buy; inpB.disabled = isNull;
+  inpB.dataset.field = "swapBuy";
+  rowBuy.append(lblB, inpB);
+
+  // Sell row
+  const rowSell = document.createElement("div");
+  rowSell.className = "inputs";
+  const lblS = document.createElement("label");
+  lblS.textContent = "Sell";
+  const inpS = document.createElement("input");
+  inpS.type = "number"; inpS.step = "any";
+  inpS.value = sell; inpS.disabled = isNull;
+  inpS.dataset.field = "swapSell";
+  rowSell.append(lblS, inpS);
+
+  // Unit (read-only display)
+  const unitLabel = document.createElement("div");
+  unitLabel.className = "unit-label";
+  unitLabel.textContent = "単位: " + unit.toLocaleString();
+
+  // NA checkbox
+  const naRow = document.createElement("div");
+  naRow.className = "na-row";
+  const chk = document.createElement("input");
+  chk.type = "checkbox";
+  chk.checked = isNull;
+  const chkLabel = document.createElement("span");
+  chkLabel.textContent = "取扱なし";
+  naRow.append(chk, chkLabel);
+
+  chk.addEventListener("change", () => {
+    const disabled = chk.checked;
+    inpB.disabled = disabled;
+    inpS.disabled = disabled;
+    wrap.classList.toggle("disabled", disabled);
+  });
+
+  wrap.append(rowBuy, rowSell, unitLabel, naRow);
+  return wrap;
+}
+
+/* ============================================================
+   Collect table data back into JSON
+   ============================================================ */
+function collectData() {
+  const out = JSON.parse(JSON.stringify(swapData)); // deep clone
+  // Update timestamp
+  out.meta.lastUpdated = new Date().toISOString();
+
+  document.querySelectorAll(".cell-group").forEach(cell => {
+    const broker = cell.dataset.broker;
+    const pair   = cell.dataset.pair;
+    const naChk  = cell.querySelector('.na-row input[type="checkbox"]');
+    if (naChk.checked) {
+      out.brokers[broker][pair] = null;
+      return;
+    }
+    const buyInp  = cell.querySelector('[data-field="swapBuy"]');
+    const sellInp = cell.querySelector('[data-field="swapSell"]');
+    const existing = (swapData.brokers[broker] || {})[pair];
+    const unit = (existing && existing.unit) ? existing.unit : 10000;
+    out.brokers[broker][pair] = {
+      swapBuy:  buyInp.value === "" ? 0 : parseFloat(buyInp.value),
+      swapSell: sellInp.value === "" ? 0 : parseFloat(sellInp.value),
+      unit: unit
+    };
+  });
+  return out;
+}
+
+function toJSON(data) {
+  return JSON.stringify(data, null, 2) + "\n";
+}
+
+/* ============================================================
+   Download
+   ============================================================ */
+document.getElementById("btn-download").addEventListener("click", () => {
+  const data = collectData();
+  const blob = new Blob([toJSON(data)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "swap-data.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showStatus("swap-data.json をダウンロードしました", false);
+});
+
+/* ============================================================
+   GitHub Commit Modal
+   ============================================================ */
+const ghModalBg = document.getElementById("gh-modal-bg");
+
+document.getElementById("btn-github").addEventListener("click", () => {
+  // Pre-fill defaults
+  const repoInput = document.getElementById("gh-repo");
+  if (!repoInput.value) {
+    // Try to guess from page URL (GitHub Pages pattern: owner.github.io/repo)
+    try {
+      const host = location.hostname;
+      const path = location.pathname.split("/").filter(Boolean);
+      if (host.endsWith(".github.io")) {
+        const owner = host.replace(".github.io", "");
+        const repo = path[0] || "";
+        if (repo) repoInput.value = owner + "/" + repo;
+      }
+    } catch (_) { /* ignore */ }
+  }
+  const msgInput = document.getElementById("gh-msg");
+  if (!msgInput.value) {
+    const d = new Date();
+    const ds = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+    msgInput.value = "chore(data): manual swap update " + ds;
+  }
+  document.getElementById("gh-status").textContent = "";
+  ghModalBg.classList.add("visible");
+});
+
+document.getElementById("gh-cancel-btn").addEventListener("click", () => {
+  ghModalBg.classList.remove("visible");
+});
+ghModalBg.addEventListener("click", e => {
+  if (e.target === ghModalBg) ghModalBg.classList.remove("visible");
+});
+
+document.getElementById("gh-commit-btn").addEventListener("click", async () => {
+  const repo  = document.getElementById("gh-repo").value.trim();
+  const token = document.getElementById("gh-token").value.trim();
+  const msg   = document.getElementById("gh-msg").value.trim();
+  const stEl  = document.getElementById("gh-status");
+
+  if (!repo || !token || !msg) {
+    stEl.textContent = "全ての項目を入力してください";
+    stEl.style.color = "#dc2626";
+    return;
+  }
+
+  stEl.textContent = "コミット中...";
+  stEl.style.color = "#2563eb";
+
+  const filePath = "data/swap-data.json";
+  const apiUrl = "https://api.github.com/repos/" + repo + "/contents/" + filePath;
+  const data = collectData();
+  const content = btoa(unescape(encodeURIComponent(toJSON(data))));
+
+  try {
+    // Get current file SHA
+    const getRes = await fetch(apiUrl, {
+      headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
+    });
+    let sha = undefined;
+    if (getRes.ok) {
+      const curr = await getRes.json();
+      sha = curr.sha;
+    }
+
+    // PUT to update / create
+    const body = { message: msg, content: content };
+    if (sha) body.sha = sha;
+
+    const putRes = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      throw new Error(err.message || ("HTTP " + putRes.status));
+    }
+
+    stEl.textContent = "コミット完了!";
+    stEl.style.color = "#16a34a";
+    showStatus("GitHub にコミットしました", false);
+  } catch (err) {
+    stEl.textContent = "エラー: " + err.message;
+    stEl.style.color = "#dc2626";
+  }
+});
+
+/* ============================================================
+   Status message helper
+   ============================================================ */
+function showStatus(msg, isError) {
+  const el = document.getElementById("status-msg");
+  el.textContent = msg;
+  el.className = "status-msg " + (isError ? "error" : "success");
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.className = "status-msg"; }, 5000);
+}
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 // Service Worker — FXスワップ投資シミュレーター
 // ============================================================
 
-const CACHE_NAME = 'fxswap-v1';
+const CACHE_NAME = 'fxswap-v2';
 
 // キャッシュ対象の静的ファイル
 const STATIC_ASSETS = [
@@ -16,6 +16,7 @@ const STATIC_ASSETS = [
   './js/notifications.js',
   './manifest.json',
   './correlations.json',
+  './data/swap-data.json',
 ];
 
 // 外部CDN（Chart.js）
@@ -50,6 +51,12 @@ self.addEventListener('activate', (event) => {
 // フェッチ時: キャッシュ戦略
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // swap-data.json はネットワークファースト（常に最新を取得）
+  if (url.pathname.endsWith('/swap-data.json')) {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
 
   // API呼び出し（為替レート等）はネットワークファースト
   if (url.hostname !== location.hostname && !CDN_ASSETS.some(cdn => event.request.url.startsWith(cdn))) {

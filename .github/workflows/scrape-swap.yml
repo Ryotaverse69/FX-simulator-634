@@ -1,0 +1,39 @@
+name: Scrape Swap Points
+
+on:
+  schedule:
+    # 毎朝6時JST（UTC 21:00）、月-金のみ
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch: # 手動実行用
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: scripts
+
+      - name: Run scraper
+        run: node scrape-swap.mjs
+        working-directory: scripts
+        timeout-minutes: 5
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/swap-data.json
+          git diff --cached --quiet || git commit -m "chore(data): update swap points $(date +%Y-%m-%d)"
+          git push

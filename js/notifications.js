@@ -40,12 +40,14 @@ async function getSwapRateData(broker) {
   // 将来はここを fetch('/api/swap-rates/' + broker) に差し替え
   const data = brokerSwapData[broker];
   if (!data) return [];
-  return Object.entries(data).map(([pair, info]) => ({
-    currencyPair: pair,
-    swapBuy: info.swapBuy,
-    swapSell: info.swapSell,
-    unit: info.unit,
-  }));
+  return Object.entries(data)
+    .filter(([, info]) => info !== null)
+    .map(([pair, info]) => ({
+      currencyPair: pair,
+      swapBuy: info.swapBuy,
+      swapSell: info.swapSell,
+      unit: info.unit,
+    }));
 }
 
 async function fetchSwapRates() {
@@ -103,6 +105,7 @@ function simulateSwapRateChange() {
   brokers.forEach(broker => {
     Object.keys(brokerSwapData[broker]).forEach(pair => {
       const data = brokerSwapData[broker][pair];
+      if (data === null) return; // 取扱なし通貨ペアをスキップ
       const change = (Math.random() - 0.4) * 6; // -2.4 〜 +3.6
       data.swapBuy = Math.round((data.swapBuy + change) * 10) / 10;
       data.swapSell = Math.round((data.swapSell - change) * 10) / 10;

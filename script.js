@@ -47,12 +47,44 @@ const brokerInfo = {
     affiliateUrl: '', // A8.net等で取得後に設定
     features: ['業界最高水準スワップ', '約定力99.9%', 'LIGHT ペア対応'],
     recommended: '高金利通貨に強い'
+  },
+  gaikaex: {
+    name: 'GMO外貨ex',
+    subtitle: 'GMO外貨ex（GMO外貨）対応',
+    swapUrl: 'https://www.gaikaex.com/gaikaex/spread-swap/',
+    affiliateUrl: '',
+    features: ['1,000通貨取引OK', '豊富な注文方法', 'バイナリーオプション対応'],
+    recommended: '少額取引から始めたい方に'
+  },
+  dmm: {
+    name: 'DMM FX',
+    subtitle: 'DMM FX（DMM.com証券）対応',
+    swapUrl: 'https://fx.dmm.com/fx/service/swap/',
+    affiliateUrl: '',
+    features: ['口座数国内No.1', '24時間サポート', '取引ツール充実'],
+    recommended: '初心者・サポート重視の方に'
+  },
+  sbi: {
+    name: 'SBI FXトレード',
+    subtitle: 'SBI FXトレード対応',
+    swapUrl: 'https://www.sbifxt.co.jp/service/swap.html',
+    affiliateUrl: '',
+    features: ['1通貨取引OK', 'SBIグループの信頼性', '積立FX対応'],
+    recommended: '超少額・積立投資に'
+  },
+  central: {
+    name: 'セントラル短資FX',
+    subtitle: 'セントラル短資FX対応',
+    swapUrl: 'https://www.central-tanshifx.com/market/swappoint/',
+    affiliateUrl: '',
+    features: ['100年の歴史', '高金利通貨に強い', 'パーソナルレコード'],
+    recommended: '高金利通貨スワップ派に'
   }
 };
 
-// 各証券会社のスワップポイントデータ（参考値 - 最新は公式サイトで確認）
+// 各証券会社のスワップポイントデータ（フォールバック値 - swap-data.jsonで上書きされる）
 // 注意：エクセルデータに基づき、全通貨ペアで1万通貨（10000）単位で記載
-const brokerSwapData = {
+let brokerSwapData = {
   gmo: {
     // 2024年12月時点の実データ（エクセルより）
     // 全て1万通貨（10000）単位でスワップポイントを記載
@@ -86,6 +118,50 @@ const brokerSwapData = {
     EUR_JPY: { swapBuy: 55, swapSell: -55, unit: 10000 },
     CHF_JPY: { swapBuy: -47, swapSell: 47, unit: 10000 },
     CZK_JPY: { swapBuy: 12, swapSell: -12, unit: 10000 }
+  },
+  gaikaex: {
+    // GMO外貨ex — HUF_JPY, CZK_JPY は取扱なし
+    TRY_JPY: { swapBuy: 28, swapSell: -28, unit: 10000 },
+    MXN_JPY: { swapBuy: 14.5, swapSell: -14.5, unit: 10000 },
+    ZAR_JPY: { swapBuy: 12.6, swapSell: -12.6, unit: 10000 },
+    HUF_JPY: null,
+    USD_JPY: { swapBuy: 149, swapSell: -149, unit: 10000 },
+    EUR_JPY: { swapBuy: 101, swapSell: -101, unit: 10000 },
+    CHF_JPY: { swapBuy: -5, swapSell: 5, unit: 10000 },
+    CZK_JPY: null
+  },
+  dmm: {
+    // DMM FX — HUF_JPY, CZK_JPY は取扱なし
+    TRY_JPY: { swapBuy: 28, swapSell: -31, unit: 10000 },
+    MXN_JPY: { swapBuy: 12, swapSell: -15, unit: 10000 },
+    ZAR_JPY: { swapBuy: 12, swapSell: -15, unit: 10000 },
+    HUF_JPY: null,
+    USD_JPY: { swapBuy: 135, swapSell: -138, unit: 10000 },
+    EUR_JPY: { swapBuy: 107, swapSell: -110, unit: 10000 },
+    CHF_JPY: { swapBuy: -9, swapSell: 6, unit: 10000 },
+    CZK_JPY: null
+  },
+  sbi: {
+    // SBI FXトレード — HUF_JPY, CZK_JPY は取扱なし
+    TRY_JPY: { swapBuy: 26, swapSell: -24, unit: 10000 },
+    MXN_JPY: { swapBuy: 12.1, swapSell: -14, unit: 10000 },
+    ZAR_JPY: { swapBuy: 10.4, swapSell: -9.6, unit: 10000 },
+    HUF_JPY: null,
+    USD_JPY: { swapBuy: 131, swapSell: -129, unit: 10000 },
+    EUR_JPY: { swapBuy: 103, swapSell: -104, unit: 10000 },
+    CHF_JPY: { swapBuy: -34, swapSell: 24, unit: 10000 },
+    CZK_JPY: null
+  },
+  central: {
+    // セントラル短資FX — CZK_JPY は取扱なし
+    TRY_JPY: { swapBuy: 29, swapSell: -29, unit: 10000 },
+    MXN_JPY: { swapBuy: 12.5, swapSell: -14.5, unit: 10000 },
+    ZAR_JPY: { swapBuy: 12.9, swapSell: -17.8, unit: 10000 },
+    HUF_JPY: { swapBuy: 1, swapSell: -1, unit: 10000 },
+    USD_JPY: { swapBuy: 153, swapSell: -252, unit: 10000 },
+    EUR_JPY: { swapBuy: 98, swapSell: -103, unit: 10000 },
+    CHF_JPY: { swapBuy: -36, swapSell: 26, unit: 10000 },
+    CZK_JPY: null
   }
 };
 
@@ -235,17 +311,29 @@ function initializeCurrencyPairsForBroker(broker) {
 
   currencyPairs = baseCurrencyPairs.map(pair => {
     const data = swapData[pair.id];
-    if (data) {
+    // null = この証券会社では取扱なし
+    if (data === null || data === undefined) {
       return {
         ...pair,
-        swapBuy: data.swapBuy,
-        swapSell: data.swapSell,
-        unit: data.unit,
-        enabled: pair.defaultEnabled,
+        swapBuy: 0,
+        swapSell: 0,
+        unit: 10000,
+        enabled: false,
+        unavailable: true,
         position: pair.defaultPosition,
         maxPosition: pair.maxPosition || Infinity
       };
     }
+    return {
+      ...pair,
+      swapBuy: data.swapBuy,
+      swapSell: data.swapSell,
+      unit: data.unit,
+      enabled: pair.defaultEnabled,
+      unavailable: false,
+      position: pair.defaultPosition,
+      maxPosition: pair.maxPosition || Infinity
+    };
   });
 }
 
@@ -268,14 +356,47 @@ let frontierChart = null;
 // 為替レートAPI設定
 const EXCHANGE_RATE_API = 'https://api.exchangerate-api.com/v4/latest/JPY';
 
+// swap-data.json から最新スワップデータを取得
+async function loadSwapData() {
+  try {
+    const res = await fetch('./data/swap-data.json?t=' + Date.now());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    if (json.brokers) {
+      Object.keys(json.brokers).forEach(broker => {
+        brokerSwapData[broker] = json.brokers[broker];
+      });
+    }
+    console.log('スワップデータ更新:', json.meta?.lastUpdated || 'unknown');
+    return json.meta || {};
+  } catch (e) {
+    console.warn('swap-data.json の読み込みに失敗。ハードコード値を使用:', e.message);
+    return null;
+  }
+}
+
 // 初期化処理
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // ハードコード値で即座に初期表示
   initializeCurrencyPairsForBroker(currentBroker);
   initializeCurrencyTable();
   initializeCorrelationMatrix();
   setupEventListeners();
   updateBrokerCta(currentBroker);
   renderBrokerComparison();
+
+  // バックグラウンドで最新データを取得し、成功したら再描画
+  const meta = await loadSwapData();
+  if (meta) {
+    initializeCurrencyPairsForBroker(currentBroker);
+    initializeCurrencyTable();
+    updateCompoundSwapsForBroker(currentBroker);
+    renderBrokerComparison();
+    const dateEl = document.getElementById('swapDataUpdatedAt');
+    if (dateEl && meta.lastUpdated) {
+      dateEl.textContent = `スワップデータ: ${new Date(meta.lastUpdated).toLocaleDateString('ja-JP')} 更新`;
+    }
+  }
 });
 
 // 証券会社切り替え関数
@@ -302,7 +423,46 @@ function switchBroker(broker) {
   // アフィリエイトCTA更新
   updateBrokerCta(broker);
 
+  // 複利シミュレーターのスワップ値を更新
+  updateCompoundSwapsForBroker(broker);
+
   console.log(`証券会社を ${info.name} に切り替えました`);
+}
+
+// 複利シミュレーターのスワップ値を証券会社に合わせて更新
+function updateCompoundSwapsForBroker(broker) {
+  const swapData = brokerSwapData[broker];
+  if (!swapData) return;
+
+  COMPOUND_CURRENCIES.forEach(c => {
+    const swapInput = document.getElementById(`compound_${c.id}_swap`);
+    if (!swapInput) return;
+
+    const data = swapData[c.id];
+    if (data === null || data === undefined) {
+      // 取扱なし → 無効化
+      swapInput.value = 0;
+      swapInput.disabled = true;
+      const checkbox = document.getElementById(`compound_${c.id}_enabled`);
+      if (checkbox) {
+        checkbox.checked = false;
+        checkbox.disabled = true;
+        const inputs = document.querySelectorAll(`tr[data-currency="${c.id}"] input:not([type="checkbox"])`);
+        inputs.forEach(inp => inp.disabled = true);
+      }
+      const ratioInput = document.getElementById(`compound_${c.id}_ratio`);
+      if (ratioInput) ratioInput.value = 0;
+    } else {
+      // 万通貨あたりに正規化（unitが100000の場合は÷10）
+      const normalizedSwap = data.swapBuy * (10000 / data.unit);
+      swapInput.value = Math.round(normalizedSwap * 10) / 10;
+      swapInput.disabled = !document.getElementById(`compound_${c.id}_enabled`)?.checked;
+      const checkbox = document.getElementById(`compound_${c.id}_enabled`);
+      if (checkbox) checkbox.disabled = false;
+    }
+  });
+  // 配分バリデーション再実行
+  if (typeof validateRatioSum === 'function') validateRatioSum();
 }
 
 // 証券会社CTAリンク更新
@@ -331,7 +491,7 @@ function renderBrokerComparison() {
   container.innerHTML = Object.entries(brokerInfo).map(([key, info]) => {
     const swapData = brokerSwapData[key];
     const topSwaps = Object.entries(swapData)
-      .filter(([, v]) => v.swapBuy > 0)
+      .filter(([, v]) => v !== null && v.swapBuy > 0)
       .sort((a, b) => {
         const aPerUnit = a[1].swapBuy / (a[1].unit / 10000);
         const bPerUnit = b[1].swapBuy / (b[1].unit / 10000);
@@ -374,6 +534,23 @@ function initializeCurrencyTable() {
 
   currencyPairs.forEach(pair => {
     const row = document.createElement('tr');
+
+    // 取扱なしの通貨ペアはdisabled表示
+    if (pair.unavailable) {
+      row.classList.add('pair-unavailable');
+      row.innerHTML = `
+        <td><input type="checkbox" class="currency-enabled" data-id="${pair.id}" disabled></td>
+        <td><strong>${pair.name}</strong><br><small>${pair.fullName}</small><br><span class="unavailable-badge">取扱なし</span></td>
+        <td><select class="position-select" data-id="${pair.id}" disabled><option>—</option></select></td>
+        <td>${pair.rate.toFixed(3)}</td>
+        <td><input type="number" class="swap-input" data-id="${pair.id}" value="—" disabled></td>
+        <td class="annual-rate" data-id="${pair.id}">—</td>
+        <td>${pair.volatility.toFixed(2)}%</td>
+        <td>—</td>
+      `;
+      tbody.appendChild(row);
+      return;
+    }
 
     // スワップポイント（ポジションによって切り替え）
     const swapValue = pair.position === 'long' ? pair.swapBuy : Math.abs(pair.swapSell);
@@ -2935,6 +3112,9 @@ function setupCompoundEventListeners() {
 
   // 通貨設定UIを動的生成
   renderCompoundCurrencyConfig();
+
+  // 初期ブローカーのスワップ値を複利シミュに反映
+  updateCompoundSwapsForBroker(currentBroker);
 
   // ストレステスト チェックボックス → 下落率列の表示切替 + 暴落耐性オプション
   const stressCheckbox = document.getElementById('compoundStressTestEnabled');

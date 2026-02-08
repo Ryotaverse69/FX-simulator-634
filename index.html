@@ -43,7 +43,7 @@
 
       <!-- 証券会社選択 -->
       <section class="card broker-section">
-        <h2>証券会社選択</h2>
+        <h2>証券会社選択 <span id="swapDataUpdatedAt" class="swap-data-badge"></span></h2>
         <div class="broker-buttons">
           <button class="broker-btn active" data-broker="gmo">
             <span class="broker-name">GMOクリック証券</span>
@@ -56,6 +56,22 @@
           <button class="broker-btn" data-broker="lightfx">
             <span class="broker-name">LIGHT FX</span>
             <span class="broker-feature">トレイダーズ証券</span>
+          </button>
+          <button class="broker-btn" data-broker="gaikaex">
+            <span class="broker-name">GMO外貨ex</span>
+            <span class="broker-feature">GMO外貨</span>
+          </button>
+          <button class="broker-btn" data-broker="dmm">
+            <span class="broker-name">DMM FX</span>
+            <span class="broker-feature">DMM.com証券</span>
+          </button>
+          <button class="broker-btn" data-broker="sbi">
+            <span class="broker-name">SBI FXトレード</span>
+            <span class="broker-feature">SBIグループ</span>
+          </button>
+          <button class="broker-btn" data-broker="central">
+            <span class="broker-name">セントラル短資FX</span>
+            <span class="broker-feature">セントラル短資</span>
           </button>
         </div>
         <div class="broker-cta" id="brokerCta">
@@ -117,14 +133,21 @@
 
       <!-- 相関係数マトリクス -->
       <section class="card">
-        <h2>相関係数マトリクス</h2>
-        <p class="hint">通貨ペア間の相関係数（-1〜1）。<strong>実データから計算</strong>（2024/12/20-2025/12/19の日次データより算出、年率換算）。対角線は自動で1になります。</p>
-        <div class="table-responsive">
-          <table id="correlationMatrix">
-            <!-- JavaScriptで動的に生成 -->
-          </table>
-        </div>
-        <button id="resetCorrelation" class="btn-secondary">デフォルト値にリセット</button>
+        <details class="collapsible-section" id="correlationDetails">
+          <summary class="collapsible-header">
+            <h2>相関係数マトリクス</h2>
+            <span class="collapsible-hint">クリックで展開</span>
+          </summary>
+          <div class="collapsible-body">
+            <p class="hint">通貨ペア間の相関係数（-1〜1）。<strong>実データから計算</strong>（2024/12/20-2025/12/19の日次データより算出、年率換算）。対角線は自動で1になります。</p>
+            <div class="table-responsive">
+              <table id="correlationMatrix">
+                <!-- JavaScriptで動的に生成 -->
+              </table>
+            </div>
+            <button id="resetCorrelation" class="btn-secondary">デフォルト値にリセット</button>
+          </div>
+        </details>
       </section>
 
       <!-- 最適化設定 -->
@@ -597,6 +620,10 @@
                 <option value="gmo">GMOクリック証券</option>
                 <option value="minnano">みんなのFX</option>
                 <option value="lightfx">LIGHT FX</option>
+                <option value="gaikaex">GMO外貨ex</option>
+                <option value="dmm">DMM FX</option>
+                <option value="sbi">SBI FXトレード</option>
+                <option value="central">セントラル短資FX</option>
               </select>
             </div>
             <div class="input-group">
@@ -830,6 +857,10 @@
                 <option value="gmo">GMOクリック証券</option>
                 <option value="minnano">みんなのFX</option>
                 <option value="lightfx">LIGHT FX</option>
+                <option value="gaikaex">GMO外貨ex</option>
+                <option value="dmm">DMM FX</option>
+                <option value="sbi">SBI FXトレード</option>
+                <option value="central">セントラル短資FX</option>
               </select>
             </div>
             <div class="input-group">

@@ -3,7 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>多通貨スワップポートフォリオ最適化シミュレーター</title>
+  <title>FXスワップ投資シミュレーター</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FXスワップ">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- OGP -->
+  <meta name="description" content="FXスワップポイントのポートフォリオ最適化・複利シミュレーション・ポジション管理ができる無料ツール">
+  <meta property="og:title" content="FXスワップ投資シミュレーター">
+  <meta property="og:description" content="多通貨スワップ最適化・複利運用シミュレーション・ポートフォリオ管理">
+  <meta property="og:type" content="website">
+
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -15,6 +30,17 @@
     </header>
 
     <main>
+      <!-- タブ切り替えUI -->
+      <div class="tab-container">
+        <button class="tab-btn active" data-tab="optimizer">最適化シミュレーター</button>
+        <button class="tab-btn" data-tab="compound">複利シミュレーター</button>
+        <button class="tab-btn" data-tab="portfolio">ポートフォリオ管理</button>
+        <button class="tab-btn" data-tab="notification">スワップ通知</button>
+      </div>
+
+      <!-- 最適化シミュレーターセクション -->
+      <div id="optimizerSection" class="tab-content active">
+
       <!-- 証券会社選択 -->
       <section class="card broker-section">
         <h2>証券会社選択</h2>
@@ -32,6 +58,10 @@
             <span class="broker-feature">トレイダーズ証券</span>
           </button>
         </div>
+        <div class="broker-cta" id="brokerCta">
+          <p class="broker-cta-text" id="brokerCtaText"></p>
+          <a id="brokerCtaLink" href="#" target="_blank" rel="noopener" class="broker-cta-btn" style="display:none;">無料で口座開設</a>
+        </div>
       </section>
 
       <!-- 投資条件入力 -->
@@ -39,11 +69,16 @@
         <h2>投資条件</h2>
         <div class="input-group">
           <label for="totalCapital">投資資金（円）</label>
-          <input type="number" id="totalCapital" value="1000000" min="0" step="10000">
+          <input type="number" id="totalCapital" value="500000" min="0" step="10000">
         </div>
         <div class="input-group">
           <label for="targetLeverage">目標レバレッジ</label>
-          <input type="number" id="targetLeverage" value="3" min="1" max="25" step="0.1">
+          <input type="number" id="targetLeverage" value="25" min="1" max="25" step="0.1">
+        </div>
+        <div class="button-group">
+          <button id="exportSettingsBtn" class="btn-secondary">📥 設定を保存</button>
+          <button id="importSettingsBtn" class="btn-secondary">📤 設定を読み込み</button>
+          <input type="file" id="importSettingsFile" accept=".json" style="display: none;">
         </div>
       </section>
 
@@ -51,7 +86,10 @@
       <section class="card">
         <h2>通貨ペア設定</h2>
         <div class="swap-info-bar">
-          <span class="swap-update-date">参考値（最新のスワップは公式サイトで確認）</span>
+          <div class="swap-info-left">
+            <span class="swap-update-date" id="rateUpdateTime">為替レート: デフォルト値</span>
+            <button id="refreshRatesBtn" class="refresh-btn" title="為替レートを更新">🔄 レート更新</button>
+          </div>
           <a id="brokerLink" href="https://www.click-sec.com/corp/guide/fxneo/swplog/" target="_blank" class="swap-link">
             📊 公式スワップポイント確認
           </a>
@@ -80,7 +118,7 @@
       <!-- 相関係数マトリクス -->
       <section class="card">
         <h2>相関係数マトリクス</h2>
-        <p class="hint">通貨ペア間の相関係数（-1〜1）を設定します。対角線は自動で1になります。</p>
+        <p class="hint">通貨ペア間の相関係数（-1〜1）。<strong>実データから計算</strong>（2024/12/20-2025/12/19の日次データより算出、年率換算）。対角線は自動で1になります。</p>
         <div class="table-responsive">
           <table id="correlationMatrix">
             <!-- JavaScriptで動的に生成 -->
@@ -92,25 +130,48 @@
       <!-- 最適化設定 -->
       <section class="card">
         <h2>最適化設定</h2>
+        <p class="hint">sujinikublog方式: レバレッジ≠リスク。1日のリスク（標準偏差）を制約にスワップを最大化します。</p>
         <div class="input-group">
           <label for="optimizationTarget">最適化目標</label>
           <select id="optimizationTarget">
+            <option value="maxSwapTargetRisk">スワップ最大化（1日リスク制約型）★推奨</option>
             <option value="sharpe">シャープレシオ最大化</option>
-            <option value="minRisk">リスク最小化（目標リターン維持）</option>
-            <option value="maxReturn">リターン最大化（目標リスク内）</option>
           </select>
         </div>
-        <div class="input-group" id="targetReturnGroup" style="display: none;">
-          <label for="targetReturn">目標リターン（年率%）</label>
-          <input type="number" id="targetReturn" value="20" min="0" max="100" step="1">
+        <div class="input-group" id="targetDailyRiskGroup">
+          <label for="targetDailyRisk">1日の目標リスク上限（円）</label>
+          <input type="number" id="targetDailyRisk" value="30000" min="0" step="5000">
+          <small class="input-hint">スワップ最大化: 1日の損益ブレ幅（標準偏差）を制限してスワップを最大化</small>
         </div>
-        <div class="input-group" id="targetRiskGroup" style="display: none;">
-          <label for="targetRisk">目標リスク（年率%）</label>
-          <input type="number" id="targetRisk" value="15" min="0" max="100" step="1">
+        <div class="input-group">
+          <label>
+            <input type="checkbox" id="allowShortPositions" checked>
+            ショートポジションも最適化に含める（リスク抑制用）
+          </label>
+        </div>
+        <div class="input-group">
+          <label>
+            <input type="checkbox" id="considerSpreadCost">
+            スプレッドコストを考慮する
+          </label>
+          <small class="input-hint">オンにすると、各通貨ペアのスプレッドから概算したコストを差し引いた有効資金で最適化します</small>
+        </div>
+        <div class="input-group">
+          <label>
+            <input type="checkbox" id="optimizerStressTest">
+            ストレステスト（暴落耐性チェック）
+          </label>
+          <small class="input-hint">最適化結果に対し、全通貨が同時に最大級の暴落を起こした場合のロスカット耐性を検証します</small>
+        </div>
+        <div class="input-group" id="optCrashSafeOption" style="display: none;">
+          <label>
+            <input type="checkbox" id="optimizerCrashSafe">
+            暴落耐性モード（ポジションを自動縮小）
+          </label>
+          <small class="input-hint">暴落時でも維持率100%を下回らないようにポジションを自動的にスケールダウンします</small>
         </div>
         <div class="button-group">
           <button id="optimizeBtn" class="btn-primary">最適化を実行</button>
-          <button id="calculateBtn" class="btn-secondary">現在の設定で計算</button>
         </div>
       </section>
 
@@ -120,20 +181,30 @@
 
         <div class="result-summary">
           <div class="result-item">
-            <span class="label">期待リターン（年率）</span>
-            <span class="value" id="expectedReturn">-</span>
+            <span class="label">スワップポイント収益（税前）</span>
+            <span class="value" id="annualSwap">-</span>
+            <span class="sub-value">
+              1日: <span id="dailySwap">-</span> |
+              1ヶ月: <span id="monthlySwap">-</span>
+            </span>
           </div>
           <div class="result-item">
-            <span class="label">ポートフォリオリスク（年率）</span>
-            <span class="value" id="portfolioRisk">-</span>
+            <span class="label">評価損益のブレ（リスク額）</span>
+            <span class="value" id="annualRisk">-</span>
+            <span class="sub-value">
+              1日: <span id="dailyRisk">-</span> |
+              1ヶ月: <span id="monthlyRisk">-</span>
+            </span>
           </div>
           <div class="result-item has-tooltip">
             <span class="label">シャープレシオ <span class="info-icon" title="詳細を見る">?</span></span>
             <span class="value" id="sharpeRatio">-</span>
+            <span class="sub-value" id="actualLeverage">-</span>
           </div>
           <div class="result-item">
-            <span class="label">年間スワップ収益（税前）</span>
-            <span class="value" id="annualSwap">-</span>
+            <span class="label">期待リターン（税引前）</span>
+            <span class="value" id="expectedReturn">-</span>
+            <span class="sub-value" id="expectedReturnYen">-</span>
           </div>
         </div>
 
@@ -182,6 +253,7 @@
                 <th>配分比率</th>
                 <th>保有数量</th>
                 <th>必要証拠金</th>
+                <th>1日のスワップ</th>
                 <th>年間スワップ</th>
               </tr>
             </thead>
@@ -202,6 +274,42 @@
           </div>
         </div>
 
+        <!-- ストレステスト結果 -->
+        <div id="optimizerStressResult" style="display: none;">
+          <h3>ストレステスト（暴落耐性）</h3>
+          <div class="result-summary stress-test-summary" id="optimizerStressSummary">
+            <div class="result-item stress-safe">
+              <span class="label">暴落後純資産</span>
+              <span class="value" id="optStressEquity">-</span>
+              <span class="sub-value" id="optStressLoss">-</span>
+            </div>
+            <div class="result-item stress-warning">
+              <span class="label">証拠金維持率</span>
+              <span class="value" id="optStressMaintenanceRate">-</span>
+              <span class="sub-value" id="optStressMaintenanceDetail">-</span>
+            </div>
+            <div class="result-item stress-result">
+              <span class="label">ロスカット判定</span>
+              <span class="value" id="optStressVerdict">-</span>
+              <span class="sub-value" id="optStressVerdictDetail">-</span>
+            </div>
+          </div>
+          <div class="table-responsive" style="margin-top: 12px;">
+            <table id="stressDetailTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>ポジション</th>
+                  <th>想定下落率</th>
+                  <th>含み損</th>
+                </tr>
+              </thead>
+              <tbody id="stressDetailBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- リスク分解 -->
         <h3>リスク寄与度</h3>
         <div class="table-responsive">
@@ -218,13 +326,623 @@
           </table>
         </div>
       </section>
+      </div><!-- /optimizerSection -->
+
+      <!-- 複利シミュレーターセクション -->
+      <div id="compoundSection" class="tab-content" style="display: none;">
+        <section class="card compound-header">
+          <h2>多通貨複利運用シミュレーション</h2>
+          <p class="hint">複数の高金利通貨を組み合わせた複利運用シミュレーションです。通貨の有効/無効、配分、スワップポイントを自由に設定できます。</p>
+        </section>
+
+        <!-- 設定パネル -->
+        <section class="card">
+          <h2>シミュレーション設定</h2>
+          <div class="compound-config-grid">
+            <div class="config-item">
+              <label>初期資金</label>
+              <input type="number" id="compoundInitialCapital" value="400000" min="100000" step="10000">
+              <span class="unit">円</span>
+            </div>
+            <div class="config-item">
+              <label>シミュレーション期間</label>
+              <input type="number" id="compoundMonths" value="36" min="12" max="120" step="12">
+              <span class="unit">ヶ月</span>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">通貨ペア設定</h3>
+          <p class="hint">有効にする通貨ペアを選び、配分・レート・スワップポイント(1万通貨/日)を設定してください。</p>
+          <div id="compoundCurrencyConfig"></div>
+
+          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">ストレステスト設定</h3>
+          <div class="input-group">
+            <label>
+              <input type="checkbox" id="compoundStressTestEnabled">
+              ストレステストを有効にする
+            </label>
+            <small class="input-hint">毎月「今ここで暴落が起きたら？」を検証し、ロスカット耐性を表示します（各通貨の1日最大下落率は上の表で設定）</small>
+          </div>
+          <div id="crashSafeOption" class="input-group" style="display: none; margin-top: 8px;">
+            <label>
+              <input type="checkbox" id="compoundCrashSafe">
+              暴落耐性モード（レバレッジを自動制限）
+            </label>
+            <small class="input-hint">暴落時でも維持率100%を下回らないようにレバレッジ上限を自動計算します</small>
+          </div>
+        </section>
+
+        <!-- レバレッジルール -->
+        <section class="card">
+          <h2>レバレッジルール</h2>
+          <p class="hint">総資産に応じてレバレッジ上限を段階的に引き下げ、リスクを管理しながら複利運用します。</p>
+          <div class="table-responsive">
+            <table class="leverage-rules-table leverage-rules-editable">
+              <thead>
+                <tr>
+                  <th>総資産上限</th>
+                  <th>最大レバレッジ</th>
+                  <th>再投資ルール</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>〜 <input type="number" id="rule1Threshold" value="500000" min="100000" step="100000" class="rule-input"> 円</td>
+                  <td><input type="number" id="rule1Leverage" value="5" min="1" max="25" step="0.5" class="rule-input-small"> 倍</td>
+                  <td>毎月スワップを再投資</td>
+                </tr>
+                <tr>
+                  <td>〜 <input type="number" id="rule2Threshold" value="1000000" min="100000" step="100000" class="rule-input"> 円</td>
+                  <td><input type="number" id="rule2Leverage" value="3" min="1" max="25" step="0.5" class="rule-input-small"> 倍到達まで</td>
+                  <td>スワップ貯蓄 → 再投資再開</td>
+                </tr>
+                <tr>
+                  <td>それ以上</td>
+                  <td><input type="number" id="rule3Leverage" value="2" min="1" max="25" step="0.5" class="rule-input-small"> 倍到達まで</td>
+                  <td>スワップ貯蓄 → 再投資再開</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 実行ボタン -->
+        <section class="card">
+          <div class="button-group">
+            <button id="runCompoundSimBtn" class="btn-primary">シミュレーション実行</button>
+            <button id="optimizeRatioBtn" class="btn-secondary">配分を最適化</button>
+          </div>
+        </section>
+
+        <!-- 配分最適化結果 -->
+        <section class="card" id="ratioOptResult" style="display: none;">
+          <h2>配分最適化結果</h2>
+          <div class="result-summary compound-summary">
+            <div class="result-item">
+              <span class="label">最適配分</span>
+              <span class="value" id="optimalRatioSummary">-</span>
+              <span class="sub-value" id="optimalRatioDetail">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">最終資産</span>
+              <span class="value" id="optimalFinalAssets">-</span>
+              <span class="sub-value" id="optimalAssetGrowth">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">総スワップ収益</span>
+              <span class="value" id="optimalTotalSwap">-</span>
+              <span class="sub-value" id="optimalMonthlySwap">-</span>
+            </div>
+            <div class="result-item" style="display: none;">
+              <span class="label">最低維持率</span>
+              <span class="value" id="optimalMinMaintenanceRate">-</span>
+              <span class="sub-value" id="optimalMinMaintenanceDetail">-</span>
+            </div>
+          </div>
+          <div class="chart-wrapper compound-chart">
+            <h3>配分パターン vs 最終資産・暴落耐性</h3>
+            <canvas id="ratioOptChart"></canvas>
+          </div>
+          <div class="button-group" style="margin-top: 1rem;">
+            <button id="applyOptimalRatioBtn" class="btn-primary">最適配分を適用してシミュレーション実行</button>
+          </div>
+        </section>
+
+        <!-- 結果表示エリア -->
+        <section class="card" id="compoundResultSection" style="display: none;">
+          <h2>シミュレーション結果</h2>
+
+          <!-- サマリーカード -->
+          <div class="result-summary compound-summary">
+            <div class="result-item">
+              <span class="label">最終資産</span>
+              <span class="value" id="compoundFinalAssets">-</span>
+              <span class="sub-value" id="compoundAssetGrowth">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">総スワップ収益</span>
+              <span class="value" id="compoundTotalSwap">-</span>
+              <span class="sub-value" id="compoundMonthlyAvgSwap">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">トータルリターン</span>
+              <span class="value" id="compoundTotalReturn">-</span>
+              <span class="sub-value" id="compoundAnnualizedReturn">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">最終レバレッジ</span>
+              <span class="value" id="compoundFinalLeverage">-</span>
+              <span class="sub-value" id="compoundReinvestCount">-</span>
+            </div>
+          </div>
+
+          <!-- ストレステスト結果サマリー -->
+          <div class="result-summary stress-test-summary" id="stressTestSummary" style="display: none;">
+            <div class="result-item stress-safe">
+              <span class="label">最も危険な月</span>
+              <span class="value" id="stressMostDangerousMonth">-</span>
+              <span class="sub-value" id="stressMostDangerousDetail">-</span>
+            </div>
+            <div class="result-item stress-warning">
+              <span class="label">最低維持率</span>
+              <span class="value" id="stressMinMaintenanceRate">-</span>
+              <span class="sub-value" id="stressMinMaintenanceDetail">-</span>
+            </div>
+            <div class="result-item stress-result">
+              <span class="label">ロスカット判定</span>
+              <span class="value" id="stressMarginCallResult">-</span>
+              <span class="sub-value" id="stressMarginCallDetail">-</span>
+            </div>
+          </div>
+
+          <!-- 資産推移グラフ -->
+          <div class="chart-wrapper compound-chart">
+            <h3>資産推移</h3>
+            <canvas id="assetGrowthChart"></canvas>
+          </div>
+
+          <!-- 月次詳細テーブル -->
+          <h3>月次詳細</h3>
+          <div class="table-responsive compound-table-wrapper">
+            <table class="compound-monthly-table" id="compoundMonthlyTable">
+              <thead>
+                <tr>
+                  <th>月</th>
+                  <th>総資産</th>
+                  <!-- 通貨ロット列はJSで動的生成 -->
+                  <th>レバレッジ</th>
+                  <th>月間スワップ</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody id="compoundMonthlyBody">
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div><!-- /compoundSection -->
+
+      <!-- ポートフォリオ管理セクション -->
+      <div id="portfolioSection" class="tab-content" style="display: none;">
+
+        <!-- ヘッダー -->
+        <section class="card portfolio-header">
+          <h2>ポートフォリオ管理</h2>
+          <p class="hint">保有ポジションの登録・損益追跡・スワップ収入の可視化を行います。データはブラウザに自動保存されます。</p>
+        </section>
+
+        <!-- ポートフォリオサマリー -->
+        <section class="card" id="portfolioSummarySection">
+          <h2>サマリー</h2>
+          <div class="result-summary portfolio-summary">
+            <div class="result-item">
+              <span class="label">総資産評価額</span>
+              <span class="value" id="pfTotalValue">¥0</span>
+              <span class="sub-value" id="pfPositionCount">ポジション: 0件</span>
+            </div>
+            <div class="result-item">
+              <span class="label">含み損益</span>
+              <span class="value" id="pfUnrealizedPnL">¥0</span>
+              <span class="sub-value" id="pfUnrealizedPnLRate">0%</span>
+            </div>
+            <div class="result-item">
+              <span class="label">累計スワップ収入</span>
+              <span class="value" id="pfTotalSwapIncome">¥0</span>
+              <span class="sub-value" id="pfMonthlySwapIncome">今月: ¥0</span>
+            </div>
+            <div class="result-item">
+              <span class="label">目標達成率</span>
+              <span class="value" id="pfGoalProgress">未設定</span>
+              <span class="sub-value" id="pfGoalDetail">-</span>
+            </div>
+          </div>
+          <div class="goal-progress-container" id="goalProgressContainer" style="display: none;">
+            <div class="goal-progress-bar">
+              <div class="goal-progress-fill" id="goalProgressFill" style="width: 0%"></div>
+            </div>
+            <div class="goal-progress-label" id="goalProgressLabel"></div>
+          </div>
+        </section>
+
+        <!-- ポジション登録フォーム -->
+        <section class="card">
+          <h2>ポジション登録</h2>
+          <div class="position-form-grid">
+            <div class="input-group">
+              <label for="pfCurrencyPair">通貨ペア</label>
+              <select id="pfCurrencyPair"></select>
+            </div>
+            <div class="input-group">
+              <label for="pfDirection">売買方向</label>
+              <select id="pfDirection">
+                <option value="long">買い（Long）</option>
+                <option value="short">売り（Short）</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="pfLots">ロット数</label>
+              <input type="number" id="pfLots" value="1" min="0.1" step="0.1">
+            </div>
+            <div class="input-group">
+              <label for="pfEntryRate">エントリーレート</label>
+              <input type="number" id="pfEntryRate" step="0.001">
+            </div>
+            <div class="input-group">
+              <label for="pfEntryDate">エントリー日</label>
+              <input type="date" id="pfEntryDate">
+            </div>
+            <div class="input-group">
+              <label for="pfBroker">証券会社</label>
+              <select id="pfBroker">
+                <option value="gmo">GMOクリック証券</option>
+                <option value="minnano">みんなのFX</option>
+                <option value="lightfx">LIGHT FX</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="pfMemo">メモ（任意）</label>
+              <input type="text" id="pfMemo" placeholder="例: スワップ狙い">
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="pfAddPositionBtn" class="btn-primary">ポジションを登録</button>
+          </div>
+        </section>
+
+        <!-- 保有ポジション一覧 -->
+        <section class="card">
+          <h2>保有ポジション一覧</h2>
+          <div id="noPositionsMsg" class="empty-message">ポジションが登録されていません。上のフォームからポジションを登録してください。</div>
+          <div class="table-responsive" id="openPositionsWrapper" style="display: none;">
+            <table id="openPositionsTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>方向</th>
+                  <th>ロット</th>
+                  <th>エントリー</th>
+                  <th>現在レート</th>
+                  <th>含み損益</th>
+                  <th>日次スワップ</th>
+                  <th>累計スワップ</th>
+                  <th>保有日数</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="openPositionsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- スワップ収入チャート -->
+        <section class="card" id="swapVisualizationSection" style="display: none;">
+          <h2>スワップ収入チャート</h2>
+          <div class="swap-chart-controls">
+            <select id="swapChartPeriod">
+              <option value="daily">日次</option>
+              <option value="weekly">週次</option>
+              <option value="monthly" selected>月次</option>
+            </select>
+            <select id="swapChartType">
+              <option value="bar">棒グラフ</option>
+              <option value="cumulative">累積折れ線</option>
+            </select>
+          </div>
+          <div class="charts-container">
+            <div class="chart-wrapper compound-chart">
+              <h3>スワップ収入推移</h3>
+              <canvas id="swapIncomeChart"></canvas>
+            </div>
+            <div class="chart-wrapper compound-chart">
+              <h3>通貨別スワップ収入</h3>
+              <canvas id="swapByCurrencyChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- 資産推移 -->
+        <section class="card" id="assetTransitionSection" style="display: none;">
+          <h2>資産推移</h2>
+          <div class="chart-wrapper compound-chart">
+            <canvas id="portfolioAssetChart"></canvas>
+          </div>
+        </section>
+
+        <!-- 通貨別パフォーマンス -->
+        <section class="card" id="currencyPerformanceSection" style="display: none;">
+          <h2>通貨別パフォーマンス</h2>
+          <div class="table-responsive">
+            <table id="currencyPerformanceTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>保有ロット</th>
+                  <th>含み損益</th>
+                  <th>累計スワップ</th>
+                  <th>トータル損益</th>
+                  <th>損益率</th>
+                </tr>
+              </thead>
+              <tbody id="currencyPerformanceBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 決済済みポジション -->
+        <section class="card" id="closedPositionsSection" style="display: none;">
+          <h2>決済済みポジション</h2>
+          <div class="table-responsive">
+            <table id="closedPositionsTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>方向</th>
+                  <th>ロット</th>
+                  <th>エントリー</th>
+                  <th>決済レート</th>
+                  <th>実現損益</th>
+                  <th>獲得スワップ</th>
+                  <th>合計損益</th>
+                  <th>保有期間</th>
+                </tr>
+              </thead>
+              <tbody id="closedPositionsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 目標設定 -->
+        <section class="card">
+          <h2>目標設定</h2>
+          <div class="goal-form-grid">
+            <div class="input-group">
+              <label for="goalType">目標種別</label>
+              <select id="goalType">
+                <option value="monthly">月次目標</option>
+                <option value="yearly">年次目標</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="goalAmount">目標金額（円）</label>
+              <input type="number" id="goalAmount" value="30000" min="0" step="1000">
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="saveGoalBtn" class="btn-primary">目標を保存</button>
+          </div>
+        </section>
+
+        <!-- 確定申告用レポート -->
+        <section class="card">
+          <h2>データ管理 / 確定申告用レポート</h2>
+          <p class="hint">指定した年のFX取引損益をCSV形式でエクスポートできます。確定申告の参考資料としてご利用ください。</p>
+          <div class="export-controls">
+            <div class="input-group">
+              <label for="taxYear">対象年</label>
+              <select id="taxYear"></select>
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="exportTaxReportBtn" class="btn-secondary">CSV出力（確定申告用）</button>
+            <button id="exportPortfolioDataBtn" class="btn-secondary">全データ出力（JSON）</button>
+            <button id="importPortfolioDataBtn" class="btn-secondary">データ読み込み（JSON）</button>
+            <input type="file" id="importPortfolioDataFile" accept=".json" style="display: none;">
+          </div>
+          <div class="storage-usage" id="storageUsage"></div>
+        </section>
+
+      </div><!-- /portfolioSection -->
+
+      <!-- スワップ通知セクション -->
+      <div id="notificationSection" class="tab-content" style="display: none;">
+
+        <!-- ヘッダー -->
+        <section class="card notification-header">
+          <h2>スワップ通知システム</h2>
+          <p class="hint">スワップポイントの変動を監視し、設定した閾値を超えた場合に通知でお知らせします。</p>
+        </section>
+
+        <!-- 本日のスワップ変動 -->
+        <section class="card">
+          <h2>スワップ変動サマリー</h2>
+          <div class="swap-summary-controls">
+            <button id="fetchSwapRatesBtn" class="btn-primary">スワップレート取得</button>
+            <button id="simulateChangeBtn" class="btn-secondary" title="デモ用：スワップレートにランダム変動を加えます">デモ変動</button>
+            <span class="swap-last-updated" id="swapLastUpdated">最終更新: -</span>
+          </div>
+          <div class="table-responsive">
+            <table id="swapSummaryTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>証券会社</th>
+                  <th>前回(買)</th>
+                  <th>現在(買)</th>
+                  <th>変動(買)</th>
+                  <th>前回(売)</th>
+                  <th>現在(売)</th>
+                  <th>変動(売)</th>
+                </tr>
+              </thead>
+              <tbody id="swapSummaryBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- アラート設定 -->
+        <section class="card">
+          <h2>アラート設定</h2>
+          <div class="input-group">
+            <label>
+              <input type="checkbox" id="enableBrowserNotifications">
+              ブラウザプッシュ通知を有効にする
+            </label>
+            <small class="input-hint">ブラウザの通知許可が必要です</small>
+          </div>
+
+          <h3 style="margin-top: 1rem;">閾値アラート一覧</h3>
+          <div id="noAlertsMsg" class="empty-message">アラートが設定されていません。</div>
+          <div class="table-responsive" id="alertThresholdsWrapper" style="display: none;">
+            <table id="alertThresholdsTable">
+              <thead>
+                <tr>
+                  <th>有効</th>
+                  <th>通貨ペア</th>
+                  <th>証券会社</th>
+                  <th>条件</th>
+                  <th>閾値</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="alertThresholdsBody"></tbody>
+            </table>
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">新規アラート追加</h3>
+          <div class="alert-form-grid">
+            <div class="input-group">
+              <label for="alertCurrencyPair">通貨ペア</label>
+              <select id="alertCurrencyPair"></select>
+            </div>
+            <div class="input-group">
+              <label for="alertBroker">証券会社</label>
+              <select id="alertBroker">
+                <option value="gmo">GMOクリック証券</option>
+                <option value="minnano">みんなのFX</option>
+                <option value="lightfx">LIGHT FX</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="alertDirection">条件</label>
+              <select id="alertDirection">
+                <option value="below">スワップが下回ったら</option>
+                <option value="above">スワップが上回ったら</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="alertValue">閾値（円/日）</label>
+              <input type="number" id="alertValue" step="0.1" value="10">
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="addAlertBtn" class="btn-primary">アラートを追加</button>
+          </div>
+        </section>
+
+        <!-- 通知履歴 -->
+        <section class="card">
+          <h2>通知履歴</h2>
+          <div id="noNotificationsMsg" class="empty-message">通知履歴はありません。</div>
+          <div class="table-responsive" id="notificationHistoryWrapper" style="display: none;">
+            <table id="notificationHistoryTable">
+              <thead>
+                <tr>
+                  <th>日時</th>
+                  <th>種別</th>
+                  <th>通貨ペア</th>
+                  <th>メッセージ</th>
+                </tr>
+              </thead>
+              <tbody id="notificationHistoryBody"></tbody>
+            </table>
+          </div>
+          <div class="button-group">
+            <button id="clearNotificationHistoryBtn" class="btn-secondary">履歴をクリア</button>
+          </div>
+        </section>
+
+      </div><!-- /notificationSection -->
+
     </main>
+
+    <!-- おすすめ証券会社比較 -->
+    <section class="card broker-comparison" id="brokerComparisonSection">
+      <h2>スワップ投資におすすめの証券会社</h2>
+      <p class="hint">当シミュレーターで対応している証券会社の比較です。口座開設は全て無料です。</p>
+      <div class="broker-cards" id="brokerCards"></div>
+      <p class="affiliate-disclosure">※当サイトはアフィリエイトプログラムに参加しています。上記リンクから口座開設いただくと、当サイトに紹介料が支払われます。ユーザーの皆様に追加費用は一切発生しません。</p>
+    </section>
 
     <footer>
       <p>※このシミュレーターは投資の参考情報を提供するものであり、投資助言ではありません。実際の投資は自己責任で行ってください。</p>
     </footer>
   </div>
 
-  <script src="script.js"></script>
+  <!-- PWAインストールバナー -->
+  <div id="installBanner" class="install-banner" style="display: none;">
+    <div class="install-banner-content">
+      <span>ホーム画面に追加してアプリとして使えます</span>
+      <button id="installBtn" class="btn-primary install-btn">インストール</button>
+      <button id="installDismiss" class="install-dismiss">&times;</button>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="js/data-store.js?v=1"></script>
+  <script src="script.js?v=50"></script>
+  <script src="js/portfolio.js?v=1"></script>
+  <script src="js/portfolio-charts.js?v=1"></script>
+  <script src="js/notifications.js?v=1"></script>
+
+  <script>
+  // Service Worker 登録
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.log('SW registration failed:', err));
+    });
+  }
+
+  // PWA インストールプロンプト
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'flex';
+  });
+
+  document.getElementById('installBtn')?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+  });
+
+  document.getElementById('installDismiss')?.addEventListener('click', () => {
+    document.getElementById('installBanner').style.display = 'none';
+  });
+
+  // URL hash でタブ切替
+  if (location.hash) {
+    const tab = location.hash.replace('#', '');
+    if (['optimizer', 'compound', 'portfolio', 'notification'].includes(tab)) {
+      setTimeout(() => switchTab(tab), 100);
+    }
+  }
+  </script>
 </body>
 </html>

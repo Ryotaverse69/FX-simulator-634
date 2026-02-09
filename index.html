@@ -179,19 +179,20 @@
           </label>
           <small class="input-hint">オンにすると、各通貨ペアのスプレッドから概算したコストを差し引いた有効資金で最適化します</small>
         </div>
+        <h3 style="margin-top: 1rem; margin-bottom: 0.5rem;">暴落防御設定</h3>
         <div class="input-group">
           <label>
-            <input type="checkbox" id="optimizerStressTest">
-            ストレステスト（暴落耐性チェック）
-          </label>
-          <small class="input-hint">最適化結果に対し、全通貨が同時に最大級の暴落を起こした場合のロスカット耐性を検証します</small>
-        </div>
-        <div class="input-group" id="optCrashSafeOption" style="display: none;">
-          <label>
             <input type="checkbox" id="optimizerCrashSafe">
-            暴落耐性モード（ポジションを自動縮小）
+            暴落耐性モード（ポジションを自動調整）
           </label>
-          <small class="input-hint">暴落時でも維持率100%を下回らないようにポジションを自動的にスケールダウンします</small>
+          <small class="input-hint">各通貨の最大下落率で暴落しても維持率200%を確保するようポジションを最適化します</small>
+        </div>
+        <div class="input-group">
+          <label>
+            <input type="checkbox" id="optimizerCrashFullDefense">
+            暴落完全防御モード（最大級暴落に完全対応）
+          </label>
+          <small class="input-hint">直近10年の歴史的最悪暴落率を使い、維持率300%以上を維持するようポジションを最適化します。より安全ですがリターンは低下します</small>
         </div>
         <div class="button-group">
           <button id="optimizeBtn" class="btn-primary">最適化を実行</button>
@@ -297,9 +298,9 @@
           </div>
         </div>
 
-        <!-- ストレステスト結果 -->
+        <!-- 暴落シミュレーション結果 -->
         <div id="optimizerStressResult" style="display: none;">
-          <h3>ストレステスト（暴落耐性）</h3>
+          <h3>暴落シミュレーション</h3>
           <div class="result-summary stress-test-summary" id="optimizerStressSummary">
             <div class="result-item stress-safe">
               <span class="label">暴落後純資産</span>
@@ -378,20 +379,20 @@
           <p class="hint">有効にする通貨ペアを選び、配分・レート・スワップポイント(1万通貨/日)を設定してください。</p>
           <div id="compoundCurrencyConfig"></div>
 
-          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">ストレステスト設定</h3>
+          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">暴落防御設定</h3>
           <div class="input-group">
-            <label>
-              <input type="checkbox" id="compoundStressTestEnabled">
-              ストレステストを有効にする
-            </label>
-            <small class="input-hint">毎月「今ここで暴落が起きたら？」を検証し、ロスカット耐性を表示します（各通貨の1日最大下落率は上の表で設定）</small>
-          </div>
-          <div id="crashSafeOption" class="input-group" style="display: none; margin-top: 8px;">
             <label>
               <input type="checkbox" id="compoundCrashSafe">
               暴落耐性モード（レバレッジを自動制限）
             </label>
-            <small class="input-hint">暴落時でも維持率100%を下回らないようにレバレッジ上限を自動計算します</small>
+            <small class="input-hint">各通貨の最大下落率で暴落しても維持率200%を確保するようレバレッジを最適化します</small>
+          </div>
+          <div class="input-group">
+            <label>
+              <input type="checkbox" id="compoundCrashFullDefense">
+              暴落完全防御モード（最大級暴落に完全対応）
+            </label>
+            <small class="input-hint">直近10年の歴史的最悪暴落率を使い、維持率300%以上を維持。より安全ですがリターンは大幅に低下します</small>
           </div>
         </section>
 

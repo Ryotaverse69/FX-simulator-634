@@ -30,7 +30,15 @@ const brokerInfo = {
     swapUrl: 'https://www.click-sec.com/corp/guide/fxneo/swplog/',
     affiliateUrl: '', // A8.net等で取得後に設定
     features: ['業界最小スプレッド', '高機能チャート', 'スワップ振替可能'],
-    recommended: '低コスト重視の方に'
+    recommended: '低コスト重視の方に',
+    losscutRate: 50,
+    marginCallRate: 100,
+    // 通貨ペア別建玉上限（通貨単位）
+    maxPositions: {
+      TRY_JPY: 1000000, MXN_JPY: 3000000, ZAR_JPY: 3000000,
+      HUF_JPY: 10000000, CZK_JPY: 3000000,
+      USD_JPY: 10000000, EUR_JPY: 10000000, CHF_JPY: 10000000
+    }
   },
   minnano: {
     name: 'みんなのFX',
@@ -38,7 +46,14 @@ const brokerInfo = {
     swapUrl: 'https://min-fx.jp/market/swap/',
     affiliateUrl: '', // A8.net等で取得後に設定
     features: ['高スワップポイント', '1,000通貨取引OK', 'スワップ途中受取可'],
-    recommended: 'スワップ投資に最適'
+    recommended: 'スワップ投資に最適',
+    losscutRate: 100,
+    marginCallRate: 100,
+    maxPositions: {
+      TRY_JPY: 10000000, MXN_JPY: 30000000, ZAR_JPY: 30000000,
+      HUF_JPY: 300000000, CZK_JPY: 10000000,
+      USD_JPY: 10000000, EUR_JPY: 10000000, CHF_JPY: 10000000
+    }
   },
   lightfx: {
     name: 'LIGHT FX',
@@ -46,7 +61,14 @@ const brokerInfo = {
     swapUrl: 'https://lightfx.jp/service/swappoint/',
     affiliateUrl: '', // A8.net等で取得後に設定
     features: ['業界最高水準スワップ', '約定力99.9%', 'LIGHT ペア対応'],
-    recommended: '高金利通貨に強い'
+    recommended: '高金利通貨に強い',
+    losscutRate: 100,
+    marginCallRate: 100,
+    maxPositions: {
+      TRY_JPY: 30000000, MXN_JPY: 30000000, ZAR_JPY: 30000000,
+      HUF_JPY: 300000000, CZK_JPY: 10000000,
+      USD_JPY: 5000000, EUR_JPY: 10000000, CHF_JPY: 10000000
+    }
   },
   gaikaex: {
     name: 'GMO外貨ex',
@@ -54,7 +76,14 @@ const brokerInfo = {
     swapUrl: 'https://www.gaikaex.com/gaikaex/spread-swap/',
     affiliateUrl: '',
     features: ['1,000通貨取引OK', '豊富な注文方法', 'バイナリーオプション対応'],
-    recommended: '少額取引から始めたい方に'
+    recommended: '少額取引から始めたい方に',
+    losscutRate: 50,
+    marginCallRate: 100,
+    // 通貨ペア個別上限なし（全体で4000万通貨）、HUF/CZK取扱なし
+    maxPositions: {
+      TRY_JPY: 40000000, MXN_JPY: 40000000, ZAR_JPY: 40000000,
+      USD_JPY: 40000000, EUR_JPY: 40000000, CHF_JPY: 40000000
+    }
   },
   dmm: {
     name: 'DMM FX',
@@ -62,7 +91,14 @@ const brokerInfo = {
     swapUrl: 'https://fx.dmm.com/fx/service/swap/',
     affiliateUrl: '',
     features: ['口座数国内No.1', '24時間サポート', '取引ツール充実'],
-    recommended: '初心者・サポート重視の方に'
+    recommended: '初心者・サポート重視の方に',
+    losscutRate: 50,
+    marginCallRate: 100,
+    // HUF/CZK取扱なし
+    maxPositions: {
+      TRY_JPY: 100000000, MXN_JPY: 100000000, ZAR_JPY: 100000000,
+      USD_JPY: 50000000, EUR_JPY: 30000000, CHF_JPY: 10000000
+    }
   },
   sbi: {
     name: 'SBI FXトレード',
@@ -70,7 +106,14 @@ const brokerInfo = {
     swapUrl: 'https://www.sbifxt.co.jp/service/swap.html',
     affiliateUrl: '',
     features: ['1通貨取引OK', 'SBIグループの信頼性', '積立FX対応'],
-    recommended: '超少額・積立投資に'
+    recommended: '超少額・積立投資に',
+    losscutRate: 50,
+    marginCallRate: 100,
+    // 通貨ペア別上限なし・総額無制限、HUF/CZK取扱なし
+    maxPositions: {
+      TRY_JPY: Infinity, MXN_JPY: Infinity, ZAR_JPY: Infinity,
+      USD_JPY: Infinity, EUR_JPY: Infinity, CHF_JPY: Infinity
+    }
   },
   central: {
     name: 'セントラル短資FX',
@@ -78,7 +121,15 @@ const brokerInfo = {
     swapUrl: 'https://www.central-tanshifx.com/market/swappoint/',
     affiliateUrl: '',
     features: ['100年の歴史', '高金利通貨に強い', 'パーソナルレコード'],
-    recommended: '高金利通貨スワップ派に'
+    recommended: '高金利通貨スワップ派に',
+    losscutRate: 50,
+    marginCallRate: 125,
+    // CZK取扱なし
+    maxPositions: {
+      TRY_JPY: 100000000, MXN_JPY: 1000000000, ZAR_JPY: 1000000000,
+      HUF_JPY: 1000000000,
+      USD_JPY: 50000000, EUR_JPY: 50000000, CHF_JPY: 50000000
+    }
   }
 };
 
@@ -168,15 +219,15 @@ let brokerSwapData = {
 // 複利シミュレーター用の通貨ペア定義
 const COMPOUND_CURRENCIES = [
   { id: 'HUF_JPY', name: 'HUF/JPY', label: 'ハンガリーフォリント',
-    defaultRate: 0.43, defaultSwap: 2, defaultCrashRate: 5, defaultRatio: 70, defaultEnabled: true },
+    defaultRate: 0.43, defaultSwap: 2, defaultCrashRate: 5, historicalWorstCrashRate: 7, defaultRatio: 70, defaultEnabled: true },
   { id: 'TRY_JPY', name: 'TRY/JPY', label: 'トルコリラ',
-    defaultRate: 3.6, defaultSwap: 32, defaultCrashRate: 15, defaultRatio: 30, defaultEnabled: true },
+    defaultRate: 3.6, defaultSwap: 32, defaultCrashRate: 18, historicalWorstCrashRate: 20, defaultRatio: 30, defaultEnabled: true },
   { id: 'MXN_JPY', name: 'MXN/JPY', label: 'メキシコペソ',
-    defaultRate: 8.7, defaultSwap: 16, defaultCrashRate: 10, defaultRatio: 0, defaultEnabled: false },
+    defaultRate: 8.7, defaultSwap: 16, defaultCrashRate: 7, historicalWorstCrashRate: 10, defaultRatio: 0, defaultEnabled: false },
   { id: 'ZAR_JPY', name: 'ZAR/JPY', label: '南アフリカランド',
-    defaultRate: 9.4, defaultSwap: 15, defaultCrashRate: 10, defaultRatio: 0, defaultEnabled: false },
+    defaultRate: 9.4, defaultSwap: 15, defaultCrashRate: 9, historicalWorstCrashRate: 12, defaultRatio: 0, defaultEnabled: false },
   { id: 'CZK_JPY', name: 'CZK/JPY', label: 'チェココルナ',
-    defaultRate: 7.0, defaultSwap: 12, defaultCrashRate: 5, defaultRatio: 0, defaultEnabled: false }
+    defaultRate: 7.0, defaultSwap: 12, defaultCrashRate: 4, historicalWorstCrashRate: 6, defaultRatio: 0, defaultEnabled: false }
 ];
 
 // 基本通貨ペアデータ（レート、ボラティリティ、期待下落率など）
@@ -196,7 +247,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 1000000, // 100万通貨（100lot）
     spread: 1.7, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 15 // 1日最大下落率(%) - 2021年11月実績ベース
+    maxDailyDrop: 18, // 1日最大下落率(%) - 2018年8月トルコリラ危機実績
+    historicalWorstDrop: 20 // 直近10年の最悪想定(%) - 2018/8/10瞬間的に~20%下落
   },
   {
     id: 'MXN_JPY',
@@ -210,7 +262,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 3000000, // 300万通貨（30lot）
     spread: 0.2, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 10 // 1日最大下落率(%) - 新興国通貨リスク
+    maxDailyDrop: 7, // 1日最大下落率(%) - 2020年3月COVID暴落実績
+    historicalWorstDrop: 10 // 直近10年の最悪想定(%) - フラッシュクラッシュ等考慮
   },
   {
     id: 'ZAR_JPY',
@@ -224,7 +277,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 3000000, // 300万通貨（30lot）
     spread: 0.9, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 10 // 1日最大下落率(%) - 新興国通貨リスク
+    maxDailyDrop: 9, // 1日最大下落率(%) - 2016年1月フラッシュクラッシュ実績
+    historicalWorstDrop: 12 // 直近10年の最悪想定(%) - 新興国通貨の極端シナリオ
   },
   {
     id: 'HUF_JPY',
@@ -238,7 +292,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 10000000, // 1000万通貨（100lot）
     spread: 0.5, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 5 // 1日最大下落率(%) - 欧州通貨で比較的安定
+    maxDailyDrop: 5, // 1日最大下落率(%) - 欧州通貨で比較的安定
+    historicalWorstDrop: 7 // 直近10年の最悪想定(%) - Brexit級イベント時の波及
   },
   {
     id: 'CZK_JPY',
@@ -252,7 +307,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 5000000, // 500万通貨（50lot）
     spread: 0.1, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 5 // 1日最大下落率(%) - EUR連動で安定
+    maxDailyDrop: 4, // 1日最大下落率(%) - EUR連動で安定
+    historicalWorstDrop: 6 // 直近10年の最悪想定(%) - 欧州危機時の波及
   },
   {
     id: 'USD_JPY',
@@ -266,7 +322,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'short',
     maxPosition: 500000, // 50万通貨（50lot）
     spread: 0.2, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 5 // 1日最大下落率(%) - 主要通貨
+    maxDailyDrop: 4, // 1日最大下落率(%) - 2015年8月チャイナBM実績
+    historicalWorstDrop: 6 // 直近10年の最悪想定(%) - フラッシュクラッシュ考慮
   },
   {
     id: 'EUR_JPY',
@@ -280,7 +337,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'short',
     maxPosition: 500000, // 50万通貨（50lot）
     spread: 0.4, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 5 // 1日最大下落率(%) - 主要通貨
+    maxDailyDrop: 4, // 1日最大下落率(%) - 2016年Brexit実績
+    historicalWorstDrop: 6 // 直近10年の最悪想定(%) - 複合リスクイベント考慮
   },
   {
     id: 'CHF_JPY',
@@ -294,7 +352,8 @@ const baseCurrencyPairs = [
     defaultPosition: 'long', // リスク抑制のためロング（スワップ払いでも有効）
     maxPosition: 500000, // 50万通貨（50lot）
     spread: 1.8, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 8 // 1日最大下落率(%) - 2015年スイスフランショック考慮
+    maxDailyDrop: 8, // 1日最大下落率(%) - 2015年スイスフランショック考慮
+    historicalWorstDrop: 12 // 直近10年の最悪想定(%) - 2015/1/15 SNBショック級
   }
 ];
 
@@ -309,8 +368,14 @@ function initializeCurrencyPairsForBroker(broker) {
   const swapData = brokerSwapData[broker];
   if (!swapData) return;
 
+  const brokerMaxPositions = brokerInfo[broker]?.maxPositions || {};
+
   currencyPairs = baseCurrencyPairs.map(pair => {
     const data = swapData[pair.id];
+    // 証券会社の建玉上限を適用（未設定ならbaseCurrencyPairsのデフォルト値）
+    const brokerLimit = brokerMaxPositions[pair.id];
+    const maxPos = brokerLimit !== undefined ? brokerLimit : (pair.maxPosition || Infinity);
+
     // null = この証券会社では取扱なし
     if (data === null || data === undefined) {
       return {
@@ -321,7 +386,7 @@ function initializeCurrencyPairsForBroker(broker) {
         enabled: false,
         unavailable: true,
         position: pair.defaultPosition,
-        maxPosition: pair.maxPosition || Infinity
+        maxPosition: maxPos
       };
     }
     return {
@@ -332,7 +397,7 @@ function initializeCurrencyPairsForBroker(broker) {
       enabled: pair.defaultEnabled,
       unavailable: false,
       position: pair.defaultPosition,
-      maxPosition: pair.maxPosition || Infinity
+      maxPosition: maxPos
     };
   });
 }
@@ -1576,19 +1641,29 @@ function calculateEfficientFrontier(pairs, totalCapital, targetDailyRisk, maxLev
 }
 
 function displayResults(pairs, weights, results, totalCapital, targetLeverage, targetDailyRisk, allowShorts, optimizationTarget) {
-  // 暴落耐性モード: ストレステスト有効時にポジションを自動縮小
-  const optStressEnabled = document.getElementById('optimizerStressTest')?.checked || false;
-  const optCrashSafe = optStressEnabled && (document.getElementById('optimizerCrashSafe')?.checked || false);
+  // 暴落耐性モード / 暴落完全防御モード
+  const optCrashSafe = document.getElementById('optimizerCrashSafe')?.checked || false;
+  const optCrashFullDefense = document.getElementById('optimizerCrashFullDefense')?.checked || false;
+  // どちらかが有効ならストレステストも自動的に実行
+  const optStressEnabled = optCrashSafe || optCrashFullDefense;
   let crashSafeScale = 1;
+  let activeDefenseMode = null; // 'safe' or 'fullDefense'
 
-  if (optCrashSafe) {
+  if (optCrashFullDefense || optCrashSafe) {
     const capitalForStress = results.originalCapital || totalCapital;
     let preTotalUnrealizedLoss = 0;
     let prePostCrashNotional = 0;
 
+    // 完全防御モード: historicalWorstDrop + 維持率300%目標
+    // 耐性モード: maxDailyDrop + 維持率200%目標
+    const useHistorical = optCrashFullDefense;
+    const targetMaintenanceRate = optCrashFullDefense ? 3.0 : 2.0;
+
     results.allocations.forEach(alloc => {
       if (alloc.lots === 0) return;
-      const crashRate = (alloc.pair.maxDailyDrop || 10) / 100;
+      const crashRate = useHistorical
+        ? (alloc.pair.historicalWorstDrop || alloc.pair.maxDailyDrop || 10) / 100
+        : (alloc.pair.maxDailyDrop || 10) / 100;
       const absUnits = Math.abs(alloc.units);
       const currentNotional = absUnits * alloc.pair.rate;
       const unrealizedLoss = alloc.position === 'long'
@@ -1598,31 +1673,37 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, t
       prePostCrashNotional += currentNotional * (1 - crashRate);
     });
 
-    const denom = preTotalUnrealizedLoss + prePostCrashNotional * 0.04;
+    // targetMaintenanceRate倍の維持率を確保: equity / margin >= targetMaintenanceRate
+    // equity = capital - loss*scale, margin = notional*scale*0.04
+    // (capital - loss*scale) / (notional*scale*0.04) >= targetMaintenanceRate
+    // capital >= scale * (loss + notional*0.04*targetMaintenanceRate)
+    const denom = preTotalUnrealizedLoss + prePostCrashNotional * 0.04 * targetMaintenanceRate;
     if (denom > 0) {
       const requiredScale = capitalForStress / denom;
-      if (requiredScale < 1) {
-        crashSafeScale = requiredScale * 0.99;  // 1%安全バッファ
-        console.log(`暴落耐性モード: ポジションを${(crashSafeScale * 100).toFixed(1)}%にスケールダウン`);
+      // 目標維持率ギリギリまでポジションを最適化（拡大・縮小の両方向）
+      crashSafeScale = requiredScale * 0.99;  // 1%安全バッファ
+      activeDefenseMode = optCrashFullDefense ? 'fullDefense' : 'safe';
+      const modeName = optCrashFullDefense ? '暴落完全防御モード' : '暴落耐性モード';
+      const direction = crashSafeScale < 1 ? 'スケールダウン' : 'スケールアップ';
+      console.log(`${modeName}: ポジションを${(crashSafeScale * 100).toFixed(1)}%に${direction}`);
 
-        // Scale all allocations
-        results.allocations.forEach(alloc => {
-          alloc.units = Math.round(alloc.units * crashSafeScale);
-          alloc.lots = alloc.lots * crashSafeScale;
-          alloc.displayLots = alloc.displayLots * crashSafeScale;
-          alloc.margin = alloc.margin * crashSafeScale;
-          alloc.annualSwap = alloc.annualSwap * crashSafeScale;
-          alloc.actualAmount = alloc.actualAmount * crashSafeScale;
-        });
+      // Scale all allocations
+      results.allocations.forEach(alloc => {
+        alloc.units = Math.round(alloc.units * crashSafeScale);
+        alloc.lots = alloc.lots * crashSafeScale;
+        alloc.displayLots = alloc.displayLots * crashSafeScale;
+        alloc.margin = alloc.margin * crashSafeScale;
+        alloc.annualSwap = alloc.annualSwap * crashSafeScale;
+        alloc.actualAmount = alloc.actualAmount * crashSafeScale;
+      });
 
-        // Scale totals
-        results.totalAnnualSwap *= crashSafeScale;
-        results.totalMargin *= crashSafeScale;
-        if (results.riskYen) results.riskYen *= crashSafeScale;
-        if (results.expectedReturnYen) results.expectedReturnYen *= crashSafeScale;
-        if (results.spreadCost) results.spreadCost *= crashSafeScale;
-        if (results.estimatedSpreadCost) results.estimatedSpreadCost *= crashSafeScale;
-      }
+      // Scale totals
+      results.totalAnnualSwap *= crashSafeScale;
+      results.totalMargin *= crashSafeScale;
+      if (results.riskYen) results.riskYen *= crashSafeScale;
+      if (results.expectedReturnYen) results.expectedReturnYen *= crashSafeScale;
+      if (results.spreadCost) results.spreadCost *= crashSafeScale;
+      if (results.estimatedSpreadCost) results.estimatedSpreadCost *= crashSafeScale;
     }
   }
 
@@ -1746,11 +1827,10 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, t
   totalRow.style.background = '#f1f5f9';
   resultBody.appendChild(totalRow);
 
-  // ストレステスト計算
-  const optimizerStressEnabled = document.getElementById('optimizerStressTest')?.checked || false;
+  // ストレステスト計算（暴落モードが有効なら自動実行）
   const stressResultDiv = document.getElementById('optimizerStressResult');
 
-  if (optimizerStressEnabled && stressResultDiv) {
+  if (optStressEnabled && stressResultDiv) {
     stressResultDiv.style.display = 'block';
 
     const OPTIMIZATION_UNIT = 1000;
@@ -1758,9 +1838,14 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, t
     let postCrashNotional = 0;
     const stressDetails = [];
 
+    // 完全防御モード時はhistoricalWorstDropを使用
+    const useHistoricalForStress = optCrashFullDefense;
+
     results.allocations.forEach(alloc => {
       if (alloc.lots === 0) return;
-      const crashRate = (alloc.pair.maxDailyDrop || 10) / 100;
+      const crashRate = useHistoricalForStress
+        ? (alloc.pair.historicalWorstDrop || alloc.pair.maxDailyDrop || 10) / 100
+        : (alloc.pair.maxDailyDrop || 10) / 100;
       const absUnits = Math.abs(alloc.units);
       const currentNotional = absUnits * alloc.pair.rate;
 
@@ -1797,20 +1882,30 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, t
       maintenanceRate === Infinity ? '∞' : `${maintenanceRate.toFixed(1)}%`;
 
     const verdictCard = document.getElementById('optStressVerdict').closest('.result-item');
-    if (maintenanceRate < 100) {
+    const broker = brokerInfo[currentBroker];
+    const brokerLosscutRate = broker?.losscutRate || 100;
+    const brokerMarginCallRate = broker?.marginCallRate || 100;
+    const brokerName = broker?.name || '';
+
+    if (maintenanceRate < brokerLosscutRate) {
       document.getElementById('optStressMaintenanceDetail').textContent = 'ロスカット圏';
       document.getElementById('optStressVerdict').textContent = 'ロスカット';
-      document.getElementById('optStressVerdictDetail').textContent = '証拠金維持率が100%未満';
+      document.getElementById('optStressVerdictDetail').textContent = `${brokerName}のLC水準${brokerLosscutRate}%未満`;
+      verdictCard.className = 'result-item stress-danger';
+    } else if (maintenanceRate < brokerMarginCallRate) {
+      document.getElementById('optStressMaintenanceDetail').textContent = '追証・警告圏';
+      document.getElementById('optStressVerdict').textContent = '追証リスク';
+      document.getElementById('optStressVerdictDetail').textContent = `${brokerName}の追証水準${brokerMarginCallRate}%未満`;
       verdictCard.className = 'result-item stress-danger';
     } else if (maintenanceRate < 200) {
       document.getElementById('optStressMaintenanceDetail').textContent = '警告圏';
       document.getElementById('optStressVerdict').textContent = '警告';
-      document.getElementById('optStressVerdictDetail').textContent = '維持率200%未満で追証リスクあり';
+      document.getElementById('optStressVerdictDetail').textContent = `維持率200%未満（LC水準${brokerLosscutRate}%）`;
       verdictCard.className = 'result-item stress-warning';
     } else {
       document.getElementById('optStressMaintenanceDetail').textContent = '安全圏';
       document.getElementById('optStressVerdict').textContent = '耐久可能';
-      document.getElementById('optStressVerdictDetail').textContent = `維持率${maintenanceRate.toFixed(0)}%で余裕あり`;
+      document.getElementById('optStressVerdictDetail').textContent = `維持率${maintenanceRate.toFixed(0)}%（LC水準${brokerLosscutRate}%）`;
       verdictCard.className = 'result-item stress-safe';
     }
 
@@ -1838,13 +1933,20 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, t
     `;
     stressBody.appendChild(stressTotalRow);
 
-    // 暴落耐性モードで縮小した場合はメモを表示
-    if (optCrashSafe && crashSafeScale < 1) {
+    // 暴落耐性モード/完全防御モードでスケーリングした場合はメモを表示
+    if (activeDefenseMode && crashSafeScale !== 1) {
       const noteRow = document.createElement('tr');
-      noteRow.style.background = '#eff6ff';
+      const isFullDefense = activeDefenseMode === 'fullDefense';
+      noteRow.style.background = isFullDefense ? '#fef3c7' : '#eff6ff';
+      const icon = isFullDefense ? '🛡️' : '⚡';
+      const modeName = isFullDefense ? '暴落完全防御モード' : '暴落耐性モード';
+      const color = isFullDefense ? '#92400e' : '#2563eb';
+      const targetPct = isFullDefense ? '300%' : '200%';
+      const action = crashSafeScale < 1 ? '自動縮小' : '自動拡大';
+      const extra = `<br><small>暴落後の維持率が${targetPct}になるようポジションを最適化</small>`;
       noteRow.innerHTML = `
-        <td colspan="4" style="color: #2563eb; font-size: 0.85rem; padding: 8px;">
-          ⚡ 暴落耐性モード: ポジションを元の <strong>${(crashSafeScale * 100).toFixed(1)}%</strong> に自動縮小しました
+        <td colspan="4" style="color: ${color}; font-size: 0.85rem; padding: 8px;">
+          ${icon} ${modeName}: ポジションを元の <strong>${(crashSafeScale * 100).toFixed(1)}%</strong> に${action}しました${extra}
         </td>
       `;
       stressBody.appendChild(noteRow);
@@ -2231,17 +2333,19 @@ function validateRatioSum() {
   }
 }
 
-// ストレステスト有効/無効で下落率列の表示切替
+// 暴落モード有効/無効で下落率列の表示切替
 function updateCrashRateVisibility() {
-  const stressEnabled = document.getElementById('compoundStressTestEnabled')?.checked || false;
+  const anyDefenseMode = (document.getElementById('compoundCrashSafe')?.checked || false)
+    || (document.getElementById('compoundCrashFullDefense')?.checked || false);
   document.querySelectorAll('.crash-rate-col').forEach(el => {
-    el.style.display = stressEnabled ? '' : 'none';
+    el.style.display = anyDefenseMode ? '' : 'none';
   });
 }
 
 // DOMから有効通貨の設定を読み取る
 function readCompoundCurrencies(ratioOverrides) {
-  const stressTestEnabled = document.getElementById('compoundStressTestEnabled')?.checked || false;
+  const stressTestEnabled = (document.getElementById('compoundCrashSafe')?.checked || false)
+    || (document.getElementById('compoundCrashFullDefense')?.checked || false);
   const currencies = [];
 
   COMPOUND_CURRENCIES.forEach(c => {
@@ -2261,6 +2365,7 @@ function readCompoundCurrencies(ratioOverrides) {
       crashRate: stressTestEnabled
         ? (parseFloat(document.getElementById(`compound_${c.id}_crash`)?.value) || c.defaultCrashRate) / 100
         : 0,
+      historicalWorstCrashRate: (c.historicalWorstCrashRate || c.defaultCrashRate) / 100,
       unit: 10000,
       marginRate: 0.04
     });
@@ -2295,25 +2400,36 @@ function runCompoundSimulation(options = {}) {
     { maxAssets: Infinity, maxLeverage: rule3Leverage, reinvestThreshold: rule3Leverage }
   ];
 
-  const stressTestEnabled = document.getElementById('compoundStressTestEnabled')?.checked || false;
+  // 暴落モードが有効ならストレステストも自動有効
+  const stressTestEnabled = (document.getElementById('compoundCrashSafe')?.checked || false)
+    || (document.getElementById('compoundCrashFullDefense')?.checked || false);
 
   if (!silent) {
     const ratioStr = currencies.map(c => `${c.name}=${(c.ratio*100).toFixed(0)}%`).join(', ');
     console.log(`複利シミュレーション開始: 初期資金=${initialCapital}円, ${ratioStr}, 期間=${months}ヶ月`);
     if (stressTestEnabled) {
       const crashStr = currencies.map(c => `${c.name}=${(c.crashRate*100).toFixed(0)}%`).join(', ');
-      console.log(`ストレステスト有効: ${crashStr}`);
+      console.log(`暴落防御モード有効: ${crashStr}`);
     }
   }
 
-  // 暴落耐性モード
+  // 暴落耐性モード / 暴落完全防御モード
   const crashSafeMode = stressTestEnabled && (document.getElementById('compoundCrashSafe')?.checked || false);
+  const crashFullDefenseMode = stressTestEnabled && (document.getElementById('compoundCrashFullDefense')?.checked || false);
+  const activeCompoundDefense = crashFullDefenseMode ? 'fullDefense' : (crashSafeMode ? 'safe' : null);
   let maxSafeLeverage = Infinity;
-  if (crashSafeMode) {
-    const weightedCrashRate = currencies.reduce((sum, c) => sum + c.ratio * c.crashRate, 0);
-    maxSafeLeverage = 1 / (weightedCrashRate + (1 - weightedCrashRate) * 0.04) * 0.99;
+  if (crashSafeMode || crashFullDefenseMode) {
+    // 完全防御モード: historicalWorstCrashRateを使用、耐性モード: crashRateを使用
+    // 完全防御モード: historicalWorstCrashRate + 維持率300%目標
+    // 耐性モード: crashRate + 維持率200%目標
+    const weightedCrashRate = crashFullDefenseMode
+      ? currencies.reduce((sum, c) => sum + c.ratio * c.historicalWorstCrashRate, 0)
+      : currencies.reduce((sum, c) => sum + c.ratio * c.crashRate, 0);
+    const targetMaintenanceRate = crashFullDefenseMode ? 3.0 : 2.0;
+    maxSafeLeverage = 1 / (weightedCrashRate + (1 - weightedCrashRate) * 0.04 * targetMaintenanceRate) * 0.99;
     if (!silent) {
-      console.log(`暴落耐性モード: 加重暴落率=${(weightedCrashRate*100).toFixed(1)}%, 最大安全レバレッジ=${maxSafeLeverage.toFixed(2)}倍`);
+      const modeName = crashFullDefenseMode ? '暴落完全防御モード' : '暴落耐性モード';
+      console.log(`${modeName}: 加重暴落率=${(weightedCrashRate*100).toFixed(1)}%, 最大安全レバレッジ=${maxSafeLeverage.toFixed(2)}倍`);
     }
   }
 
@@ -2327,7 +2443,8 @@ function runCompoundSimulation(options = {}) {
   currencies.forEach(c => { state.lots[c.id] = 0; });
 
   // 初期ポジションを購入
-  const initialMaxLeverage = crashSafeMode ? Math.min(rule1Leverage, maxSafeLeverage) : rule1Leverage;
+  // 防御モード時はmaxSafeLeverageをそのまま目標レバレッジとして使用（ギリギリまでポジションを持つ）
+  const initialMaxLeverage = (crashSafeMode || crashFullDefenseMode) ? maxSafeLeverage : rule1Leverage;
   const initialPurchase = calculateInitialPurchaseN(initialCapital, currencies, initialMaxLeverage);
   Object.keys(initialPurchase.lots).forEach(id => { state.lots[id] = initialPurchase.lots[id]; });
   state.cashReserve = initialCapital - initialPurchase.totalMargin;
@@ -2335,14 +2452,15 @@ function runCompoundSimulation(options = {}) {
   const results = [];
   let reinvestCount = 0;
 
-  // N通貨ストレステスト計算ヘルパー
+  // N通貨ストレステスト計算ヘルパー（完全防御モード時はhistoricalWorstCrashRateを使用）
   function calcStressData(lots, totalAssets) {
     if (!stressTestEnabled) return null;
     let totalLoss = 0;
     let postCrashNotional = 0;
     currencies.forEach(c => {
-      totalLoss += lots[c.id] * c.unit * c.rate * c.crashRate;
-      postCrashNotional += lots[c.id] * c.unit * c.rate * (1 - c.crashRate);
+      const rate = crashFullDefenseMode ? c.historicalWorstCrashRate : c.crashRate;
+      totalLoss += lots[c.id] * c.unit * c.rate * rate;
+      postCrashNotional += lots[c.id] * c.unit * c.rate * (1 - rate);
     });
     const postCrashEquity = totalAssets - totalLoss;
     const postCrashMargin = postCrashNotional * 0.04;
@@ -2350,7 +2468,7 @@ function runCompoundSimulation(options = {}) {
     return {
       postCrashEquity,
       maintenanceRate,
-      stressStatus: maintenanceRate < 100 ? 'margin_call' : maintenanceRate < 200 ? 'warning' : 'safe',
+      stressStatus: maintenanceRate < (brokerInfo[currentBroker]?.losscutRate || 100) ? 'margin_call' : maintenanceRate < 200 ? 'warning' : 'safe',
       unrealizedLoss: totalLoss
     };
   }
@@ -2396,8 +2514,9 @@ function runCompoundSimulation(options = {}) {
     // 5. レバレッジルールを判定
     const rule = leverageRules.find(r => state.totalAssets <= r.maxAssets);
     let targetLeverage = rule ? rule.reinvestThreshold : rule3Leverage;
-    if (crashSafeMode) {
-      targetLeverage = Math.min(targetLeverage, maxSafeLeverage);
+    if (crashSafeMode || crashFullDefenseMode) {
+      // 防御モード時はmaxSafeLeverageを目標レバレッジとして使用（ギリギリまでポジションを持つ）
+      targetLeverage = maxSafeLeverage;
     }
 
     // 6. 再投資判定とアクション
@@ -2459,7 +2578,7 @@ function runCompoundSimulation(options = {}) {
 
   // 結果を表示（silentモードでは表示をスキップ）
   if (!silent) {
-    displayCompoundResults(results, initialCapital, reinvestCount, stressTestEnabled, crashSafeMode, maxSafeLeverage, currencies);
+    displayCompoundResults(results, initialCapital, reinvestCount, stressTestEnabled, crashSafeMode || crashFullDefenseMode, maxSafeLeverage, currencies, activeCompoundDefense);
   }
 
   return results;
@@ -2491,7 +2610,8 @@ function generateRatioCombinations(n, step = 5) {
 
 function optimizeCompoundRatio() {
   const initialCapital = parseFloat(document.getElementById('compoundInitialCapital').value) || 400000;
-  const stressTestEnabled = document.getElementById('compoundStressTestEnabled')?.checked || false;
+  const stressTestEnabled = (document.getElementById('compoundCrashSafe')?.checked || false)
+    || (document.getElementById('compoundCrashFullDefense')?.checked || false);
 
   // 有効通貨を読み取り（配分は無視、IDリストとして使用）
   const currencies = readCompoundCurrencies();
@@ -2795,7 +2915,7 @@ function calculateAdditionalPurchaseN(availableCash, currencies, maxAdditionalNo
 }
 
 // 複利シミュレーション結果表示
-function displayCompoundResults(results, initialCapital, reinvestCount, stressTestEnabled = false, crashSafeMode = false, maxSafeLeverage = Infinity, currencies = []) {
+function displayCompoundResults(results, initialCapital, reinvestCount, stressTestEnabled = false, crashSafeMode = false, maxSafeLeverage = Infinity, currencies = [], activeDefenseMode = null) {
   const finalResult = results[results.length - 1];
   const totalMonths = results.length - 1;
 
@@ -2841,17 +2961,19 @@ function displayCompoundResults(results, initialCapital, reinvestCount, stressTe
 
       document.getElementById('stressMinMaintenanceRate').textContent =
         minRate === Infinity ? '∞' : `${minRate.toFixed(1)}%`;
+      const compBroker = brokerInfo[currentBroker];
+      const compLosscutRate = compBroker?.losscutRate || 100;
       document.getElementById('stressMinMaintenanceDetail').textContent =
-        minRate < 100 ? 'ロスカット圏' : minRate < 200 ? '警告圏' : '安全圏';
+        minRate < compLosscutRate ? 'ロスカット圏' : minRate < 200 ? '警告圏' : '安全圏';
 
       const resultCard = document.getElementById('stressMarginCallResult').closest('.result-item');
       if (marginCallMonth !== null) {
         document.getElementById('stressMarginCallResult').textContent = 'ロスカット発生';
-        document.getElementById('stressMarginCallDetail').textContent = `${marginCallMonth}ヶ月目で発生`;
+        document.getElementById('stressMarginCallDetail').textContent = `${marginCallMonth}ヶ月目（LC水準${compLosscutRate}%）`;
         resultCard.className = 'result-item stress-danger';
       } else {
         document.getElementById('stressMarginCallResult').textContent = '全期間耐久可能';
-        document.getElementById('stressMarginCallDetail').textContent = `最低維持率 ${minRate.toFixed(1)}%`;
+        document.getElementById('stressMarginCallDetail').textContent = `最低維持率 ${minRate.toFixed(1)}%（LC水準${compLosscutRate}%）`;
         resultCard.className = 'result-item stress-safe';
       }
 
@@ -2860,8 +2982,14 @@ function displayCompoundResults(results, initialCapital, reinvestCount, stressTe
       if (crashSafeMode && maxSafeLeverage < Infinity) {
         const note = document.createElement('div');
         note.className = 'crash-safe-note';
-        note.style.cssText = 'grid-column: 1 / -1; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #1e40af;';
-        note.innerHTML = `⚡ <strong>暴落耐性モード</strong>: レバレッジ上限を <strong>${maxSafeLeverage.toFixed(2)}倍</strong> に自動制限しています`;
+        const isFullDefense = activeDefenseMode === 'fullDefense';
+        if (isFullDefense) {
+          note.style.cssText = 'grid-column: 1 / -1; background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #f59e0b; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #92400e;';
+          note.innerHTML = `🛡️ <strong>暴落完全防御モード</strong>: レバレッジ上限を <strong>${maxSafeLeverage.toFixed(2)}倍</strong> に自動制限<br><small>歴史的最悪暴落率で維持率300%以上を確保</small>`;
+        } else {
+          note.style.cssText = 'grid-column: 1 / -1; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #1e40af;';
+          note.innerHTML = `⚡ <strong>暴落耐性モード</strong>: レバレッジ上限を <strong>${maxSafeLeverage.toFixed(2)}倍</strong> に自動制限しています`;
+        }
         stressSummary.appendChild(note);
       }
     }
@@ -3116,29 +3244,29 @@ function setupCompoundEventListeners() {
   // 初期ブローカーのスワップ値を複利シミュに反映
   updateCompoundSwapsForBroker(currentBroker);
 
-  // ストレステスト チェックボックス → 下落率列の表示切替 + 暴落耐性オプション
-  const stressCheckbox = document.getElementById('compoundStressTestEnabled');
-  const crashSafeOption = document.getElementById('crashSafeOption');
-  if (stressCheckbox) {
-    stressCheckbox.addEventListener('change', () => {
-      const show = stressCheckbox.checked;
+  // 複利シミュ: 暴落完全防御と暴落耐性は排他的 + 下落率列の表示連動
+  const compoundCrashSafe = document.getElementById('compoundCrashSafe');
+  const compoundCrashFullDefense = document.getElementById('compoundCrashFullDefense');
+  if (compoundCrashSafe && compoundCrashFullDefense) {
+    compoundCrashFullDefense.addEventListener('change', () => {
+      if (compoundCrashFullDefense.checked) compoundCrashSafe.checked = false;
       updateCrashRateVisibility();
-      if (crashSafeOption) crashSafeOption.style.display = show ? 'block' : 'none';
-      if (!show && document.getElementById('compoundCrashSafe')) {
-        document.getElementById('compoundCrashSafe').checked = false;
-      }
+    });
+    compoundCrashSafe.addEventListener('change', () => {
+      if (compoundCrashSafe.checked) compoundCrashFullDefense.checked = false;
+      updateCrashRateVisibility();
     });
   }
 
-  // 最適化シミュのストレステスト → 暴落耐性オプション連動
-  const optStressCheckbox = document.getElementById('optimizerStressTest');
-  const optCrashSafeOption = document.getElementById('optCrashSafeOption');
-  if (optStressCheckbox && optCrashSafeOption) {
-    optStressCheckbox.addEventListener('change', () => {
-      optCrashSafeOption.style.display = optStressCheckbox.checked ? 'block' : 'none';
-      if (!optStressCheckbox.checked && document.getElementById('optimizerCrashSafe')) {
-        document.getElementById('optimizerCrashSafe').checked = false;
-      }
+  // 最適化シミュ: 暴落完全防御と暴落耐性は排他的
+  const optCrashSafe = document.getElementById('optimizerCrashSafe');
+  const optCrashFullDefense = document.getElementById('optimizerCrashFullDefense');
+  if (optCrashSafe && optCrashFullDefense) {
+    optCrashFullDefense.addEventListener('change', () => {
+      if (optCrashFullDefense.checked) optCrashSafe.checked = false;
+    });
+    optCrashSafe.addEventListener('change', () => {
+      if (optCrashSafe.checked) optCrashFullDefense.checked = false;
     });
   }
 

@@ -375,29 +375,54 @@
             </div>
           </div>
 
+          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">証券会社選択</h3>
+          <div class="compound-broker-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="broker-btn compound-broker-btn active" data-compound-broker="gmo" style="padding: 8px 14px; font-size: 0.85rem;">GMOクリック</button>
+            <button class="broker-btn compound-broker-btn" data-compound-broker="minnano" style="padding: 8px 14px; font-size: 0.85rem;">みんなのFX</button>
+            <button class="broker-btn compound-broker-btn" data-compound-broker="lightfx" style="padding: 8px 14px; font-size: 0.85rem;">LIGHT FX</button>
+            <button class="broker-btn compound-broker-btn" data-compound-broker="gaikaex" style="padding: 8px 14px; font-size: 0.85rem;">GMO外貨ex</button>
+            <button class="broker-btn compound-broker-btn" data-compound-broker="dmm" style="padding: 8px 14px; font-size: 0.85rem;">DMM FX</button>
+            <button class="broker-btn compound-broker-btn" data-compound-broker="sbi" style="padding: 8px 14px; font-size: 0.85rem;">SBI FXトレード</button>
+            <button class="broker-btn compound-broker-btn" data-compound-broker="central" style="padding: 8px 14px; font-size: 0.85rem;">セントラル短資</button>
+          </div>
+          <p class="hint" id="compoundBrokerInfo" style="margin-bottom: 1rem; color: #64748b;"></p>
+
           <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">通貨ペア設定</h3>
-          <p class="hint">有効にする通貨ペアを選び、配分・レート・スワップポイント(1万通貨/日)を設定してください。</p>
+          <p class="hint">有効にする通貨ペアを選び、配分・レート・スワップポイント(1万通貨/日)・年間変動率を設定してください。</p>
           <div id="compoundCurrencyConfig"></div>
 
-          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">暴落防御設定</h3>
+          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">運用モード選択</h3>
           <div class="input-group">
-            <label>
-              <input type="checkbox" id="compoundCrashSafe">
-              暴落耐性モード（レバレッジを自動制限）
-            </label>
-            <small class="input-hint">各通貨の最大下落率で暴落しても維持率200%を確保するようレバレッジを最適化します</small>
+            <div class="compound-mode-selector" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <label class="mode-radio-label" id="modeLabelLeverage" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #3b82f6; border-radius: 8px; cursor: pointer; background: #eff6ff; text-align: center;">
+                <input type="radio" name="compoundMode" id="compoundModeLeverage" value="leverage" checked style="margin-right: 6px;">
+                <strong>レバレッジルール</strong><br>
+                <small style="color: #64748b;">手動でレバレッジを設定 + 暴落時の維持率を確認</small>
+              </label>
+              <label class="mode-radio-label" id="modeLabelCrashSafe" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: center;">
+                <input type="radio" name="compoundMode" id="compoundModeCrashSafe" value="crashSafe" style="margin-right: 6px;">
+                <strong>暴落耐性モード</strong><br>
+                <small style="color: #64748b;">暴落後も維持率200%を確保するレバレッジを自動計算</small>
+              </label>
+              <label class="mode-radio-label" id="modeLabelFullDefense" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: center;">
+                <input type="radio" name="compoundMode" id="compoundModeFullDefense" value="fullDefense" style="margin-right: 6px;">
+                <strong>暴落完全防御</strong><br>
+                <small style="color: #64748b;">歴史的最悪暴落率で維持率300%以上を確保</small>
+              </label>
+            </div>
           </div>
-          <div class="input-group">
-            <label>
-              <input type="checkbox" id="compoundCrashFullDefense">
-              暴落完全防御モード（最大級暴落に完全対応）
+
+          <div style="margin-top: 1rem;">
+            <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem;">
+              <input type="checkbox" id="compoundSpreadEnabled" checked>
+              <span>スプレッドコスト考慮</span>
+              <small style="color: #94a3b8;">（ポジション追加時のスプレッドコストを差し引く）</small>
             </label>
-            <small class="input-hint">直近10年の歴史的最悪暴落率を使い、維持率300%以上を維持。より安全ですがリターンは大幅に低下します</small>
           </div>
         </section>
 
-        <!-- レバレッジルール -->
-        <section class="card">
+        <!-- レバレッジルール（レバレッジルールモード時のみ有効） -->
+        <section class="card" id="leverageRulesSection">
           <h2>レバレッジルール</h2>
           <p class="hint">総資産に応じてレバレッジ上限を段階的に引き下げ、リスクを管理しながら複利運用します。</p>
           <div class="table-responsive">
@@ -497,6 +522,21 @@
               <span class="label">最終レバレッジ</span>
               <span class="value" id="compoundFinalLeverage">-</span>
               <span class="sub-value" id="compoundReinvestCount">-</span>
+            </div>
+            <div class="result-item" id="compoundUnrealizedPLItem" style="display: none;">
+              <span class="label">含み損益（レート変動）</span>
+              <span class="value" id="compoundUnrealizedPL">-</span>
+              <span class="sub-value" id="compoundUnrealizedPLDetail">-</span>
+            </div>
+            <div class="result-item" id="compoundSpreadCostItem" style="display: none;">
+              <span class="label">スプレッドコスト累計</span>
+              <span class="value" id="compoundSpreadCost">-</span>
+              <span class="sub-value" id="compoundSpreadCostDetail">-</span>
+            </div>
+            <div class="result-item" id="compoundNetPLItem" style="display: none;">
+              <span class="label">純損益</span>
+              <span class="value" id="compoundNetPL">-</span>
+              <span class="sub-value" id="compoundNetPLDetail">-</span>
             </div>
           </div>
 

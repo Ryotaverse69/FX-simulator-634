@@ -36,6 +36,7 @@
         <button class="tab-btn" data-tab="compound">複利シミュレーター</button>
         <button class="tab-btn" data-tab="portfolio">ポートフォリオ管理</button>
         <button class="tab-btn" data-tab="notification">スワップ通知</button>
+        <button class="tab-btn" data-tab="rebalance">軌道修正</button>
       </div>
 
       <!-- 最適化シミュレーターセクション -->
@@ -153,19 +154,7 @@
       <!-- 最適化設定 -->
       <section class="card">
         <h2>最適化設定</h2>
-        <p class="hint">sujinikublog方式: レバレッジ≠リスク。1日のリスク（標準偏差）を制約にスワップを最大化します。</p>
-        <div class="input-group">
-          <label for="optimizationTarget">最適化目標</label>
-          <select id="optimizationTarget">
-            <option value="maxSwapTargetRisk">スワップ最大化（1日リスク制約型）★推奨</option>
-            <option value="sharpe">シャープレシオ最大化</option>
-          </select>
-        </div>
-        <div class="input-group" id="targetDailyRiskGroup">
-          <label for="targetDailyRisk">1日の目標リスク上限（円）</label>
-          <input type="number" id="targetDailyRisk" value="30000" min="0" step="5000">
-          <small class="input-hint">スワップ最大化: 1日の損益ブレ幅（標準偏差）を制限してスワップを最大化</small>
-        </div>
+        <p class="hint">リスクあたりのスワップ収益効率（シャープレシオ）を最大化するポートフォリオを計算します。</p>
         <div class="input-group">
           <label>
             <input type="checkbox" id="allowShortPositions" checked>
@@ -584,6 +573,7 @@
             </table>
           </div>
         </section>
+
       </div><!-- /compoundSection -->
 
       <!-- ポートフォリオ管理セクション -->
@@ -945,6 +935,212 @@
 
       </div><!-- /notificationSection -->
 
+      <!-- 軌道修正シミュレーターセクション -->
+      <div id="rebalanceSection" class="tab-content" style="display: none;">
+
+        <!-- ヘッダー -->
+        <section class="card">
+          <h2>軌道修正シミュレーター</h2>
+          <p class="hint">既にポジションを保有している方向け。現在の状態を診断し、理想とのギャップを分析して具体的な調整プランを提示します。</p>
+        </section>
+
+        <!-- 現在のポジション入力 -->
+        <section class="card">
+          <h2>現在のポジション</h2>
+
+          <div class="compound-broker-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="broker-btn rebalance-broker-btn active" data-rebalance-broker="gmo" style="padding: 8px 14px; font-size: 0.85rem;">GMOクリック</button>
+            <button class="broker-btn rebalance-broker-btn" data-rebalance-broker="minnano" style="padding: 8px 14px; font-size: 0.85rem;">みんなのFX</button>
+            <button class="broker-btn rebalance-broker-btn" data-rebalance-broker="lightfx" style="padding: 8px 14px; font-size: 0.85rem;">LIGHT FX</button>
+            <button class="broker-btn rebalance-broker-btn" data-rebalance-broker="gaikaex" style="padding: 8px 14px; font-size: 0.85rem;">GMO外貨ex</button>
+            <button class="broker-btn rebalance-broker-btn" data-rebalance-broker="dmm" style="padding: 8px 14px; font-size: 0.85rem;">DMM FX</button>
+            <button class="broker-btn rebalance-broker-btn" data-rebalance-broker="sbi" style="padding: 8px 14px; font-size: 0.85rem;">SBI FXトレード</button>
+            <button class="broker-btn rebalance-broker-btn" data-rebalance-broker="central" style="padding: 8px 14px; font-size: 0.85rem;">セントラル短資</button>
+          </div>
+
+          <div class="compound-config-grid" style="margin-bottom: 1rem;">
+            <div class="config-item">
+              <label>口座残高</label>
+              <input type="number" id="rebalanceCapital" value="500000" min="0" step="10000">
+              <span class="unit">円</span>
+            </div>
+            <div class="config-item">
+              <label>評価損益</label>
+              <input type="number" id="rebalanceUnrealizedPnL" value="0" step="1000">
+              <span class="unit">円</span>
+            </div>
+          </div>
+          <p class="hint">有効証拠金 = 口座残高 + 評価損益。証券会社のアプリで確認できます。</p>
+
+          <div class="button-group" style="margin-bottom: 1rem;">
+            <button id="loadPortfolioToRebalanceBtn" class="btn-secondary">ポートフォリオから読み込み</button>
+            <button id="addRebalancePositionBtn" class="btn-secondary">+ ポジション行を追加</button>
+          </div>
+
+          <div class="table-responsive">
+            <table id="rebalancePositionTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>方向</th>
+                  <th>ロット数</th>
+                  <th>エントリーレート</th>
+                  <th>削除</th>
+                </tr>
+              </thead>
+              <tbody id="rebalancePositionBody">
+                <!-- JavaScriptで動的に生成 -->
+              </tbody>
+            </table>
+          </div>
+          <p class="hint" id="rebalancePositionHint">ポジション行を追加するか、ポートフォリオ管理から読み込んでください。</p>
+        </section>
+
+        <!-- 目標設定 -->
+        <section class="card">
+          <h2>目標設定</h2>
+          <div class="input-group">
+            <label for="rebalanceTarget">最適化目標</label>
+            <select id="rebalanceTarget">
+              <option value="sharpe">シャープレシオ最大化</option>
+              <option value="compound">複利シミュレーションの理想に合わせる</option>
+            </select>
+          </div>
+          <!-- 複利シミュ選択時のヒント -->
+          <p class="hint" id="rebalanceCompoundHint" style="display: none;">先に「複利シミュレーター」タブでシミュレーションを実行してください。口座残高に最も近い時点の理想ロットと比較します。</p>
+          <!-- ポートフォリオ最適化時の入力 -->
+          <div id="rebalanceOptimizerGroup">
+            <div class="input-group">
+              <label for="rebalanceTargetLeverage">目標レバレッジ</label>
+              <input type="number" id="rebalanceTargetLeverage" value="25" min="1" max="25" step="0.1">
+            </div>
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="rebalanceAllowShorts" checked>
+                ショートポジションも最適化に含める
+              </label>
+            </div>
+            <h3 style="margin-top: 1rem; margin-bottom: 0.5rem;">暴落防御設定</h3>
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="rebalanceCrashSafe">
+                暴落耐性モード（維持率200%確保）
+              </label>
+            </div>
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="rebalanceCrashFullDefense">
+                暴落完全防御モード（維持率300%確保）
+              </label>
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="runRebalanceBtn" class="btn-primary">診断＆調整プラン作成</button>
+          </div>
+        </section>
+
+        <!-- 現在のポートフォリオ診断結果 -->
+        <section class="card" id="rebalanceDiagnosisSection" style="display: none;">
+          <h2>現在のポートフォリオ診断</h2>
+          <div class="result-summary">
+            <div class="result-item">
+              <span class="label">年間スワップ収益</span>
+              <span class="value" id="rbCurrentSwap">-</span>
+              <span class="sub-value">1日: <span id="rbCurrentDailySwap">-</span></span>
+            </div>
+            <div class="result-item">
+              <span class="label">リスク（標準偏差）</span>
+              <span class="value" id="rbCurrentRisk">-</span>
+              <span class="sub-value">1日: <span id="rbCurrentDailyRisk">-</span></span>
+            </div>
+            <div class="result-item">
+              <span class="label">実効レバレッジ</span>
+              <span class="value" id="rbCurrentLeverage">-</span>
+              <span class="sub-value" id="rbCurrentMargin">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">シャープレシオ</span>
+              <span class="value" id="rbCurrentSharpe">-</span>
+              <span class="sub-value" id="rbCurrentSharpeDetail">-</span>
+            </div>
+          </div>
+
+          <!-- 暴落シミュレーション -->
+          <div id="rbStressTest" style="margin-top: 1rem;">
+            <h3>暴落シミュレーション（現在のポジション）</h3>
+            <div class="result-summary stress-test-summary">
+              <div class="result-item stress-safe">
+                <span class="label">暴落後純資産</span>
+                <span class="value" id="rbStressEquity">-</span>
+                <span class="sub-value" id="rbStressLoss">-</span>
+              </div>
+              <div class="result-item stress-warning">
+                <span class="label">証拠金維持率</span>
+                <span class="value" id="rbStressMaintenanceRate">-</span>
+                <span class="sub-value" id="rbStressMaintenanceDetail">-</span>
+              </div>
+              <div class="result-item stress-result">
+                <span class="label">ロスカット判定</span>
+                <span class="value" id="rbStressVerdict">-</span>
+                <span class="sub-value" id="rbStressVerdictDetail">-</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 調整プラン -->
+        <section class="card" id="rebalanceAdjustmentSection" style="display: none;">
+          <h2>調整プラン</h2>
+
+          <!-- 理想 vs 現在 サマリー -->
+          <div class="rb-comparison-summary" style="margin-bottom: 1.5rem;">
+            <div class="result-summary">
+              <div class="result-item">
+                <span class="label">スワップ収益変化</span>
+                <span class="value" id="rbSwapChange">-</span>
+                <span class="sub-value" id="rbSwapChangeDetail">-</span>
+              </div>
+              <div class="result-item">
+                <span class="label">リスク変化</span>
+                <span class="value" id="rbRiskChange">-</span>
+                <span class="sub-value" id="rbRiskChangeDetail">-</span>
+              </div>
+              <div class="result-item">
+                <span class="label">レバレッジ変化</span>
+                <span class="value" id="rbLeverageChange">-</span>
+                <span class="sub-value" id="rbLeverageChangeDetail">-</span>
+              </div>
+              <div class="result-item">
+                <span class="label">シャープレシオ変化</span>
+                <span class="value" id="rbSharpeChange">-</span>
+                <span class="sub-value" id="rbSharpeChangeDetail">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 差分テーブル -->
+          <h3>通貨ペア別調整内容</h3>
+          <div class="table-responsive">
+            <table id="rebalanceAdjustmentTable">
+              <thead>
+                <tr>
+                  <th>通貨ペア</th>
+                  <th>アクション</th>
+                  <th>現在</th>
+                  <th>理想</th>
+                  <th>増減</th>
+                  <th>スワップ変化</th>
+                  <th>優先度</th>
+                </tr>
+              </thead>
+              <tbody id="rebalanceAdjustmentBody"></tbody>
+            </table>
+          </div>
+
+        </section>
+
+      </div><!-- /rebalanceSection -->
+
     </main>
 
     <!-- おすすめ証券会社比較 -->
@@ -1011,7 +1207,7 @@
   // URL hash でタブ切替
   if (location.hash) {
     const tab = location.hash.replace('#', '');
-    if (['optimizer', 'compound', 'portfolio', 'notification'].includes(tab)) {
+    if (['optimizer', 'compound', 'portfolio', 'notification', 'rebalance'].includes(tab)) {
       setTimeout(() => switchTab(tab), 100);
     }
   }

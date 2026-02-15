@@ -51,6 +51,7 @@ function populateTaxYearDropdown() {
 function setupPortfolioEventListeners() {
   document.getElementById('pfCurrencyPair').addEventListener('change', updateEntryRateDefault);
   document.getElementById('pfAddPositionBtn').addEventListener('click', addPosition);
+  document.getElementById('pfAccountBalance').addEventListener('input', renderPortfolioSummary);
   document.getElementById('saveGoalBtn').addEventListener('click', saveGoal);
   document.getElementById('exportTaxReportBtn').addEventListener('click', () => {
     const year = parseInt(document.getElementById('taxYear').value);
@@ -316,12 +317,13 @@ function renderPortfolioSummary() {
   const swapHistory = DataStore.getSwapHistory();
   const closedPositions = DataStore.getClosedPositions();
 
-  // 含み損益合計
+  // 含み損益合計・想定元本（現在レートベース）
   let totalUnrealizedPnL = 0;
-  let totalMargin = 0;
+  let totalNotional = 0;
   positions.forEach(pos => {
     totalUnrealizedPnL += calculateUnrealizedPnL(pos);
-    totalMargin += pos.units * pos.entryRate * 0.04; // 証拠金
+    const currentRate = getCurrentRate(pos.currencyPair) || pos.entryRate;
+    totalNotional += pos.units * currentRate;
   });
 
   // 累計スワップ
@@ -334,17 +336,21 @@ function renderPortfolioSummary() {
     .filter(r => r.date >= monthStart)
     .reduce((s, r) => s + r.amount, 0);
 
-  // 総資産 = 証拠金 + 含み損益 + スワップ収入
-  const totalValue = totalMargin + totalUnrealizedPnL + totalSwapIncome;
-  const pnlRate = totalMargin > 0 ? (totalUnrealizedPnL / totalMargin * 100) : 0;
+  // 実行レバレッジ = 想定元本 / 有効証拠金
+  const accountBalance = parseFloat(document.getElementById('pfAccountBalance')?.value) || 0;
+  const equity = accountBalance + totalUnrealizedPnL;
+  const leverage = equity > 0 ? totalNotional / equity : 0;
 
-  document.getElementById('pfTotalValue').textContent = `¥${Math.round(totalValue).toLocaleString()}`;
-  document.getElementById('pfPositionCount').textContent = `ポジション: ${positions.length}件`;
+  const levEl = document.getElementById('pfLeverage');
+  levEl.textContent = leverage > 0 ? `${leverage.toFixed(2)}倍` : '-';
+  document.getElementById('pfLeverageDetail').textContent =
+    leverage > 0 ? `想定元本: ¥${Math.round(totalNotional).toLocaleString()}` : '口座残高を入力してください';
 
   const pnlEl = document.getElementById('pfUnrealizedPnL');
   pnlEl.textContent = `¥${Math.round(totalUnrealizedPnL).toLocaleString()}`;
   pnlEl.className = `value ${totalUnrealizedPnL >= 0 ? '' : 'pf-negative'}`;
 
+  const pnlRate = totalNotional > 0 ? (totalUnrealizedPnL / totalNotional * 100) : 0;
   document.getElementById('pfUnrealizedPnLRate').textContent = `${pnlRate >= 0 ? '+' : ''}${pnlRate.toFixed(1)}%`;
   document.getElementById('pfTotalSwapIncome').textContent = `¥${Math.round(totalSwapIncome).toLocaleString()}`;
   document.getElementById('pfMonthlySwapIncome').textContent = `今月: ¥${Math.round(monthlySwap).toLocaleString()}`;

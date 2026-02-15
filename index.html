@@ -169,19 +169,47 @@
           <small class="input-hint">オンにすると、各通貨ペアのスプレッドから概算したコストを差し引いた有効資金で最適化します</small>
         </div>
         <h3 style="margin-top: 1rem; margin-bottom: 0.5rem;">暴落防御設定</h3>
+        <p class="hint" style="margin-bottom: 0.75rem; font-size: 0.82rem; color: #64748b; line-height: 1.5;">
+          暴落防御を有効にすると、指定した暴落シナリオでもロスカットされないようポジション量を制限して最適化します。<br>
+          防御なしの場合はスワップ収益を最大化しますが、急落時にロスカットされるリスクがあります。
+        </p>
         <div class="input-group">
           <label>
             <input type="checkbox" id="optimizerCrashSafe">
-            暴落耐性モード（ポジションを自動調整）
+            暴落耐性モード
           </label>
-          <small class="input-hint">各通貨の最大下落率で暴落しても維持率200%を確保するようポジションを最適化します</small>
+          <small class="input-hint" style="line-height: 1.6;">
+            各通貨の<strong>過去の代表的な暴落（数日〜数週間）の下落率</strong>を想定し、暴落後も<strong>証拠金維持率200%以上</strong>を確保するようポジション量を制限します。<br>
+            例: TRY -35%, MXN -28%, ZAR -25%, HUF -15% が同時に発生しても安全な水準を維持。<br>
+            過去に何度か起きたレベルの暴落に耐えられる設定です。
+          </small>
         </div>
         <div class="input-group">
           <label>
             <input type="checkbox" id="optimizerCrashFullDefense">
-            暴落完全防御モード（最大級暴落に完全対応）
+            暴落完全防御モード
           </label>
-          <small class="input-hint">直近10年の歴史的最悪暴落率を使い、維持率300%以上を維持するようポジションを最適化します。より安全ですがリターンは低下します</small>
+          <small class="input-hint" style="line-height: 1.6;">
+            <strong>直近10年の歴史的最悪の暴落（ピーク→ボトム）</strong>を想定し、<strong>証拠金維持率300%以上</strong>を確保します。<br>
+            例: TRY -50%（2021年リラショック）, MXN -35%, ZAR -35% が来ても耐えられる最も安全な設定。<br>
+            ポジション量が大幅に制限されるためリターンは低下しますが、歴史的最悪の暴落でもロスカットされません。
+          </small>
+        </div>
+        <div class="input-group" id="optimizerCrashDurationGroup" style="display: none; margin-top: 0.5rem; padding: 8px 12px; background: #f8fafc; border-radius: 6px;">
+          <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; display: block;">暴落想定期間</label>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <label style="cursor: pointer; font-size: 0.85rem;">
+              <input type="radio" name="optimizerCrashDuration" value="period" checked> 暴落期間（数日〜数週間）
+            </label>
+            <label style="cursor: pointer; font-size: 0.85rem;">
+              <input type="radio" name="optimizerCrashDuration" value="daily"> 1日
+            </label>
+          </div>
+          <small style="display: block; margin-top: 4px; font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+            「暴落期間」= 数日〜数週間かけてピーク→ボトムまでの累積下落率。「1日」= 1日で起きうる最大下落率。<br>
+            短期トレーダーは「1日」、長期保有者は「暴落期間」を推奨。
+          </small>
+          <div id="optimizerCrashRateSummary" style="margin-top: 6px; font-size: 0.8rem; color: #64748b;"></div>
         </div>
         <div class="button-group">
           <button id="optimizeBtn" class="btn-primary">最適化を実行</button>
@@ -215,9 +243,10 @@
             <span class="sub-value" id="actualLeverage">-</span>
           </div>
           <div class="result-item">
-            <span class="label">期待リターン（税引前）</span>
+            <span class="label">実質リターン（税引前）</span>
             <span class="value" id="expectedReturn">-</span>
             <span class="sub-value" id="expectedReturnYen">-</span>
+            <span class="sub-value" id="returnBreakdown" style="font-size:0.75em; color:#888;"></span>
           </div>
         </div>
 
@@ -362,7 +391,13 @@
               <input type="number" id="compoundMonths" value="36" min="12" max="120" step="12">
               <span class="unit">ヶ月</span>
             </div>
+            <div class="config-item">
+              <label>毎月追加入金</label>
+              <input type="number" id="compoundMonthlyDeposit" value="0" min="0" step="5000">
+              <span class="unit">円/月</span>
+            </div>
           </div>
+          <small class="input-hint" style="margin-top: -0.5rem; display: block;">毎月追加入金を設定すると、毎月の入金分も複利運用に組み込まれます（0なら入金なし）</small>
 
           <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">証券会社選択</h3>
           <div class="compound-broker-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem;">
@@ -380,25 +415,54 @@
           <p class="hint">有効にする通貨ペアを選び、配分・レート・スワップポイント(1万通貨/日)・年間変動率を設定してください。</p>
           <div id="compoundCurrencyConfig"></div>
 
-          <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">運用モード選択</h3>
+          <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">運用モード選択</h3>
+          <p class="hint" style="margin-bottom: 1rem; font-size: 0.82rem; color: #64748b; line-height: 1.5;">
+            暴落防御モードでは、想定される暴落が来てもロスカットされない安全なレバレッジを自動計算し、そのレバレッジで複利運用をシミュレーションします。
+          </p>
           <div class="input-group">
             <div class="compound-mode-selector" style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <label class="mode-radio-label" id="modeLabelLeverage" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #3b82f6; border-radius: 8px; cursor: pointer; background: #eff6ff; text-align: center;">
+              <label class="mode-radio-label" id="modeLabelLeverage" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #3b82f6; border-radius: 8px; cursor: pointer; background: #eff6ff; text-align: left;">
                 <input type="radio" name="compoundMode" id="compoundModeLeverage" value="leverage" checked style="margin-right: 6px;">
                 <strong>レバレッジルール</strong><br>
-                <small style="color: #64748b;">手動でレバレッジを設定 + 暴落時の維持率を確認</small>
+                <small style="color: #64748b; line-height: 1.5;">
+                  レバレッジを手動設定して運用。暴落防御は行わず、暴落時の維持率は参考表示のみ。<br>
+                  高レバレッジ＝高リターンだが暴落時にロスカットリスクあり。
+                </small>
               </label>
-              <label class="mode-radio-label" id="modeLabelCrashSafe" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: center;">
+              <label class="mode-radio-label" id="modeLabelCrashSafe" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: left;">
                 <input type="radio" name="compoundMode" id="compoundModeCrashSafe" value="crashSafe" style="margin-right: 6px;">
                 <strong>暴落耐性モード</strong><br>
-                <small style="color: #64748b;">暴落後も維持率200%を確保するレバレッジを自動計算</small>
+                <small style="color: #64748b; line-height: 1.5;">
+                  過去の代表的な暴落（例: TRY -35%, MXN -28%）が来ても<strong>維持率200%以上</strong>を確保するレバレッジを自動計算。<br>
+                  過去に何度か起きたレベルの暴落に耐えられるバランス型。
+                </small>
               </label>
-              <label class="mode-radio-label" id="modeLabelFullDefense" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: center;">
+              <label class="mode-radio-label" id="modeLabelFullDefense" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; text-align: left;">
                 <input type="radio" name="compoundMode" id="compoundModeFullDefense" value="fullDefense" style="margin-right: 6px;">
                 <strong>暴落完全防御</strong><br>
-                <small style="color: #64748b;">歴史的最悪暴落率で維持率300%以上を確保</small>
+                <small style="color: #64748b; line-height: 1.5;">
+                  歴史的最悪の暴落（例: TRY -50%, MXN -35%）でも<strong>維持率300%以上</strong>を確保。<br>
+                  最も安全だがレバレッジが低くなるため複利効果は緩やか。
+                </small>
               </label>
             </div>
+          </div>
+
+          <div id="compoundCrashDurationGroup" style="display: none; margin-top: 0.75rem; padding: 8px 12px; background: #f8fafc; border-radius: 6px;">
+            <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; display: block;">暴落想定期間</label>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <label style="cursor: pointer; font-size: 0.85rem;">
+                <input type="radio" name="compoundCrashDuration" value="period" checked> 暴落期間（数日〜数週間）
+              </label>
+              <label style="cursor: pointer; font-size: 0.85rem;">
+                <input type="radio" name="compoundCrashDuration" value="daily"> 1日
+              </label>
+            </div>
+            <small style="display: block; margin-top: 4px; font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+              「暴落期間」= 数日〜数週間かけてピーク→ボトムまでの累積下落率。「1日」= 1日で起きうる最大下落率。<br>
+              短期トレーダーは「1日」、長期保有者は「暴落期間」が適切です。
+            </small>
+            <div id="compoundCrashRateSummary" style="margin-top: 6px; font-size: 0.8rem; color: #64748b;"></div>
           </div>
 
           <div style="margin-top: 1rem;">
@@ -490,6 +554,9 @@
         <section class="card" id="compoundResultSection" style="display: none;">
           <h2>シミュレーション結果</h2>
 
+          <!-- 保有上限警告 -->
+          <div id="compoundPositionLimitWarning" style="display: none; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.6; color: #92400e;"></div>
+
           <!-- サマリーカード -->
           <div class="result-summary compound-summary">
             <div class="result-item">
@@ -501,6 +568,11 @@
               <span class="label">総スワップ収益</span>
               <span class="value" id="compoundTotalSwap">-</span>
               <span class="sub-value" id="compoundMonthlyAvgSwap">-</span>
+            </div>
+            <div class="result-item" id="compoundDepositSummary" style="display: none;">
+              <span class="label">追加入金累計</span>
+              <span class="value">-</span>
+              <span class="sub-value">-</span>
             </div>
             <div class="result-item">
               <span class="label">トータルリターン</span>
@@ -588,11 +660,18 @@
         <!-- ポートフォリオサマリー -->
         <section class="card" id="portfolioSummarySection">
           <h2>サマリー</h2>
+          <div style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; color: #666;">口座残高（証券会社で確認）</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+              <input type="number" id="pfAccountBalance" value="0" min="0" step="10000" style="width: 160px;">
+              <span style="font-size: 0.85rem; color: #666;">円</span>
+            </div>
+          </div>
           <div class="result-summary portfolio-summary">
             <div class="result-item">
-              <span class="label">総資産評価額</span>
-              <span class="value" id="pfTotalValue">¥0</span>
-              <span class="sub-value" id="pfPositionCount">ポジション: 0件</span>
+              <span class="label">実行レバレッジ</span>
+              <span class="value" id="pfLeverage">-</span>
+              <span class="sub-value" id="pfLeverageDetail">想定元本: -</span>
             </div>
             <div class="result-item">
               <span class="label">含み損益</span>
@@ -984,7 +1063,7 @@
                   <th>通貨ペア</th>
                   <th>方向</th>
                   <th>ロット数</th>
-                  <th>エントリーレート</th>
+                  <th>現在レート</th>
                   <th>削除</th>
                 </tr>
               </thead>
@@ -1021,17 +1100,43 @@
               </label>
             </div>
             <h3 style="margin-top: 1rem; margin-bottom: 0.5rem;">暴落防御設定</h3>
+            <p class="hint" style="margin-bottom: 0.75rem; font-size: 0.82rem; color: #64748b; line-height: 1.5;">
+              現在のポジションが暴落に耐えられるか診断し、必要に応じてポジション削減の調整プランを提案します。
+            </p>
             <div class="input-group">
               <label>
                 <input type="checkbox" id="rebalanceCrashSafe">
-                暴落耐性モード（維持率200%確保）
+                暴落耐性モード
               </label>
+              <small class="input-hint" style="line-height: 1.6;">
+                過去の代表的な暴落（例: TRY -35%, MXN -28%）を想定し、暴落後も<strong>維持率200%以上</strong>を確保できるようポジション調整を提案。<br>
+                現在のポジションが基準を超えている場合、どの通貨をいくら減らすべきか具体的な削減プランを表示します。
+              </small>
             </div>
             <div class="input-group">
               <label>
                 <input type="checkbox" id="rebalanceCrashFullDefense">
-                暴落完全防御モード（維持率300%確保）
+                暴落完全防御モード
               </label>
+              <small class="input-hint" style="line-height: 1.6;">
+                歴史的最悪の暴落（例: TRY -50%, MXN -35%）でも<strong>維持率300%以上</strong>を確保する最も安全な基準で診断。<br>
+                大幅なポジション削減が必要になる場合がありますが、どんな暴落でもロスカットされない安心感が得られます。
+              </small>
+            </div>
+            <div class="input-group" id="rebalanceCrashDurationGroup" style="display: none; margin-top: 0.5rem; padding: 8px 12px; background: #f8fafc; border-radius: 6px;">
+              <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; display: block;">暴落想定期間</label>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <label style="cursor: pointer; font-size: 0.85rem;">
+                  <input type="radio" name="rebalanceCrashDuration" value="period" checked> 暴落期間（数日〜数週間）
+                </label>
+                <label style="cursor: pointer; font-size: 0.85rem;">
+                  <input type="radio" name="rebalanceCrashDuration" value="daily"> 1日
+                </label>
+              </div>
+              <small style="display: block; margin-top: 4px; font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+                「暴落期間」= 数日〜数週間かけてピーク→ボトムまでの累積下落率。「1日」= 1日で起きうる最大下落率。
+              </small>
+              <div id="rebalanceCrashRateSummary" style="margin-top: 6px; font-size: 0.8rem; color: #64748b;"></div>
             </div>
           </div>
           <div class="button-group">
@@ -1168,18 +1273,18 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="js/data-store.js?v=1"></script>
-  <script src="script.js?v=50"></script>
+  <script src="script.js?v=86"></script>
   <script src="js/portfolio.js?v=1"></script>
   <script src="js/portfolio-charts.js?v=1"></script>
   <script src="js/notifications.js?v=1"></script>
 
   <script>
-  // Service Worker 登録
+  // Service Worker: 古いキャッシュを削除してから再登録
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registered:', reg.scope))
-        .catch(err => console.log('SW registration failed:', err));
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => reg.unregister());
+      caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
+      console.log('古いSW/キャッシュを削除しました');
     });
   }
 

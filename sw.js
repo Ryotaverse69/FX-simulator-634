@@ -2,7 +2,7 @@
 // Service Worker — FXスワップ投資シミュレーター
 // ============================================================
 
-const CACHE_NAME = 'fxswap-v2';
+const CACHE_NAME = 'fxswap-v4';
 
 // キャッシュ対象の静的ファイル
 const STATIC_ASSETS = [

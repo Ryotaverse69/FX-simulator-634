@@ -134,57 +134,53 @@ const brokerInfo = {
 };
 
 // 各証券会社のスワップポイントデータ（フォールバック値 - swap-data.jsonで上書きされる）
-// 注意：エクセルデータに基づき、全通貨ペアで1万通貨（10000）単位で記載
+// 全通貨ペア1万通貨（10000）単位に統一。ソース: zai.diamond.jp 2026年1月実績平均
 let brokerSwapData = {
   gmo: {
-    // 2024年12月時点の実データ（エクセルより）
-    // 全て1万通貨（10000）単位でスワップポイントを記載
-    TRY_JPY: { swapBuy: 27, swapSell: -27, unit: 10000 },
-    MXN_JPY: { swapBuy: 16, swapSell: -16, unit: 10000 },
-    ZAR_JPY: { swapBuy: 15, swapSell: -15, unit: 10000 },
+    TRY_JPY: { swapBuy: 28.3, swapSell: -28.3, unit: 10000 },
+    MXN_JPY: { swapBuy: 14.6, swapSell: -14.6, unit: 10000 },
+    ZAR_JPY: { swapBuy: 12.7, swapSell: -12.7, unit: 10000 },
     HUF_JPY: { swapBuy: 2, swapSell: -2, unit: 10000 },
-    USD_JPY: { swapBuy: 140, swapSell: -140, unit: 10000 },
-    EUR_JPY: { swapBuy: 105, swapSell: -105, unit: 10000 },
-    CHF_JPY: { swapBuy: -12, swapSell: 12, unit: 10000 },
-    CZK_JPY: { swapBuy: 12, swapSell: -12, unit: 10000 }
+    CZK_JPY: { swapBuy: 10, swapSell: -10, unit: 10000 },
+    USD_JPY: { swapBuy: 141, swapSell: -141, unit: 10000 },
+    EUR_JPY: { swapBuy: 107, swapSell: -107, unit: 10000 },
+    CHF_JPY: { swapBuy: -12, swapSell: 12, unit: 10000 }
   },
   minnano: {
-    // 2026年1月2日時点の実データ（1Lot = 1万通貨 or 10万通貨）
-    TRY_JPY: { swapBuy: 29.5, swapSell: -29.5, unit: 10000 },
-    MXN_JPY: { swapBuy: 141, swapSell: -141, unit: 100000 },
-    ZAR_JPY: { swapBuy: 121, swapSell: -121, unit: 100000 },
-    HUF_JPY: { swapBuy: 60, swapSell: -60, unit: 100000 },
-    USD_JPY: { swapBuy: 155, swapSell: -155, unit: 10000 },
-    EUR_JPY: { swapBuy: 55, swapSell: -55, unit: 10000 },
-    CHF_JPY: { swapBuy: -47, swapSell: 47, unit: 10000 },
-    CZK_JPY: { swapBuy: 12, swapSell: -12, unit: 10000 }
+    TRY_JPY: { swapBuy: 25.2, swapSell: -25.2, unit: 10000 },
+    MXN_JPY: { swapBuy: 12.7, swapSell: -12.7, unit: 10000 },
+    ZAR_JPY: { swapBuy: 11.9, swapSell: -11.9, unit: 10000 },
+    HUF_JPY: { swapBuy: 0.5, swapSell: -0.5, unit: 10000 },
+    CZK_JPY: { swapBuy: 6, swapSell: -6, unit: 10000 },
+    USD_JPY: { swapBuy: 135, swapSell: -135, unit: 10000 },
+    EUR_JPY: { swapBuy: 86, swapSell: -86, unit: 10000 },
+    CHF_JPY: { swapBuy: -47, swapSell: 47, unit: 10000 }
   },
   lightfx: {
-    // LIGHT FX（トレイダーズ証券）のスワップポイント
-    TRY_JPY: { swapBuy: 29.5, swapSell: -29.5, unit: 10000 },
-    MXN_JPY: { swapBuy: 141, swapSell: -141, unit: 100000 },
-    ZAR_JPY: { swapBuy: 121, swapSell: -121, unit: 100000 },
-    HUF_JPY: { swapBuy: 60, swapSell: -60, unit: 100000 },
-    USD_JPY: { swapBuy: 155, swapSell: -155, unit: 10000 },
-    EUR_JPY: { swapBuy: 55, swapSell: -55, unit: 10000 },
-    CHF_JPY: { swapBuy: -47, swapSell: 47, unit: 10000 },
-    CZK_JPY: { swapBuy: 12, swapSell: -12, unit: 10000 }
+    TRY_JPY: { swapBuy: 25.2, swapSell: -25.2, unit: 10000 },
+    MXN_JPY: { swapBuy: 12.7, swapSell: -12.7, unit: 10000 },
+    ZAR_JPY: { swapBuy: 11.9, swapSell: -11.9, unit: 10000 },
+    HUF_JPY: { swapBuy: 0.5, swapSell: -0.5, unit: 10000 },
+    CZK_JPY: { swapBuy: 6, swapSell: -6, unit: 10000 },
+    USD_JPY: { swapBuy: 135, swapSell: -135, unit: 10000 },
+    EUR_JPY: { swapBuy: 86, swapSell: -86, unit: 10000 },
+    CHF_JPY: { swapBuy: -47, swapSell: 47, unit: 10000 }
   },
   gaikaex: {
     // GMO外貨ex — HUF_JPY, CZK_JPY は取扱なし
-    TRY_JPY: { swapBuy: 28, swapSell: -28, unit: 10000 },
-    MXN_JPY: { swapBuy: 14.5, swapSell: -14.5, unit: 10000 },
-    ZAR_JPY: { swapBuy: 12.6, swapSell: -12.6, unit: 10000 },
+    TRY_JPY: { swapBuy: 27.3, swapSell: -27.3, unit: 10000 },
+    MXN_JPY: { swapBuy: 14.7, swapSell: -14.7, unit: 10000 },
+    ZAR_JPY: { swapBuy: 12.8, swapSell: -12.8, unit: 10000 },
     HUF_JPY: null,
-    USD_JPY: { swapBuy: 149, swapSell: -149, unit: 10000 },
-    EUR_JPY: { swapBuy: 101, swapSell: -101, unit: 10000 },
+    USD_JPY: { swapBuy: 142, swapSell: -142, unit: 10000 },
+    EUR_JPY: { swapBuy: 103, swapSell: -103, unit: 10000 },
     CHF_JPY: { swapBuy: -5, swapSell: 5, unit: 10000 },
     CZK_JPY: null
   },
   dmm: {
     // DMM FX — HUF_JPY, CZK_JPY は取扱なし
-    TRY_JPY: { swapBuy: 28, swapSell: -31, unit: 10000 },
-    MXN_JPY: { swapBuy: 12, swapSell: -15, unit: 10000 },
+    TRY_JPY: { swapBuy: 27, swapSell: -30, unit: 10000 },
+    MXN_JPY: { swapBuy: 13, swapSell: -16, unit: 10000 },
     ZAR_JPY: { swapBuy: 12, swapSell: -15, unit: 10000 },
     HUF_JPY: null,
     USD_JPY: { swapBuy: 135, swapSell: -138, unit: 10000 },
@@ -194,23 +190,23 @@ let brokerSwapData = {
   },
   sbi: {
     // SBI FXトレード — HUF_JPY, CZK_JPY は取扱なし
-    TRY_JPY: { swapBuy: 26, swapSell: -24, unit: 10000 },
-    MXN_JPY: { swapBuy: 12.1, swapSell: -14, unit: 10000 },
-    ZAR_JPY: { swapBuy: 10.4, swapSell: -9.6, unit: 10000 },
+    TRY_JPY: { swapBuy: 25.1, swapSell: -23, unit: 10000 },
+    MXN_JPY: { swapBuy: 12.5, swapSell: -14, unit: 10000 },
+    ZAR_JPY: { swapBuy: 11.2, swapSell: -9.6, unit: 10000 },
     HUF_JPY: null,
     USD_JPY: { swapBuy: 131, swapSell: -129, unit: 10000 },
-    EUR_JPY: { swapBuy: 103, swapSell: -104, unit: 10000 },
+    EUR_JPY: { swapBuy: 99, swapSell: -100, unit: 10000 },
     CHF_JPY: { swapBuy: -34, swapSell: 24, unit: 10000 },
     CZK_JPY: null
   },
   central: {
     // セントラル短資FX — CZK_JPY は取扱なし
-    TRY_JPY: { swapBuy: 29, swapSell: -29, unit: 10000 },
-    MXN_JPY: { swapBuy: 12.5, swapSell: -14.5, unit: 10000 },
-    ZAR_JPY: { swapBuy: 12.9, swapSell: -17.8, unit: 10000 },
-    HUF_JPY: { swapBuy: 1, swapSell: -1, unit: 10000 },
-    USD_JPY: { swapBuy: 153, swapSell: -252, unit: 10000 },
-    EUR_JPY: { swapBuy: 98, swapSell: -103, unit: 10000 },
+    TRY_JPY: { swapBuy: 28.7, swapSell: -28.7, unit: 10000 },
+    MXN_JPY: { swapBuy: 13.1, swapSell: -15, unit: 10000 },
+    ZAR_JPY: { swapBuy: 13.7, swapSell: -18, unit: 10000 },
+    HUF_JPY: { swapBuy: 0.74, swapSell: -0.74, unit: 10000 },
+    USD_JPY: { swapBuy: 150, swapSell: -250, unit: 10000 },
+    EUR_JPY: { swapBuy: 87, swapSell: -92, unit: 10000 },
     CHF_JPY: { swapBuy: -36, swapSell: 26, unit: 10000 },
     CZK_JPY: null
   }
@@ -220,15 +216,15 @@ let brokerSwapData = {
 // annualRateChange: 年間レート変動率(%)。マイナス=下落。スワップは実額、レート変動はシミュで月次反映。
 const COMPOUND_CURRENCIES = [
   { id: 'HUF_JPY', name: 'HUF/JPY', label: 'ハンガリーフォリント',
-    defaultRate: 0.43, defaultSwap: 2, defaultSpread: 0.5, defaultCrashRate: 5, historicalWorstCrashRate: 7, defaultRatio: 70, defaultEnabled: true, annualRateChange: -3 },
+    defaultRate: 0.43, defaultSwap: 2, defaultSpread: 0.5, defaultDailyCrashRate: 5, defaultCrashRate: 15, historicalWorstDailyCrashRate: 7, historicalWorstCrashRate: 20, defaultRatio: 70, defaultEnabled: true, annualRateChange: -3 },
   { id: 'TRY_JPY', name: 'TRY/JPY', label: 'トルコリラ',
-    defaultRate: 3.6, defaultSwap: 27, defaultSpread: 1.7, defaultCrashRate: 18, historicalWorstCrashRate: 20, defaultRatio: 30, defaultEnabled: true, annualRateChange: -15 },
+    defaultRate: 3.6, defaultSwap: 28.3, defaultSpread: 1.7, defaultDailyCrashRate: 18, defaultCrashRate: 35, historicalWorstDailyCrashRate: 20, historicalWorstCrashRate: 50, defaultRatio: 30, defaultEnabled: true, annualRateChange: -15 },
   { id: 'MXN_JPY', name: 'MXN/JPY', label: 'メキシコペソ',
-    defaultRate: 8.7, defaultSwap: 16, defaultSpread: 0.2, defaultCrashRate: 7, historicalWorstCrashRate: 10, defaultRatio: 0, defaultEnabled: false, annualRateChange: -4 },
+    defaultRate: 8.7, defaultSwap: 14.6, defaultSpread: 0.2, defaultDailyCrashRate: 7, defaultCrashRate: 28, historicalWorstDailyCrashRate: 10, historicalWorstCrashRate: 35, defaultRatio: 0, defaultEnabled: false, annualRateChange: -4 },
   { id: 'ZAR_JPY', name: 'ZAR/JPY', label: '南アフリカランド',
-    defaultRate: 9.4, defaultSwap: 15, defaultSpread: 0.9, defaultCrashRate: 9, historicalWorstCrashRate: 12, defaultRatio: 0, defaultEnabled: false, annualRateChange: -6 },
+    defaultRate: 9.4, defaultSwap: 12.7, defaultSpread: 0.9, defaultDailyCrashRate: 9, defaultCrashRate: 25, historicalWorstDailyCrashRate: 12, historicalWorstCrashRate: 35, defaultRatio: 0, defaultEnabled: false, annualRateChange: -6 },
   { id: 'CZK_JPY', name: 'CZK/JPY', label: 'チェココルナ',
-    defaultRate: 7.0, defaultSwap: 12, defaultSpread: 0.1, defaultCrashRate: 4, historicalWorstCrashRate: 6, defaultRatio: 0, defaultEnabled: false, annualRateChange: -1 }
+    defaultRate: 7.0, defaultSwap: 10, defaultSpread: 0.1, defaultDailyCrashRate: 4, defaultCrashRate: 12, historicalWorstDailyCrashRate: 6, historicalWorstCrashRate: 18, defaultRatio: 0, defaultEnabled: false, annualRateChange: -1 }
 ];
 
 // 基本通貨ペアデータ（レート、ボラティリティ、期待下落率など）
@@ -248,8 +244,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 1000000, // 100万通貨（100lot）
     spread: 1.7, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 18, // 1日最大下落率(%) - 2018年8月トルコリラ危機実績
-    historicalWorstDrop: 20 // 直近10年の最悪想定(%) - 2018/8/10瞬間的に~20%下落
+    maxDailyDrop: 18, // 1日最大下落率(%) - 2018年8月トルコショック
+    maxCrashDrop: 35, // 暴落期間最大下落率(%) - 2018年8月 ~2週間で32%
+    historicalWorstDailyDrop: 20, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 50 // 最悪想定(%) - 2021年12月 ~6週間で46%
   },
   {
     id: 'MXN_JPY',
@@ -263,8 +261,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 3000000, // 300万通貨（30lot）
     spread: 0.2, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 7, // 1日最大下落率(%) - 2020年3月COVID暴落実績
-    historicalWorstDrop: 10 // 直近10年の最悪想定(%) - フラッシュクラッシュ等考慮
+    maxDailyDrop: 7, // 1日最大下落率(%) - 2020年3月COVID
+    maxCrashDrop: 28, // 暴落期間最大下落率(%) - 2020年3月COVID ~4週間で28%
+    historicalWorstDailyDrop: 10, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 35 // 最悪想定(%) - 極端シナリオ
   },
   {
     id: 'ZAR_JPY',
@@ -278,8 +278,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 3000000, // 300万通貨（30lot）
     spread: 0.9, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 9, // 1日最大下落率(%) - 2016年1月フラッシュクラッシュ実績
-    historicalWorstDrop: 12 // 直近10年の最悪想定(%) - 新興国通貨の極端シナリオ
+    maxDailyDrop: 9, // 1日最大下落率(%) - 2020年3月COVID
+    maxCrashDrop: 25, // 暴落期間最大下落率(%) - 2020年3月COVID ~6週間で25%
+    historicalWorstDailyDrop: 12, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 35 // 最悪想定(%) - 政治不安+グローバル危機
   },
   {
     id: 'HUF_JPY',
@@ -293,8 +295,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 10000000, // 1000万通貨（100lot）
     spread: 0.5, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 5, // 1日最大下落率(%) - 欧州通貨で比較的安定
-    historicalWorstDrop: 7 // 直近10年の最悪想定(%) - Brexit級イベント時の波及
+    maxDailyDrop: 5, // 1日最大下落率(%) - 2022年欧州エネルギー危機
+    maxCrashDrop: 15, // 暴落期間最大下落率(%) - 2022年欧州エネルギー危機 ~16%
+    historicalWorstDailyDrop: 7, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 20 // 最悪想定(%) - 欧州危機+円高シナリオ
   },
   {
     id: 'CZK_JPY',
@@ -308,8 +312,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'long',
     maxPosition: 5000000, // 500万通貨（50lot）
     spread: 0.1, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 4, // 1日最大下落率(%) - EUR連動で安定
-    historicalWorstDrop: 6 // 直近10年の最悪想定(%) - 欧州危機時の波及
+    maxDailyDrop: 4, // 1日最大下落率(%) - EUR連動
+    maxCrashDrop: 12, // 暴落期間最大下落率(%) - EUR連動、COVID ~10%
+    historicalWorstDailyDrop: 6, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 18 // 最悪想定(%) - 欧州危機時
   },
   {
     id: 'USD_JPY',
@@ -323,8 +329,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'short',
     maxPosition: 500000, // 50万通貨（50lot）
     spread: 0.2, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 4, // 1日最大下落率(%) - 2015年8月チャイナBM実績
-    historicalWorstDrop: 6 // 直近10年の最悪想定(%) - フラッシュクラッシュ考慮
+    maxDailyDrop: 4, // 1日最大下落率(%) - 2024年7-8月キャリー巻き戻し
+    maxCrashDrop: 12, // 暴落期間最大下落率(%) - 2024年7-8月キャリー巻き戻し ~12%
+    historicalWorstDailyDrop: 6, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 18 // 最悪想定(%) - 極端な円高シナリオ
   },
   {
     id: 'EUR_JPY',
@@ -338,8 +346,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'short',
     maxPosition: 500000, // 50万通貨（50lot）
     spread: 0.4, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 4, // 1日最大下落率(%) - 2016年Brexit実績
-    historicalWorstDrop: 6 // 直近10年の最悪想定(%) - 複合リスクイベント考慮
+    maxDailyDrop: 4, // 1日最大下落率(%) - 2016年Brexit、2024年7-8月
+    maxCrashDrop: 12, // 暴落期間最大下落率(%) - 2016年Brexit ~11%、2024年7-8月 ~11%
+    historicalWorstDailyDrop: 6, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 18 // 最悪想定(%) - 欧州危機+円高シナリオ
   },
   {
     id: 'CHF_JPY',
@@ -353,8 +363,10 @@ const baseCurrencyPairs = [
     defaultPosition: 'long', // リスク抑制のためロング（スワップ払いでも有効）
     maxPosition: 500000, // 50万通貨（50lot）
     spread: 1.8, // GMOクリック証券のスプレッド（銭）
-    maxDailyDrop: 8, // 1日最大下落率(%) - 2015年スイスフランショック考慮
-    historicalWorstDrop: 12 // 直近10年の最悪想定(%) - 2015/1/15 SNBショック級
+    maxDailyDrop: 8, // 1日最大下落率(%) - 2015年スイスフランショック
+    maxCrashDrop: 10, // 暴落期間最大下落率(%) - 安全通貨、2024年7-8月 ~8%
+    historicalWorstDailyDrop: 12, // 1日最悪想定(%)
+    historicalWorstCrashDrop: 15 // 最悪想定(%) - リスクオフ極端シナリオ
   }
 ];
 
@@ -932,7 +944,6 @@ function runOptimization() {
   setTimeout(() => {
     try {
       let results;
-      console.log('シャープレシオ最大化を実行中...');
       results = optimizeMaxSharpeRatio(enabledPairs, effectiveCapital, targetLeverage, allowShorts);
 
       if (!results) {
@@ -965,178 +976,153 @@ function runOptimization() {
 // 目的関数: シャープレシオ = スワップ / リスク の最大化
 // 制約: レバレッジ制約以下、ポジション上限
 function optimizeMaxSharpeRatio(pairs, totalCapital, maxLeverage, allowShorts) {
-  // 乱数シードをリセットして再現性を確保
-  rng = new SeededRandom(12345);
-
+  console.log('=== 配分最適化 v3 (分析的配分) ===');
   const n = pairs.length;
-
-  // 最適化単位を1000通貨に統一
   const OPTIMIZATION_UNIT = 1000;
 
-  // 各通貨ペアの1000通貨あたりの円建て価値
   const lotValues = pairs.map(pair => pair.rate * OPTIMIZATION_UNIT);
-
-  // 各通貨ペアの最大数量（1000通貨単位）
   const maxLots = pairs.map(pair => Math.floor(pair.maxPosition / OPTIMIZATION_UNIT));
-
-  // 各通貨ペアのボラティリティ（円建て・1000通貨・年率）
   const lotVolatilities = pairs.map(pair => (pair.volatility / 100) * pair.rate * OPTIMIZATION_UNIT);
-
-  // レバレッジ上限
-  // 注: スプレッドコストは結果表示時に計算し、最適化には影響させない
   const maxInvestable = totalCapital * maxLeverage;
 
   console.log(`レバレッジ制約: ${maxLeverage}倍 (最大投資額: ${maxInvestable.toLocaleString()}円)`);
 
-  // シミュレーテッドアニーリングによる最適化
-  let currentLots = Array(n).fill(0);
-
-  // 初期解: Excelの最適解から開始
-  initializeLotsForSharpe(currentLots, pairs, lotValues, maxLots, lotVolatilities, maxInvestable, allowShorts);
-
-  let bestLots = [...currentLots];
-  let bestSharpe = calculateSharpeByLotsCorrect(pairs, currentLots, lotVolatilities);
-
-  let temperature = 0.2;
-  const coolingRate = 0.90;
-  const iterations = 100; // 高速化のため100回に削減（Excel最適解ベースなので少なくてOK）
-  let noImprovementCount = 0;
-
-  const startTime = performance.now();
-  console.log('シャープレシオ最適化開始...');
-
-  for (let iter = 0; iter < iterations; iter++) {
-    // 25回ごとに進捗表示
-    if (iter % 25 === 0) {
-      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
-      console.log(`反復 ${iter}/${iterations} (${elapsed}秒経過, 現在のSharpe: ${bestSharpe.toFixed(3)})`);
-    }
-    const newLots = perturbLotsForSharpe(currentLots, pairs, null, lotValues, lotVolatilities, maxLots, maxInvestable, allowShorts);
-
-    const newSwap = calculateDailySwapCorrect(pairs, newLots);
-    const newRisk = calculatePortfolioRiskByLots(pairs, newLots, lotVolatilities);
-    const newSharpe = newRisk > 0 ? (newSwap * 365) / newRisk : 0;
-
-    const totalInvestment = newLots.reduce((sum, lot, i) => sum + Math.abs(lot) * lotValues[i], 0);
-    const leveragePenalty = totalInvestment > maxInvestable ? (totalInvestment - maxInvestable) / maxInvestable : 0;
-
-    const currentSwap = calculateDailySwapCorrect(pairs, currentLots);
-    const currentRisk = calculatePortfolioRiskByLots(pairs, currentLots, lotVolatilities);
-    const currentSharpe = currentRisk > 0 ? (currentSwap * 365) / currentRisk : 0;
-    const currentInvestment = currentLots.reduce((sum, lot, i) => sum + Math.abs(lot) * lotValues[i], 0);
-    const currentLeveragePenalty = currentInvestment > maxInvestable ? (currentInvestment - maxInvestable) / maxInvestable : 0;
-
-    const currentScore = currentSharpe - currentLeveragePenalty * 100;
-    const newScore = newSharpe - leveragePenalty * 100;
-
-    const delta = newScore - currentScore;
-
-    if (delta > 0 || rng.random() < Math.exp(delta / temperature)) {
-      currentLots = [...newLots];
-
-      // レバレッジ25倍を厳守（maxInvestableを超えない）
-      if (totalInvestment <= maxInvestable && newSharpe > bestSharpe) {
-        bestSharpe = newSharpe;
-        bestLots = [...newLots];
-        noImprovementCount = 0;
-      } else {
-        noImprovementCount++;
-      }
-    } else {
-      noImprovementCount++;
-    }
-
-    // 早期終了: 50回連続で改善なしなら終了
-    if (noImprovementCount > 50) {
-      console.log(`早期終了: ${iter}回で収束 (改善なし回数: ${noImprovementCount})`);
-      break;
-    }
-
-    temperature *= coolingRate;
+  // ロング通貨とショート通貨を分離
+  const longIndices = [];
+  const shortIndices = [];
+  for (let i = 0; i < n; i++) {
+    const isShortOnly = pairs[i].id === 'USD_JPY' || pairs[i].id === 'EUR_JPY';
+    if (isShortOnly) shortIndices.push(i);
+    else longIndices.push(i);
   }
 
-  const endTime = performance.now();
-  const totalTime = ((endTime - startTime) / 1000).toFixed(2);
-  const avgTimePerIter = ((endTime - startTime) / iterations).toFixed(2);
-  console.log(`最適化完了: ${totalTime}秒 (平均 ${avgTimePerIter}ms/回, 最終Sharpe: ${bestSharpe.toFixed(3)})`);
+  const numLong = longIndices.length;
+  if (numLong === 0) {
+    console.error('ロング通貨が1つもありません');
+    return calculateResultsByLotsCorrect(pairs, Array(n).fill(0), totalCapital, lotValues, lotVolatilities);
+  }
 
-  // レバレッジ制約の最終調整
+  // ショート通貨の予算
+  const shortBudgetRatio = (allowShorts && shortIndices.length > 0) ? 0.15 : 0;
+  const longBudget = maxInvestable * (1 - shortBudgetRatio) * 0.95;
+  const shortBudgetPerCurrency = shortBudgetRatio > 0
+    ? (maxInvestable * shortBudgetRatio * 0.95) / shortIndices.length : 0;
+
+  // === Step 1: 各通貨の個別Sharpe比を計算 ===
+  const individualSharpes = [];
+  for (let k = 0; k < numLong; k++) {
+    const i = longIndices[k];
+    // 1000通貨あたりの年間ネットリターン
+    const swapPer1000 = pairs[i].swapBuy / (pairs[i].unit / OPTIMIZATION_UNIT);
+    const annualSwap = swapPer1000 * 365;
+    const posValue = OPTIMIZATION_UNIT * pairs[i].rate;
+    const depLoss = posValue * ((pairs[i].expectedDepreciation || 0) / 100);
+    const netReturn = annualSwap - depLoss;
+    const risk = lotVolatilities[i]; // 1000通貨あたりの年間リスク（円）
+    const sharpe = risk > 0 ? netReturn / risk : 0;
+    individualSharpes.push(sharpe);
+    console.log(`  ${pairs[i].name}: 個別Sharpe=${sharpe.toFixed(4)} (swap=${annualSwap.toFixed(0)}, dep=-${depLoss.toFixed(0)}, net=${netReturn.toFixed(0)}, risk=${risk.toFixed(0)})`);
+  }
+
+  // === Step 2: 分析的配分計算 ===
+  // 均等配分(50%) + Sharpe比例配分(50%) のブレンド
+  const alpha = 0.5; // 分散重視度（0=Sharpe比例のみ, 1=均等のみ）
+  const equalWeight = 1 / numLong;
+
+  // 負のSharpeは0にクリップ
+  const clippedSharpes = individualSharpes.map(s => Math.max(s, 0));
+  const totalSharpe = clippedSharpes.reduce((sum, s) => sum + s, 0);
+
+  const weights = [];
+  for (let k = 0; k < numLong; k++) {
+    const sharpeWeight = totalSharpe > 0 ? clippedSharpes[k] / totalSharpe : equalWeight;
+    const blended = alpha * equalWeight + (1 - alpha) * sharpeWeight;
+    weights.push(blended);
+  }
+
+  // 正規化（合計100%）
+  const weightSum = weights.reduce((s, w) => s + w, 0);
+  const normalizedWeights = weights.map(w => w / weightSum);
+
+  console.log(`配分計算 (α=${alpha}): ${longIndices.map((idx, k) => pairs[idx].name + '=' + (normalizedWeights[k] * 100).toFixed(1) + '%').join(', ')}`);
+
+  // === Step 3: ロット数に変換 ===
+  let bestLots = Array(n).fill(0);
+
+  for (let k = 0; k < numLong; k++) {
+    const i = longIndices[k];
+    const budget = longBudget * normalizedWeights[k];
+    bestLots[i] = Math.min(maxLots[i], Math.max(0, Math.floor(budget / lotValues[i])));
+  }
+
+  // ショート通貨
+  if (allowShorts) {
+    for (const i of shortIndices) {
+      const lotCount = Math.floor(shortBudgetPerCurrency / lotValues[i]);
+      bestLots[i] = -Math.max(10, Math.min(maxLots[i], lotCount));
+    }
+  }
+
+  // === Step 4: レバレッジ最終調整 ===
   let finalInvestment = bestLots.reduce((sum, lot, i) => sum + Math.abs(lot) * lotValues[i], 0);
-  const targetUtilization = maxInvestable * 0.95; // 目標レバレッジの95%を目指す
+  const targetUtilization = maxInvestable * 0.95;
 
-  if (finalInvestment > maxInvestable) {
-    // 目標レバレッジを超えている場合: スケールダウン（厳守）
-    const scale = maxInvestable / finalInvestment;
-    console.log(`レバレッジ超過のため ${(scale * 100).toFixed(1)}% にスケールダウン`);
+  if (finalInvestment < targetUtilization && finalInvestment > 0) {
+    const scale = Math.min(1.5, targetUtilization / finalInvestment);
     bestLots = bestLots.map((lot, i) => {
-      const isShortOnlyCurrency = pairs[i].id === 'USD_JPY' || pairs[i].id === 'EUR_JPY';
-
-      if (lot > 0) {
-        return Math.floor(lot * scale);
-      } else if (lot < 0) {
-        const scaledLot = Math.ceil(lot * scale);
-        // ショート専用通貨は可能であれば最低-10単位（1万通貨）を維持
-        if (allowShorts && isShortOnlyCurrency && scaledLot > -10) {
-          return -10;
-        }
-        return scaledLot;
-      }
+      if (lot > 0) return Math.min(maxLots[i], Math.floor(lot * scale));
+      else if (lot < 0) return Math.max(-maxLots[i], Math.ceil(lot * scale));
       return 0;
     });
-
-    // スケールダウン後、再度レバレッジをチェック（厳守のため）
     finalInvestment = bestLots.reduce((sum, lot, i) => sum + Math.abs(lot) * lotValues[i], 0);
     if (finalInvestment > maxInvestable) {
-      // まだ超過している場合: ショート専用通貨も含めて再スケールダウン
-      const scale2 = maxInvestable / finalInvestment;
-      console.log(`再スケールダウン: ${(scale2 * 100).toFixed(1)}%（ショート含む）`);
+      const downScale = maxInvestable / finalInvestment;
       bestLots = bestLots.map((lot, i) => {
-        if (lot > 0) {
-          return Math.floor(lot * scale2);
-        } else if (lot < 0) {
-          return Math.ceil(lot * scale2);
-        }
+        if (lot > 0) return Math.floor(lot * downScale);
+        else if (lot < 0) return Math.ceil(lot * downScale);
         return 0;
       });
     }
-  } else if (finalInvestment < targetUtilization) {
-    // レバレッジに余裕がある場合: スケールアップ（最大ロット制約内で）
-    const scale = Math.min(1.2, targetUtilization / finalInvestment); // 最大20%増まで
-    console.log(`レバレッジ余裕あり: ${(scale * 100).toFixed(1)}% にスケールアップ`);
+  } else if (finalInvestment > maxInvestable) {
+    const downScale = maxInvestable / finalInvestment;
     bestLots = bestLots.map((lot, i) => {
-      if (lot > 0) {
-        return Math.min(maxLots[i], Math.max(10, Math.floor(lot * scale)));
-      } else if (lot < 0) {
-        return Math.max(-maxLots[i], Math.min(-10, Math.ceil(lot * scale)));
-      }
+      if (lot > 0) return Math.floor(lot * downScale);
+      else if (lot < 0) return Math.ceil(lot * downScale);
       return 0;
     });
-
-    // スケールアップ後、レバレッジを再チェック
-    finalInvestment = bestLots.reduce((sum, lot, i) => sum + Math.abs(lot) * lotValues[i], 0);
-    if (finalInvestment > maxInvestable) {
-      const scale = maxInvestable / finalInvestment;
-      console.log(`スケールアップ後にレバレッジ超過: ${(scale * 100).toFixed(1)}% に再調整`);
-      bestLots = bestLots.map((lot, i) => {
-        const isShortOnlyCurrency = pairs[i].id === 'USD_JPY' || pairs[i].id === 'EUR_JPY';
-
-        if (lot > 0) {
-          return Math.floor(lot * scale);
-        } else if (lot < 0) {
-          const scaledLot = Math.ceil(lot * scale);
-          // ショート専用通貨は最低-10単位（1万通貨）を維持（ヘッジ保持）
-          if (allowShorts && isShortOnlyCurrency) {
-            return Math.min(-10, scaledLot);
-          }
-          return scaledLot;
-        }
-        return 0;
-      });
-    }
   }
 
-  // 結果の計算（正しいスワップ計算を使用）
+  // 最終結果のログ
+  const finalLongInv = longIndices.reduce((sum, i) => sum + Math.abs(bestLots[i]) * lotValues[i], 0);
+  for (let k = 0; k < numLong; k++) {
+    const i = longIndices[k];
+    const inv = Math.abs(bestLots[i]) * lotValues[i];
+    const pct = finalLongInv > 0 ? (inv / finalLongInv * 100) : 0;
+    console.log(`  最終配分 ${pairs[i].name}: ${pct.toFixed(1)}% (${bestLots[i]}ロット)`);
+  }
+
   return calculateResultsByLotsCorrect(pairs, bestLots, totalCapital, lotValues, lotVolatilities);
+}
+
+// 実質年間リターン計算：スワップ収入 - 期待下落による含み損
+// lotsは1000通貨単位での数量
+function calculateNetAnnualReturn(pairs, lots) {
+  const OPTIMIZATION_UNIT = 1000;
+  const annualSwap = calculateDailySwapCorrect(pairs, lots) * 365;
+  let depreciationPL = 0;
+  for (let i = 0; i < pairs.length; i++) {
+    if (lots[i] === 0) continue;
+    const positionValue = Math.abs(lots[i]) * OPTIMIZATION_UNIT * pairs[i].rate;
+    const depRate = (pairs[i].expectedDepreciation || 0) / 100;
+    if (lots[i] > 0) {
+      // ロング: 通貨下落は損失
+      depreciationPL -= positionValue * depRate;
+    } else {
+      // ショート: 通貨下落は利益
+      depreciationPL += positionValue * depRate;
+    }
+  }
+  return annualSwap + depreciationPL;
 }
 
 // 正しいスワップ計算：ロットの符号に応じてswapBuy/swapSellを使い分ける
@@ -1161,10 +1147,9 @@ function calculateDailySwapCorrect(pairs, lots) {
 }
 
 function calculateSharpeByLotsCorrect(pairs, lots, lotVolatilities) {
-  const dailySwap = calculateDailySwapCorrect(pairs, lots);
-  const annualSwap = dailySwap * 365;
+  const netReturn = calculateNetAnnualReturn(pairs, lots);
   const risk = calculatePortfolioRiskByLots(pairs, lots, lotVolatilities);
-  return risk > 0 ? annualSwap / risk : 0;
+  return risk > 0 ? netReturn / risk : 0;
 }
 
 // 正しい結果計算関数
@@ -1173,8 +1158,9 @@ function calculateResultsByLotsCorrect(pairs, lots, totalCapital, lotValues, lot
   const OPTIMIZATION_UNIT = 1000;
   const dailySwap = calculateDailySwapCorrect(pairs, lots);
   const annualSwap = dailySwap * 365;
+  const netAnnualReturn = calculateNetAnnualReturn(pairs, lots);
   const riskYen = calculatePortfolioRiskByLots(pairs, lots, lotVolatilities);
-  const sharpe = riskYen > 0 ? annualSwap / riskYen : 0;
+  const sharpe = riskYen > 0 ? netAnnualReturn / riskYen : 0;
 
   // 各ペアの配分詳細
   const allocations = pairs.map((pair, i) => {
@@ -1236,21 +1222,21 @@ function calculateResultsByLotsCorrect(pairs, lots, totalCapital, lotValues, lot
     }
   }
 
-  // 期待リターンはスプレッドコスト考慮後の実質リターンとして計算
-  // totalCapitalは有効資金（スプレッドコスト差し引き後）なので、
-  // 実質的な投資元本に対するリターンを計算
-  const netSwap = annualSwap; // スワップ収益
-  const expectedReturn = totalCapital > 0 ? (netSwap / totalCapital) * 100 : 0;
+  // 期待リターン: スワップ収入 - 通貨下落による含み損
+  const expectedReturn = totalCapital > 0 ? (netAnnualReturn / totalCapital) * 100 : 0;
+  const depreciationLoss = annualSwap - netAnnualReturn; // 期待下落損（正の値=損失）
 
   return {
     allocations: allocations,
     totalAnnualSwap: annualSwap,
+    netAnnualReturn: netAnnualReturn,
+    depreciationLoss: depreciationLoss,
     totalMargin: totalMargin,
     riskYen: riskYen,
     sharpe: sharpe,
     totalInvestment: totalInvestment,
     expectedReturn: expectedReturn,
-    expectedReturnYen: annualSwap,
+    expectedReturnYen: netAnnualReturn,
     riskContributions: riskContributions,
     weights: lots, // ロット数を返す
     spreadCost: spreadCost // スプレッドコスト（円）
@@ -1258,61 +1244,79 @@ function calculateResultsByLotsCorrect(pairs, lots, totalCapital, lotValues, lot
 }
 
 function initializeLotsForSharpe(lots, pairs, lotValues, maxLots, lotVolatilities, maxInvestable, allowShorts) {
-  const OPTIMIZATION_UNIT = 1000;
+  // 有効通貨に円建てで均等配分する初期化
+  // ショート専用通貨は10%、ヘッジ通貨は5%、残りをロング通貨に均等配分
+  const targetInvestment = maxInvestable * 0.90;
 
-  // Excelの最適解の比率を使って、レバレッジ制約内で初期化
-  // Excel最適解（投資資金100万円想定、証券会社のロット単位）
-  const excelLotsOriginal = {};
-  excelLotsOriginal['TRY_JPY'] = 100;   // 100ロット = 100万通貨
-  excelLotsOriginal['HUF_JPY'] = 1000;  // 1000ロット = 1億通貨
-  excelLotsOriginal['CZK_JPY'] = 15;    // 15ロット = 15万通貨
-  excelLotsOriginal['CHF_JPY'] = 0;
-  excelLotsOriginal['USD_JPY'] = -2;    // -2ロット = -2万通貨
-  excelLotsOriginal['EUR_JPY'] = -4;    // -4ロット = -4万通貨
-  excelLotsOriginal['MXN_JPY'] = 0;
-  excelLotsOriginal['ZAR_JPY'] = 0;
-
-  // 証券会社のロット数を1000通貨単位に変換
-  const excelLots = {};
+  // 通貨をカテゴリ分類
+  const longIndices = [];
+  const shortIndices = [];
   for (let i = 0; i < pairs.length; i++) {
-    const pair = pairs[i];
-    const originalLot = excelLotsOriginal[pair.id] || 0;
-    // ロット数 * 証券会社の単位 / 1000通貨 = 1000通貨単位での数量
-    excelLots[pair.id] = originalLot * (pair.unit / OPTIMIZATION_UNIT);
-  }
-
-  // Excel最適解の総投資額を計算
-  let excelTotalInvestment = 0;
-  for (let i = 0; i < pairs.length; i++) {
-    const pair = pairs[i];
-    const excelLot = excelLots[pair.id] || 0;
-    excelTotalInvestment += Math.abs(excelLot) * lotValues[i];
-  }
-
-  // スケール係数を計算（目標レバレッジの95%を目指す）
-  const targetInvestment = maxInvestable * 0.95; // 目標レバレッジの95%
-  const scale = excelTotalInvestment > 0 ? targetInvestment / excelTotalInvestment : 1;
-
-  // スケールして初期化
-  for (let i = 0; i < pairs.length; i++) {
-    const pair = pairs[i];
-    const excelLot = excelLots[pair.id] || 0;
-
-    if (excelLot > 0) {
-      lots[i] = Math.max(10, Math.floor(excelLot * scale));
-    } else if (excelLot < 0 && allowShorts) {
-      lots[i] = Math.min(-10, Math.ceil(excelLot * scale));
+    const isShortOnly = pairs[i].id === 'USD_JPY' || pairs[i].id === 'EUR_JPY';
+    if (isShortOnly) {
+      shortIndices.push(i);
     } else {
-      lots[i] = 0;
+      longIndices.push(i);
     }
   }
+
+  // ロング通貨に均等配分
+  const longBudget = allowShorts ? targetInvestment * 0.85 : targetInvestment;
+  const shortBudget = allowShorts ? targetInvestment * 0.15 : 0;
+  const perLongBudget = longIndices.length > 0 ? longBudget / longIndices.length : 0;
+  const perShortBudget = shortIndices.length > 0 ? shortBudget / shortIndices.length : 0;
+
+  for (const i of longIndices) {
+    const lotCount = Math.floor(perLongBudget / lotValues[i]);
+    lots[i] = Math.max(10, Math.min(maxLots[i], lotCount));
+  }
+
+  if (allowShorts) {
+    for (const i of shortIndices) {
+      const lotCount = Math.floor(perShortBudget / lotValues[i]);
+      lots[i] = Math.min(-10, Math.max(-maxLots[i], -lotCount));
+    }
+  }
+
+  console.log(`初期化: ロング${longIndices.length}通貨に均等配分 (各¥${Math.round(perLongBudget).toLocaleString()})`);
 }
 
 function perturbLotsForSharpe(currentLots, pairs, swapsPerLot, lotValues, lotVolatilities, maxLots, maxInvestable, allowShorts) {
   const n = currentLots.length;
   const newLots = [...currentLots];
 
-  // ランダムにペアを選択
+  // ロング通貨のインデックスを特定
+  const longIndices = [];
+  const shortOnlyIndices = [];
+  const hedgeIndices = [];
+  for (let k = 0; k < n; k++) {
+    const isShortOnly = pairs[k].id === 'USD_JPY' || pairs[k].id === 'EUR_JPY';
+    const isHedge = pairs[k].id === 'CHF_JPY';
+    if (isShortOnly) shortOnlyIndices.push(k);
+    else if (isHedge) hedgeIndices.push(k);
+    else longIndices.push(k);
+  }
+
+  // 40%の確率でスワップ操作（ロング通貨間の配分移動）
+  if (longIndices.length >= 2 && rng.random() < 0.4) {
+    // 2つのロング通貨を選んで、片方を減らしてもう片方を増やす
+    const idx1 = longIndices[Math.floor(rng.random() * longIndices.length)];
+    let idx2 = longIndices[Math.floor(rng.random() * longIndices.length)];
+    while (idx2 === idx1) {
+      idx2 = longIndices[Math.floor(rng.random() * longIndices.length)];
+    }
+
+    // 移動量は円建てで等価になるよう調整
+    const baseAmount = lotValues[idx1] * (Math.floor(rng.random() * 20) + 5); // 5〜24ユニット分の円額
+    const delta1 = Math.max(1, Math.round(baseAmount / lotValues[idx1]));
+    const delta2 = Math.max(1, Math.round(baseAmount / lotValues[idx2]));
+
+    newLots[idx1] = Math.max(0, newLots[idx1] - delta1);
+    newLots[idx2] = Math.min(maxLots[idx2], newLots[idx2] + delta2);
+    return newLots;
+  }
+
+  // 通常の単一通貨摂動
   const i = Math.floor(rng.random() * n);
   const pair = pairs[i];
 
@@ -1320,13 +1324,10 @@ function perturbLotsForSharpe(currentLots, pairs, swapsPerLot, lotValues, lotVol
   const maxPossibleLots = maxLots[i];
   let delta;
   if (maxPossibleLots > 50000) {
-    // HUFなど大きなポジションが可能な通貨（100万通貨以上）: 100〜2000単位（10万〜200万通貨）
     delta = Math.floor(rng.random() * 1900) + 100;
   } else if (maxPossibleLots > 5000) {
-    // TRY, CZKなど中規模（50万通貨以上）: 10〜500単位（1万〜50万通貨）
     delta = Math.floor(rng.random() * 490) + 10;
   } else {
-    // USD, EUR, CHFなど小規模: 10〜200単位（1万〜20万通貨）
     delta = Math.floor(rng.random() * 190) + 10;
   }
 
@@ -1334,32 +1335,24 @@ function perturbLotsForSharpe(currentLots, pairs, swapsPerLot, lotValues, lotVol
   const isHedgeCurrency = pair.id === 'CHF_JPY';
 
   if (allowShorts && isShortOnlyCurrency) {
-    // USD/EUR はショート専用（ロング方向は探索しない）
     const maxShortLots = Math.floor(maxLots[i] * 0.5);
-    const minShortLots = -10; // 最低10単位（1万通貨）はショートを維持
-
-    // 70%の確率でショート量を増やす、30%の確率で減らす（ヘッジを重視）
+    const minShortLots = -10;
     if (rng.random() < 0.7) {
       newLots[i] = Math.max(-maxShortLots, newLots[i] - delta);
     } else {
-      // ショート量を減らすが、最低10単位は維持（ゼロにはしない）
       newLots[i] = Math.max(minShortLots, Math.min(-10, newLots[i] + delta));
     }
   } else if (allowShorts && isHedgeCurrency) {
-    // CHF は両方向探索可能（ヘッジ効果）
     const maxShortLots = Math.floor(maxLots[i] * 0.5);
     if (rng.random() < 0.6) {
-      // 60%の確率でショート方向
       newLots[i] = Math.max(-maxShortLots, newLots[i] - delta);
     } else {
       newLots[i] = Math.min(maxLots[i], newLots[i] + delta);
     }
   } else {
-    // 高スワップ通貨は増減（ランダムウォーク）
-    if (rng.random() < 0.6) {
-      // 60%の確率で増加（スワップ重視）
-      const newValue = Math.min(maxLots[i], currentLots[i] + delta);
-      newLots[i] = newValue;
+    // ロング通貨は50/50で増減（偏りなし）
+    if (rng.random() < 0.5) {
+      newLots[i] = Math.min(maxLots[i], currentLots[i] + delta);
     } else {
       newLots[i] = Math.max(0, currentLots[i] - delta);
     }
@@ -1383,6 +1376,19 @@ function calculatePortfolioRiskByLots(pairs, lots, lotVolatilities) {
   }
 
   return Math.sqrt(Math.max(0, variance));
+}
+
+// 集中度（HHI: Herfindahl-Hirschman Index）を計算
+// 全て1通貨に集中 → 1.0、N通貨に均等分散 → 1/N
+function calculateConcentrationHHI(lots, lotValues) {
+  const totalInvestment = lots.reduce((sum, lot, i) => sum + Math.abs(lot) * lotValues[i], 0);
+  if (totalInvestment === 0) return 1;
+  let hhi = 0;
+  for (let i = 0; i < lots.length; i++) {
+    const weight = (Math.abs(lots[i]) * lotValues[i]) / totalInvestment;
+    hhi += weight * weight;
+  }
+  return hhi;
 }
 
 // 効率的フロンティアを計算（複数のリスク水準で最適化を実行）
@@ -1443,16 +1449,17 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, a
     let preTotalUnrealizedLoss = 0;
     let prePostCrashNotional = 0;
 
-    // 完全防御モード: historicalWorstDrop + 維持率300%目標
-    // 耐性モード: maxDailyDrop + 維持率200%目標
+    // 完全防御モード: historicalWorstCrashDrop + 維持率300%目標
+    // 耐性モード: maxCrashDrop + 維持率200%目標
     const useHistorical = optCrashFullDefense;
     const targetMaintenanceRate = optCrashFullDefense ? 3.0 : 2.0;
 
+    const useDaily = document.querySelector('input[name="optimizerCrashDuration"]:checked')?.value === 'daily';
     results.allocations.forEach(alloc => {
       if (alloc.lots === 0) return;
       const crashRate = useHistorical
-        ? (alloc.pair.historicalWorstDrop || alloc.pair.maxDailyDrop || 10) / 100
-        : (alloc.pair.maxDailyDrop || 10) / 100;
+        ? ((useDaily ? alloc.pair.historicalWorstDailyDrop : alloc.pair.historicalWorstCrashDrop) || alloc.pair.maxCrashDrop || 10) / 100
+        : ((useDaily ? alloc.pair.maxDailyDrop : alloc.pair.maxCrashDrop) || 10) / 100;
       const absUnits = Math.abs(alloc.units);
       const currentNotional = absUnits * alloc.pair.rate;
       const unrealizedLoss = alloc.position === 'long'
@@ -1493,6 +1500,8 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, a
       if (results.expectedReturnYen) results.expectedReturnYen *= crashSafeScale;
       if (results.spreadCost) results.spreadCost *= crashSafeScale;
       if (results.estimatedSpreadCost) results.estimatedSpreadCost *= crashSafeScale;
+      if (results.depreciationLoss) results.depreciationLoss *= crashSafeScale;
+      if (results.netAnnualReturn) results.netAnnualReturn *= crashSafeScale;
     }
   }
 
@@ -1520,26 +1529,15 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, a
   const spreadCostRate = originalCapital > 0 ? (actualSpreadCost / originalCapital) * 100 : 0;
 
   // 期待リターン計算
-  // 常に元の投資資金に対するリターンを計算
-  // スプレッドコスト考慮時は、スワップからスプレッドコストを差し引いた実質リターン
-  const netAnnualSwap = considerSpread ? results.totalAnnualSwap - actualSpreadCost : results.totalAnnualSwap;
-  const expectedReturn = originalCapital > 0 ? (netAnnualSwap / originalCapital) * 100 : 0;
+  // 実質リターン = スワップ収入 - 期待下落損 - スプレッドコスト
+  const depreciationLoss = results.depreciationLoss || 0;
+  const netReturn = results.totalAnnualSwap - depreciationLoss - (considerSpread ? actualSpreadCost : 0);
+  const expectedReturn = originalCapital > 0 ? (netReturn / originalCapital) * 100 : 0;
 
-  // 日次・月次の実質スワップ
-  const netDailySwap = netAnnualSwap / 365;
-  const netMonthlySwap = netAnnualSwap / 12;
-
-  // サマリー（エクセル形式）
-  // スプレッドコスト考慮時は実質スワップを表示
-  if (considerSpread && actualSpreadCost > 0) {
-    document.getElementById('annualSwap').textContent = `¥${Math.round(netAnnualSwap).toLocaleString()} / 年`;
-    document.getElementById('dailySwap').textContent = `¥${Math.round(netDailySwap).toLocaleString()}`;
-    document.getElementById('monthlySwap').textContent = `¥${Math.round(netMonthlySwap).toLocaleString()}`;
-  } else {
-    document.getElementById('annualSwap').textContent = `¥${Math.round(results.totalAnnualSwap).toLocaleString()} / 年`;
-    document.getElementById('dailySwap').textContent = `¥${Math.round(dailySwap).toLocaleString()}`;
-    document.getElementById('monthlySwap').textContent = `¥${Math.round(monthlySwap).toLocaleString()}`;
-  }
+  // スワップ表示（純粋なスワップ収入を表示）
+  document.getElementById('annualSwap').textContent = `¥${Math.round(results.totalAnnualSwap).toLocaleString()} / 年`;
+  document.getElementById('dailySwap').textContent = `¥${Math.round(dailySwap).toLocaleString()}`;
+  document.getElementById('monthlySwap').textContent = `¥${Math.round(monthlySwap).toLocaleString()}`;
 
   document.getElementById('annualRisk').textContent = `¥${Math.round(annualRiskYen).toLocaleString()} / 年`;
   document.getElementById('dailyRisk').textContent = `¥${Math.round(dailyRiskYen).toLocaleString()}`;
@@ -1557,26 +1555,33 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, a
   document.getElementById('actualLeverage').textContent = leverageText;
 
   // コンソールに詳細を出力
-  if (considerSpread) {
-    console.log(`元の投資資金: ¥${originalCapital.toLocaleString()}`);
-    console.log(`年間スワップ（税引前）: ¥${Math.round(results.totalAnnualSwap).toLocaleString()}`);
-    console.log(`スプレッドコスト: ¥${Math.round(actualSpreadCost).toLocaleString()} (${spreadCostRate.toFixed(2)}%)`);
-    console.log(`実質スワップ収益: ¥${Math.round(netAnnualSwap).toLocaleString()}`);
-    console.log(`実質リターン: ${expectedReturn.toFixed(2)}% (元本に対して、スプレッド控除後)`);
-  } else {
-    console.log(`投資資金: ¥${totalCapital.toLocaleString()}`);
-    console.log(`期待リターン: ${expectedReturn.toFixed(2)}%`);
+  console.log(`投資資金: ¥${originalCapital.toLocaleString()}`);
+  console.log(`年間スワップ（税引前）: ¥${Math.round(results.totalAnnualSwap).toLocaleString()}`);
+  if (depreciationLoss > 0) {
+    console.log(`期待下落損: ¥${Math.round(depreciationLoss).toLocaleString()}`);
   }
+  if (considerSpread && actualSpreadCost > 0) {
+    console.log(`スプレッドコスト: ¥${Math.round(actualSpreadCost).toLocaleString()} (${spreadCostRate.toFixed(2)}%)`);
+  }
+  console.log(`実質リターン: ¥${Math.round(netReturn).toLocaleString()} (${expectedReturn.toFixed(2)}%)`)
 
   document.getElementById('expectedReturn').textContent = `${expectedReturn.toFixed(2)}%`;
   const expectedReturnYenEl = document.getElementById('expectedReturnYen');
-  // スプレッドコスト考慮時は実質スワップ収益を表示
-  if (considerSpread && actualSpreadCost > 0) {
-    expectedReturnYenEl.textContent = `（¥${Math.round(netAnnualSwap).toLocaleString()}）`;
-  } else if (expectedReturnYenEl && results.expectedReturnYen !== undefined) {
-    expectedReturnYenEl.textContent = `（¥${Math.round(results.expectedReturnYen).toLocaleString()}）`;
-  } else if (expectedReturnYenEl) {
-    expectedReturnYenEl.textContent = '';
+  if (expectedReturnYenEl) {
+    expectedReturnYenEl.textContent = `（¥${Math.round(netReturn).toLocaleString()}）`;
+  }
+
+  // 内訳表示
+  const breakdownEl = document.getElementById('returnBreakdown');
+  if (breakdownEl) {
+    const parts = [`スワップ ¥${Math.round(results.totalAnnualSwap).toLocaleString()}`];
+    if (depreciationLoss > 0) {
+      parts.push(`期待下落損 -¥${Math.round(depreciationLoss).toLocaleString()}`);
+    }
+    if (considerSpread && actualSpreadCost > 0) {
+      parts.push(`スプレッド -¥${Math.round(actualSpreadCost).toLocaleString()}`);
+    }
+    breakdownEl.textContent = parts.length > 1 ? parts.join(' / ') : '';
   }
 
   // 配分テーブル
@@ -1627,14 +1632,15 @@ function displayResults(pairs, weights, results, totalCapital, targetLeverage, a
     let postCrashNotional = 0;
     const stressDetails = [];
 
-    // 完全防御モード時はhistoricalWorstDropを使用
+    // 完全防御モード時はhistoricalWorstCrashDropを使用
     const useHistoricalForStress = optCrashFullDefense;
 
+    const useDailyForStress = document.querySelector('input[name="optimizerCrashDuration"]:checked')?.value === 'daily';
     results.allocations.forEach(alloc => {
       if (alloc.lots === 0) return;
       const crashRate = useHistoricalForStress
-        ? (alloc.pair.historicalWorstDrop || alloc.pair.maxDailyDrop || 10) / 100
-        : (alloc.pair.maxDailyDrop || 10) / 100;
+        ? ((useDailyForStress ? alloc.pair.historicalWorstDailyDrop : alloc.pair.historicalWorstCrashDrop) || alloc.pair.maxCrashDrop || 10) / 100
+        : ((useDailyForStress ? alloc.pair.maxDailyDrop : alloc.pair.maxCrashDrop) || 10) / 100;
       const absUnits = Math.abs(alloc.units);
       const currentNotional = absUnits * alloc.pair.rate;
 
@@ -2039,7 +2045,7 @@ function renderCompoundCurrencyConfig() {
             <th>スワップ(円/万通貨/日)</th>
             <th class="spread-col">スプレッド(銭)</th>
             <th>年間変動率(%)</th>
-            <th class="crash-rate-col">1日最大下落率(%)</th>
+            <th class="crash-rate-col">暴落時最大下落率(%)</th>
           </tr>
         </thead>
         <tbody>
@@ -2125,6 +2131,68 @@ function getCompoundMode() {
   return 'leverage'; // デフォルト
 }
 
+// 暴落率サマリー表示更新（共通ヘルパー）
+function updateCrashRateSummary(summaryElId, pairs, durationName, isFullDefense, useDaily) {
+  const el = document.getElementById(summaryElId);
+  if (!el) return;
+  const parts = pairs.map(p => {
+    let rate;
+    if (isFullDefense) {
+      rate = useDaily ? (p.historicalWorstDailyDrop || p.maxDailyDrop || 10) : (p.historicalWorstCrashDrop || p.maxCrashDrop || 10);
+    } else {
+      rate = useDaily ? (p.maxDailyDrop || 10) : (p.maxCrashDrop || 10);
+    }
+    return `${p.name.split('/')[0]} ${rate}%`;
+  });
+  el.innerHTML = `<span style="color: #475569;">適用暴落率（${durationName}）:</span> ${parts.join(' / ')}`;
+}
+
+// ポートフォリオ最適化の暴落率サマリー更新
+function updateOptimizerCrashRateSummary() {
+  const safe = document.getElementById('optimizerCrashSafe')?.checked;
+  const full = document.getElementById('optimizerCrashFullDefense')?.checked;
+  const group = document.getElementById('optimizerCrashDurationGroup');
+  if (group) group.style.display = (safe || full) ? '' : 'none';
+  if (!safe && !full) return;
+  const useDaily = document.querySelector('input[name="optimizerCrashDuration"]:checked')?.value === 'daily';
+  const enabledPairs = currencyPairs.filter(p => document.querySelector(`.currency-enabled[data-id="${p.id}"]`)?.checked);
+  updateCrashRateSummary('optimizerCrashRateSummary', enabledPairs, useDaily ? '1日' : '暴落期間', full, useDaily);
+}
+
+// 複利シミュの暴落率サマリー更新
+function updateCompoundCrashRateSummary() {
+  const mode = getCompoundMode();
+  const isCrash = mode === 'crashSafe' || mode === 'fullDefense';
+  if (!isCrash) return;
+  const useDaily = document.querySelector('input[name="compoundCrashDuration"]:checked')?.value === 'daily';
+  const enabledPairs = COMPOUND_CURRENCIES.filter(c => document.getElementById(`compound_${c.id}_enabled`)?.checked);
+  const pairs = enabledPairs.map(c => ({
+    name: c.name,
+    maxDailyDrop: c.defaultDailyCrashRate,
+    maxCrashDrop: c.defaultCrashRate,
+    historicalWorstDailyDrop: c.historicalWorstDailyCrashRate,
+    historicalWorstCrashDrop: c.historicalWorstCrashRate
+  }));
+  updateCrashRateSummary('compoundCrashRateSummary', pairs, useDaily ? '1日' : '暴落期間', mode === 'fullDefense', useDaily);
+}
+
+// 軌道修正の暴落率サマリー更新
+function updateRebalanceCrashRateSummary() {
+  const safe = document.getElementById('rebalanceCrashSafe')?.checked;
+  const full = document.getElementById('rebalanceCrashFullDefense')?.checked;
+  const group = document.getElementById('rebalanceCrashDurationGroup');
+  if (group) group.style.display = (safe || full) ? '' : 'none';
+  if (!safe && !full) return;
+  const useDaily = document.querySelector('input[name="rebalanceCrashDuration"]:checked')?.value === 'daily';
+  // 軌道修正のポジションテーブルから使用中の通貨ペアを取得
+  const usedPairIds = new Set();
+  document.querySelectorAll('#rebalancePositionBody .rb-pair').forEach(sel => {
+    if (sel.value) usedPairIds.add(sel.value);
+  });
+  const pairs = baseCurrencyPairs.filter(p => usedPairIds.has(p.id));
+  updateCrashRateSummary('rebalanceCrashRateSummary', pairs.length > 0 ? pairs : baseCurrencyPairs, useDaily ? '1日' : '暴落期間', full, useDaily);
+}
+
 // 暴落モード有効/無効で下落率列の表示切替 + レバレッジルールセクション制御
 function updateCrashRateVisibility() {
   const mode = getCompoundMode();
@@ -2164,12 +2232,23 @@ function updateCrashRateVisibility() {
     const el = document.getElementById('modeLabelFullDefense');
     if (el) { el.style.borderColor = '#f59e0b'; el.style.background = '#fffbeb'; }
   }
+
+  // 暴落想定期間トグルの表示/非表示
+  const crashDurationGroup = document.getElementById('compoundCrashDurationGroup');
+  if (crashDurationGroup) {
+    crashDurationGroup.style.display = isCrashMode ? '' : 'none';
+  }
+  if (isCrashMode) {
+    updateCompoundCrashRateSummary();
+  }
 }
 
 // DOMから有効通貨の設定を読み取る
 function readCompoundCurrencies(ratioOverrides) {
   const mode = getCompoundMode();
   const isCrashMode = mode === 'crashSafe' || mode === 'fullDefense';
+  const compoundBroker = document.querySelector('.compound-broker-btn.active')?.dataset?.compoundBroker || currentBroker;
+  const brokerMaxPos = brokerInfo[compoundBroker]?.maxPositions || {};
   const currencies = [];
 
   COMPOUND_CURRENCIES.forEach(c => {
@@ -2180,6 +2259,11 @@ function readCompoundCurrencies(ratioOverrides) {
       ? (ratioOverrides[c.id] !== undefined ? ratioOverrides[c.id] : 0)
       : (parseFloat(document.getElementById(`compound_${c.id}_ratio`)?.value) || 0) / 100;
 
+    // ブローカー別の保有上限（通貨単位）→ lot数（万通貨単位）に変換
+    // maxPositionsに通貨がない場合は取扱なし（0）
+    const maxPosCurrency = (c.id in brokerMaxPos) ? brokerMaxPos[c.id] : 0;
+    const maxLots = Math.floor(maxPosCurrency / 10000);
+
     currencies.push({
       id: c.id,
       name: c.name,
@@ -2187,11 +2271,14 @@ function readCompoundCurrencies(ratioOverrides) {
       swap: parseFloat(document.getElementById(`compound_${c.id}_swap`)?.value) || c.defaultSwap,
       spread: parseFloat(document.getElementById(`compound_${c.id}_spread`)?.value) || c.defaultSpread || 0,
       ratio: ratio,
+      dailyCrashRate: (c.defaultDailyCrashRate || c.defaultCrashRate) / 100,
       crashRate: (parseFloat(document.getElementById(`compound_${c.id}_crash`)?.value) || c.defaultCrashRate) / 100,
+      historicalWorstDailyCrashRate: (c.historicalWorstDailyCrashRate || c.historicalWorstCrashRate || c.defaultCrashRate) / 100,
       historicalWorstCrashRate: (c.historicalWorstCrashRate || c.defaultCrashRate) / 100,
       annualRateChange: (parseFloat(document.getElementById(`compound_${c.id}_rateChange`)?.value) || 0) / 100,
       unit: 10000,
-      marginRate: 0.04
+      marginRate: 0.04,
+      maxLots: maxLots
     });
   });
 
@@ -2202,7 +2289,8 @@ function readCompoundCurrencies(ratioOverrides) {
 function runCompoundSimulation(options = {}) {
   const { ratioOverrides, silent } = options;
   const initialCapital = parseFloat(document.getElementById('compoundInitialCapital').value) || 400000;
-  const months = parseInt(document.getElementById('compoundMonths').value) || 36;
+  const months = Math.max(1, parseInt(document.getElementById('compoundMonths').value) || 36);
+  const monthlyDeposit = parseFloat(document.getElementById('compoundMonthlyDeposit')?.value) || 0;
   const compoundBroker = document.querySelector('.compound-broker-btn.active')?.dataset?.compoundBroker || currentBroker;
   const spreadEnabled = document.getElementById('compoundSpreadEnabled')?.checked || false;
 
@@ -2248,9 +2336,10 @@ function runCompoundSimulation(options = {}) {
     // 完全防御モード: historicalWorstCrashRateを使用、耐性モード: crashRateを使用
     // 完全防御モード: historicalWorstCrashRate + 維持率300%目標
     // 耐性モード: crashRate + 維持率200%目標
+    const useDailyCompound = document.querySelector('input[name="compoundCrashDuration"]:checked')?.value === 'daily';
     const weightedCrashRate = crashFullDefenseMode
-      ? currencies.reduce((sum, c) => sum + c.ratio * c.historicalWorstCrashRate, 0)
-      : currencies.reduce((sum, c) => sum + c.ratio * c.crashRate, 0);
+      ? currencies.reduce((sum, c) => sum + c.ratio * (useDailyCompound ? c.historicalWorstDailyCrashRate : c.historicalWorstCrashRate), 0)
+      : currencies.reduce((sum, c) => sum + c.ratio * (useDailyCompound ? c.dailyCrashRate : c.crashRate), 0);
     const targetMaintenanceRate = crashFullDefenseMode ? 3.0 : 2.0;
     maxSafeLeverage = 1 / (weightedCrashRate + (1 - weightedCrashRate) * 0.04 * targetMaintenanceRate) * 0.99;
     if (!silent) {
@@ -2290,6 +2379,7 @@ function runCompoundSimulation(options = {}) {
   let reinvestCount = 0;
   let totalCumulativeSwap = 0; // 再投資でリセットされないスワップ累計
   let totalSpreadCost = initialSpreadCost; // スプレッドコスト累計
+  const positionLimitHits = {}; // 上限到達した通貨と到達月を記録
 
   // 各通貨の現在レート（月ごとに変動する）と購入時平均レートを追跡
   const currentRates = {};
@@ -2321,20 +2411,21 @@ function runCompoundSimulation(options = {}) {
   }
 
   // N通貨ストレステスト計算ヘルパー
-  // レバレッジルールモード: maxDailyDrop(defaultCrashRate)で計算（表示のみ）
+  // レバレッジルールモード: maxCrashDrop(defaultCrashRate)で計算（表示のみ）
   // 暴落耐性モード: crashRateで計算
   // 暴落完全防御モード: historicalWorstCrashRateで計算
   function calcStressData(lots, totalAssets) {
     let totalLoss = 0;
     let postCrashNotional = 0;
+    const useDailyStress = document.querySelector('input[name="compoundCrashDuration"]:checked')?.value === 'daily';
     currencies.forEach(c => {
       let rate;
       if (crashFullDefenseMode) {
-        rate = c.historicalWorstCrashRate;
+        rate = useDailyStress ? c.historicalWorstDailyCrashRate : c.historicalWorstCrashRate;
       } else if (crashSafeMode) {
-        rate = c.crashRate;
+        rate = useDailyStress ? c.dailyCrashRate : c.crashRate;
       } else {
-        rate = c.crashRate > 0 ? c.crashRate : (c.historicalWorstCrashRate || 0.1);
+        rate = (useDailyStress ? c.dailyCrashRate : c.crashRate) || (c.historicalWorstCrashRate || 0.1);
       }
       totalLoss += lots[c.id] * c.unit * currentRates[c.id] * rate;
       postCrashNotional += lots[c.id] * c.unit * currentRates[c.id] * (1 - rate);
@@ -2389,6 +2480,11 @@ function runCompoundSimulation(options = {}) {
     state.accumulatedSwap += monthlySwap;
     totalCumulativeSwap += monthlySwap;
 
+    // 2.5. 毎月追加入金をキャッシュに加算
+    if (monthlyDeposit > 0) {
+      state.cashReserve += monthlyDeposit;
+    }
+
     // 3. 総資産を計算（含み損益を反映）
     const totalNotional = calcTotalNotionalWithRates(state.lots);
     const totalMargin = totalNotional * 0.04;
@@ -2431,7 +2527,7 @@ function runCompoundSimulation(options = {}) {
         if (maxAdditionalNotional > 10000) {
           // 現在のレートで追加購入（レート変動後の価格で買う）
           const currenciesWithCurrentRates = currencies.map(c => ({ ...c, rate: currentRates[c.id] }));
-          const purchase = calculateAdditionalPurchaseN(availableCash, currenciesWithCurrentRates, maxAdditionalNotional);
+          const purchase = calculateAdditionalPurchaseN(availableCash, currenciesWithCurrentRates, maxAdditionalNotional, state.lots);
 
           const anyPurchased = currencies.some(c => purchase.lots[c.id] > 0);
           if (anyPurchased) {
@@ -2450,6 +2546,13 @@ function runCompoundSimulation(options = {}) {
             state.accumulatedSwap = 0;
             action = 'reinvest';
             reinvestCount++;
+            // 上限到達チェック
+            currencies.forEach(c => {
+              if (c.maxLots && c.maxLots !== Infinity && state.lots[c.id] >= c.maxLots && !positionLimitHits[c.id]) {
+                positionLimitHits[c.id] = { name: c.name, month: month, lots: state.lots[c.id], maxLots: c.maxLots };
+                if (!silent) console.log(`月${month}: ${c.name} が保有上限 ${c.maxLots.toLocaleString()}万通貨に到達`);
+              }
+            });
           }
         }
       }
@@ -2471,6 +2574,7 @@ function runCompoundSimulation(options = {}) {
       leverage: newLeverage,
       monthlySwap: monthlySwap,
       cumulativeSwap: totalCumulativeSwap,
+      totalDeposit: monthlyDeposit * month,
       unrealizedPL: newUnrealizedPL,
       spreadCost: totalSpreadCost,
       action: action,
@@ -2482,15 +2586,17 @@ function runCompoundSimulation(options = {}) {
 
   // 結果を表示（silentモードでは表示をスキップ）
   if (!silent) {
-    displayCompoundResults(results, initialCapital, reinvestCount, showStressResults, crashSafeMode || crashFullDefenseMode, maxSafeLeverage, currencies, activeCompoundDefense, compoundBroker);
+    displayCompoundResults(results, initialCapital, reinvestCount, showStressResults, crashSafeMode || crashFullDefenseMode, maxSafeLeverage, currencies, activeCompoundDefense, compoundBroker, monthlyDeposit, positionLimitHits);
   }
 
   return results;
 }
 
 // 配分最適化
-// N通貨の配分組合せを生成（合計100%）
+// N通貨の配分組合せを生成（合計100%、0〜100%を許可）
 function generateRatioCombinations(n, step = 5) {
+  if (n === 1) return [[100]];
+
   // 4通貨以上の場合はstep=10に自動切替
   if (n >= 4 && step < 10) step = 10;
 
@@ -2563,25 +2669,36 @@ function optimizeCompoundRatio() {
     });
   });
 
-  // リスク調整スコアの計算（正規化方式）
-  if (stressTestEnabled && ratioResults.some(r => r.minMaintenanceRate !== null)) {
-    const swapValues = ratioResults.map(r => r.totalSwap);
-    const maxSwap = Math.max(...swapValues);
-    const minSwap = Math.min(...swapValues);
-    const swapRange = maxSwap - minSwap || 1;
+  // リスク調整スコアの計算
+  // finalAssets = スワップ収入 + 含み損益（通貨下落損）を含む実質リターン
+  // minMaintenanceRate = 暴落時の安全度（リスク指標）
+  const normalize = (values) => {
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const range = max - min || 1;
+    return values.map(v => (v - min) / range);
+  };
 
-    ratioResults.forEach(r => {
-      const normalizedSwap = (r.totalSwap - minSwap) / swapRange;
+  const normalizedAssets = normalize(ratioResults.map(r => r.finalAssets));
+  const normalizedSwaps = normalize(ratioResults.map(r => r.totalSwap));
+
+  if (stressTestEnabled && ratioResults.some(r => r.minMaintenanceRate !== null)) {
+    // 暴落防御モード: 実質リターン40% + 暴落安全性40% + スワップ収入20%
+    ratioResults.forEach((r, i) => {
       let normalizedSafety = 1;
       if (r.minMaintenanceRate !== null) {
         if (r.minMaintenanceRate >= 300) normalizedSafety = 1.0;
         else if (r.minMaintenanceRate >= 100) normalizedSafety = (r.minMaintenanceRate - 100) / 200;
         else normalizedSafety = 0;
       }
-      r.riskAdjustedScore = normalizedSwap * 0.5 + normalizedSafety * 0.5;
+      r.riskAdjustedScore = normalizedAssets[i] * 0.4 + normalizedSafety * 0.4 + normalizedSwaps[i] * 0.2;
     });
   } else {
-    ratioResults.forEach(r => { r.riskAdjustedScore = r.finalAssets; });
+    // 通常モード: 実質リターン（finalAssets）が全てを含む指標
+    // finalAssets = 初期資金 + スワップ累計 + 含み損益（通貨下落損） - スプレッドコスト
+    ratioResults.forEach((r, i) => {
+      r.riskAdjustedScore = normalizedAssets[i];
+    });
   }
 
   // 最適配分の決定
@@ -2779,18 +2896,44 @@ function renderRatioOptChart(ratioResults, best, stressTestEnabled = false) {
   });
 }
 
-// N通貨対応: 初期ポジション購入計算
+// N通貨対応: 初期ポジション購入計算（上限到達時は他通貨に再配分）
 function calculateInitialPurchaseN(capital, currencies, maxLeverage) {
   const maxNotional = capital * maxLeverage;
   const lots = {};
-  let totalActualNotional = 0;
+  currencies.forEach(c => { lots[c.id] = 0; });
 
-  currencies.forEach(c => {
-    const notional = maxNotional * c.ratio;
-    const lotCount = Math.floor(notional / (c.unit * c.rate));
-    lots[c.id] = lotCount;
-    totalActualNotional += lotCount * c.unit * c.rate;
-  });
+  let unallocatedNotional = maxNotional;
+  let activeRatios = currencies.map(c => ({ id: c.id, ratio: c.ratio, currency: c }));
+
+  for (let round = 0; round < 3 && unallocatedNotional > 0; round++) {
+    const totalRatio = activeRatios.reduce((s, r) => s + r.ratio, 0);
+    if (totalRatio <= 0) break;
+
+    const capped = [];
+    let usedNotional = 0;
+
+    activeRatios.forEach(r => {
+      const c = r.currency;
+      const notional = unallocatedNotional * (r.ratio / totalRatio);
+      let lotCount = Math.floor(notional / (c.unit * c.rate));
+      if (c.maxLots !== undefined && c.maxLots !== Infinity) {
+        const cap = c.maxLots - lots[c.id];
+        if (lotCount > cap) {
+          lotCount = Math.max(0, cap);
+          capped.push(c.id);
+        }
+      }
+      lots[c.id] += lotCount;
+      usedNotional += lotCount * c.unit * c.rate;
+    });
+
+    if (capped.length === 0) break;
+    unallocatedNotional -= usedNotional;
+    activeRatios = activeRatios.filter(r => !capped.includes(r.id));
+  }
+
+  let totalActualNotional = 0;
+  currencies.forEach(c => { totalActualNotional += lots[c.id] * c.unit * c.rate; });
 
   return {
     lots: lots,
@@ -2798,19 +2941,60 @@ function calculateInitialPurchaseN(capital, currencies, maxLeverage) {
   };
 }
 
-// N通貨対応: 追加購入計算
-function calculateAdditionalPurchaseN(availableCash, currencies, maxAdditionalNotional) {
+// N通貨対応: 追加購入計算（currentLotsで現在保有数を考慮、上限到達時は他通貨に再配分）
+function calculateAdditionalPurchaseN(availableCash, currencies, maxAdditionalNotional, currentLots) {
   const maxNotionalFromCash = availableCash / 0.04;
   const maxNotional = Math.min(maxNotionalFromCash, maxAdditionalNotional);
   const lots = {};
-  let totalActualNotional = 0;
+  currencies.forEach(c => { lots[c.id] = 0; });
 
+  // 各通貨の残り枠を計算
+  const remainingCapacity = {};
   currencies.forEach(c => {
-    const notional = maxNotional * c.ratio;
-    const lotCount = Math.floor(notional / (c.unit * c.rate));
-    lots[c.id] = lotCount;
-    totalActualNotional += lotCount * c.unit * c.rate;
+    if (c.maxLots !== undefined && c.maxLots !== Infinity && currentLots) {
+      remainingCapacity[c.id] = Math.max(0, c.maxLots - (currentLots[c.id] || 0));
+    } else {
+      remainingCapacity[c.id] = Infinity;
+    }
   });
+
+  // まず配分比率通りに計算し、上限で切った分を再配分
+  let unallocatedNotional = maxNotional;
+  let activeRatios = currencies.map(c => ({ id: c.id, ratio: c.ratio, currency: c }));
+
+  for (let round = 0; round < 3 && unallocatedNotional > 0; round++) {
+    const totalRatio = activeRatios.reduce((s, r) => s + r.ratio, 0);
+    if (totalRatio <= 0) break;
+
+    const capped = [];
+    let usedNotional = 0;
+
+    activeRatios.forEach(r => {
+      const c = r.currency;
+      const notional = unallocatedNotional * (r.ratio / totalRatio);
+      let lotCount = Math.floor(notional / (c.unit * c.rate));
+
+      // 残り枠で制限
+      if (remainingCapacity[c.id] !== Infinity) {
+        const cap = remainingCapacity[c.id] - lots[c.id];
+        if (lotCount > cap) {
+          lotCount = Math.max(0, cap);
+          capped.push(c.id);
+        }
+      }
+
+      lots[c.id] += lotCount;
+      usedNotional += lotCount * c.unit * c.rate;
+    });
+
+    // 上限に達した通貨を除外して再配分
+    if (capped.length === 0) break;
+    unallocatedNotional -= usedNotional;
+    activeRatios = activeRatios.filter(r => !capped.includes(r.id));
+  }
+
+  let totalActualNotional = 0;
+  currencies.forEach(c => { totalActualNotional += lots[c.id] * c.unit * c.rate; });
 
   return {
     lots: lots,
@@ -2819,7 +3003,7 @@ function calculateAdditionalPurchaseN(availableCash, currencies, maxAdditionalNo
 }
 
 // 複利シミュレーション結果表示
-function displayCompoundResults(results, initialCapital, reinvestCount, stressTestEnabled = false, crashSafeMode = false, maxSafeLeverage = Infinity, currencies = [], activeDefenseMode = null, compoundBroker = null) {
+function displayCompoundResults(results, initialCapital, reinvestCount, stressTestEnabled = false, crashSafeMode = false, maxSafeLeverage = Infinity, currencies = [], activeDefenseMode = null, compoundBroker = null, monthlyDeposit = 0, positionLimitHits = {}) {
   const broker = compoundBroker || currentBroker;
   const finalResult = results[results.length - 1];
   const totalMonths = results.length - 1;
@@ -2827,17 +3011,34 @@ function displayCompoundResults(results, initialCapital, reinvestCount, stressTe
   const totalSwap = results.reduce((sum, r) => sum + r.monthlySwap, 0);
   const monthlyAvgSwap = totalSwap / totalMonths;
 
-  const totalReturn = ((finalResult.totalAssets - initialCapital) / initialCapital) * 100;
+  const totalDeposit = monthlyDeposit * totalMonths;
+  const totalInvested = initialCapital + totalDeposit;
+  const totalReturn = ((finalResult.totalAssets - totalInvested) / totalInvested) * 100;
   const years = totalMonths / 12;
-  const annualizedReturn = (Math.pow(finalResult.totalAssets / initialCapital, 1 / years) - 1) * 100;
+  const annualizedReturn = (Math.pow(finalResult.totalAssets / totalInvested, 1 / years) - 1) * 100;
 
   document.getElementById('compoundFinalAssets').textContent = `¥${Math.round(finalResult.totalAssets).toLocaleString()}`;
-  document.getElementById('compoundAssetGrowth').textContent = `初期比 +¥${Math.round(finalResult.totalAssets - initialCapital).toLocaleString()}`;
+  const growthText = totalDeposit > 0
+    ? `投資総額¥${Math.round(totalInvested).toLocaleString()}比 +¥${Math.round(finalResult.totalAssets - totalInvested).toLocaleString()}`
+    : `初期比 +¥${Math.round(finalResult.totalAssets - initialCapital).toLocaleString()}`;
+  document.getElementById('compoundAssetGrowth').textContent = growthText;
   document.getElementById('compoundTotalSwap').textContent = `¥${Math.round(totalSwap).toLocaleString()}`;
   document.getElementById('compoundMonthlyAvgSwap').textContent = `月平均 ¥${Math.round(monthlyAvgSwap).toLocaleString()}`;
-  document.getElementById('compoundTotalReturn').textContent = `+${totalReturn.toFixed(1)}%`;
+  document.getElementById('compoundTotalReturn').textContent = `${totalReturn >= 0 ? '+' : ''}${totalReturn.toFixed(1)}%`;
   document.getElementById('compoundAnnualizedReturn').textContent = `年率 ${annualizedReturn.toFixed(1)}%`;
   document.getElementById('compoundFinalLeverage').textContent = `${finalResult.leverage.toFixed(2)}倍`;
+
+  // 追加入金サマリー表示
+  const depositSummaryEl = document.getElementById('compoundDepositSummary');
+  if (depositSummaryEl) {
+    if (totalDeposit > 0) {
+      depositSummaryEl.style.display = '';
+      depositSummaryEl.querySelector('.value').textContent = `¥${Math.round(totalDeposit).toLocaleString()}`;
+      depositSummaryEl.querySelector('.sub-value').textContent = `月¥${Math.round(monthlyDeposit).toLocaleString()} × ${totalMonths}ヶ月`;
+    } else {
+      depositSummaryEl.style.display = 'none';
+    }
+  }
 
   // 含み損益・スプレッド・純損益サマリー
   const finalUnrealizedPL = finalResult.unrealizedPL || 0;
@@ -3019,11 +3220,13 @@ function displayCompoundResults(results, initialCapital, reinvestCount, stressTe
       <td>¥${Math.round(result.totalAssets).toLocaleString()}</td>
     `;
 
-    // 各通貨のロット列
+    // 各通貨のロット列（ブローカー単位で表示）
     currencies.forEach(c => {
       const lotCount = result.lots[c.id] || 0;
-      const units = lotCount * 10000;
-      html += `<td>${lotCount.toLocaleString()}lot<br><small>${units.toLocaleString()}通貨</small></td>`;
+      const units = lotCount * c.unit;
+      const brokerUnit = brokerSwapData[broker]?.[c.id]?.unit || c.unit;
+      const brokerLots = lotCount * c.unit / brokerUnit;
+      html += `<td>${brokerLots.toLocaleString()}lot<br><small>${units.toLocaleString()}通貨</small></td>`;
     });
 
     html += `
@@ -3096,6 +3299,22 @@ function displayCompoundResults(results, initialCapital, reinvestCount, stressTe
   });
 
   renderAssetGrowthChart(results);
+
+  // 保有上限到達の警告表示
+  const limitWarningEl = document.getElementById('compoundPositionLimitWarning');
+  if (limitWarningEl) {
+    const hitEntries = Object.values(positionLimitHits);
+    if (hitEntries.length > 0) {
+      const brokerName = brokerInfo[broker]?.name || broker;
+      const warnings = hitEntries.map(h =>
+        `${h.name}: ${h.month}ヶ月目に上限${h.maxLots.toLocaleString()}万通貨に到達`
+      ).join('<br>');
+      limitWarningEl.innerHTML = `<strong>${brokerName}の保有上限に到達:</strong><br>${warnings}<br><small>上限到達後はその通貨の追加購入が停止され、複利効果が制限されます。</small>`;
+      limitWarningEl.style.display = '';
+    } else {
+      limitWarningEl.style.display = 'none';
+    }
+  }
 
   // 複利シミュ結果をグローバルに保存（軌道修正タブから参照）
   lastCompoundSimResults = results;
@@ -3280,6 +3499,10 @@ function setupCompoundEventListeners() {
       updateCrashRateVisibility();
     });
   });
+  // 複利シミュ: 暴落想定期間トグル変更時にサマリー更新
+  document.querySelectorAll('input[name="compoundCrashDuration"]').forEach(radio => {
+    radio.addEventListener('change', updateCompoundCrashRateSummary);
+  });
 
   // 最適化シミュ: 暴落完全防御と暴落耐性は排他的
   const optCrashSafe = document.getElementById('optimizerCrashSafe');
@@ -3287,11 +3510,17 @@ function setupCompoundEventListeners() {
   if (optCrashSafe && optCrashFullDefense) {
     optCrashFullDefense.addEventListener('change', () => {
       if (optCrashFullDefense.checked) optCrashSafe.checked = false;
+      updateOptimizerCrashRateSummary();
     });
     optCrashSafe.addEventListener('change', () => {
       if (optCrashSafe.checked) optCrashFullDefense.checked = false;
+      updateOptimizerCrashRateSummary();
     });
   }
+  // 最適化シミュ: 暴落想定期間トグル変更時にサマリー更新
+  document.querySelectorAll('input[name="optimizerCrashDuration"]').forEach(radio => {
+    radio.addEventListener('change', updateOptimizerCrashRateSummary);
+  });
 
   // シミュレーション実行ボタン
   const runBtn = document.getElementById('runCompoundSimBtn');
@@ -3381,9 +3610,15 @@ function initRebalance() {
   const rbCrashFull = document.getElementById('rebalanceCrashFullDefense');
   rbCrashFull.addEventListener('change', () => {
     if (rbCrashFull.checked) rbCrashSafe.checked = false;
+    updateRebalanceCrashRateSummary();
   });
   rbCrashSafe.addEventListener('change', () => {
     if (rbCrashSafe.checked) rbCrashFull.checked = false;
+    updateRebalanceCrashRateSummary();
+  });
+  // 軌道修正: 暴落想定期間トグル変更時にサマリー更新
+  document.querySelectorAll('input[name="rebalanceCrashDuration"]').forEach(radio => {
+    radio.addEventListener('change', updateRebalanceCrashRateSummary);
   });
 
   // 診断＆調整プラン作成ボタン
@@ -3409,13 +3644,16 @@ function addRebalancePositionRow(preset) {
   const row = document.createElement('tr');
   const availablePairs = getRebalanceCurrencyOptions(rebalanceBroker);
 
+  const selectedPairId = preset ? preset.currencyPair : (availablePairs[0]?.id || '');
   const pairOptions = availablePairs.map(p =>
-    `<option value="${p.id}" ${preset && preset.currencyPair === p.id ? 'selected' : ''}>${p.name} (${p.fullName})</option>`
+    `<option value="${p.id}" ${p.id === selectedPairId ? 'selected' : ''}>${p.name} (${p.fullName})</option>`
   ).join('');
 
   const direction = preset ? preset.direction : 'long';
   const lots = preset ? preset.lots : '';
-  const entryRate = preset ? preset.entryRate : '';
+  // 現在レート: presetにcurrentRateがあればそれを使う、なければbaseCurrencyPairsから取得
+  const defaultRate = baseCurrencyPairs.find(p => p.id === selectedPairId)?.rate || '';
+  const currentRate = preset?.currentRate || defaultRate;
 
   row.innerHTML = `
     <td><select class="rb-pair">${pairOptions}</select></td>
@@ -3424,9 +3662,17 @@ function addRebalancePositionRow(preset) {
       <option value="short" ${direction === 'short' ? 'selected' : ''}>売り</option>
     </select></td>
     <td><input type="number" class="rb-lots" value="${lots}" min="0.1" step="0.1" placeholder="ロット"></td>
-    <td><input type="number" class="rb-entry-rate" value="${entryRate}" step="0.001" placeholder="レート"></td>
+    <td><input type="number" class="rb-current-rate" value="${currentRate}" step="0.001" placeholder="レート"></td>
     <td><button class="rb-remove-btn" title="削除">&times;</button></td>
   `;
+
+  // 通貨ペア変更時にデフォルトレートを更新
+  row.querySelector('.rb-pair').addEventListener('change', (e) => {
+    const pair = baseCurrencyPairs.find(p => p.id === e.target.value);
+    if (pair) {
+      row.querySelector('.rb-current-rate').value = pair.rate;
+    }
+  });
 
   row.querySelector('.rb-remove-btn').addEventListener('click', () => {
     row.remove();
@@ -3461,13 +3707,12 @@ function loadPortfolioToRebalance() {
     });
   }
 
-  // ポジションを行として追加
+  // ポジションを行として追加（現在レートはbaseCurrencyPairsから自動取得）
   positions.forEach(pos => {
     addRebalancePositionRow({
       currencyPair: pos.currencyPair,
       direction: pos.direction,
       lots: pos.lots,
-      entryRate: pos.entryRate
     });
   });
 
@@ -3482,10 +3727,10 @@ function getCurrentPositionsFromTable() {
     const pairId = row.querySelector('.rb-pair')?.value;
     const direction = row.querySelector('.rb-direction')?.value;
     const lots = parseFloat(row.querySelector('.rb-lots')?.value) || 0;
-    const entryRate = parseFloat(row.querySelector('.rb-entry-rate')?.value) || 0;
+    const currentRate = parseFloat(row.querySelector('.rb-current-rate')?.value) || 0;
 
     if (pairId && lots > 0) {
-      positions.push({ pairId, direction, lots, entryRate });
+      positions.push({ pairId, direction, lots, currentRate });
     }
   });
 
@@ -3542,7 +3787,7 @@ function runRebalanceSimulation() {
   const OPTIMIZATION_UNIT = 1000;
 
   // === Step 1: 現在のポジションを1000通貨単位のロット配列に変換 ===
-  // エントリーレートが入力されている通貨はそのレートで診断する
+  // ユーザーが入力した現在レートで診断する（証券会社と同じレバレッジになる）
   const diagPairs = pairs.map(p => ({ ...p }));
   const currentLots = pairs.map(() => 0);
   positions.forEach(pos => {
@@ -3551,19 +3796,18 @@ function runRebalanceSimulation() {
       const pair = pairs[idx];
       const lotsIn1000 = pos.lots * (pair.unit / OPTIMIZATION_UNIT);
       currentLots[idx] += (pos.direction === 'long' ? lotsIn1000 : -lotsIn1000);
-      // エントリーレートがあればレートを上書き（診断用）
-      if (pos.entryRate > 0) {
-        diagPairs[idx].rate = pos.entryRate;
+      if (pos.currentRate > 0) {
+        diagPairs[idx].rate = pos.currentRate;
       }
     }
   });
 
-  // === Step 2: 現在のポートフォリオ診断（エントリーレートベース） ===
+  // === Step 2: 現在のポートフォリオ診断（ユーザー入力の現在レートベース） ===
   const lotValues = diagPairs.map(p => p.rate * OPTIMIZATION_UNIT);
   const lotVolatilities = diagPairs.map(p => (p.volatility / 100) * p.rate * OPTIMIZATION_UNIT);
 
   const currentResults = calculateResultsByLotsCorrect(diagPairs, currentLots, capital, lotValues, lotVolatilities);
-  const diagnosis = diagnoseCurrent(diagPairs, currentLots, currentResults, capital, lotValues, lotVolatilities);
+  const diagnosis = diagnoseCurrent(diagPairs, currentLots, currentResults, capital, lotValues, lotVolatilities, crashFullDefense);
 
   displayDiagnosis(diagnosis, capital);
 
@@ -3607,6 +3851,7 @@ function runRebalanceSimulation() {
 
 // 複利シミュレーション結果に基づく軌道修正
 function runRebalanceCompoundMode(positions, capital) {
+  const crashFullDefense = document.getElementById('rebalanceCrashFullDefense')?.checked || false;
   const simResults = lastCompoundSimResults;
   const currencies = lastCompoundSimCurrencies;
 
@@ -3649,7 +3894,6 @@ function runRebalanceCompoundMode(positions, capital) {
   const OPTIMIZATION_UNIT = 1000;
 
   // === Step 1: 現在のポジションを1000通貨単位のロット配列に変換 ===
-  // エントリーレートが入力されている通貨はそのレートで診断する
   const diagPairs = pairs.map(p => ({ ...p }));
   const currentLots = pairs.map(() => 0);
   positions.forEach(pos => {
@@ -3658,18 +3902,18 @@ function runRebalanceCompoundMode(positions, capital) {
       const pair = pairs[idx];
       const lotsIn1000 = pos.lots * (pair.unit / OPTIMIZATION_UNIT);
       currentLots[idx] += (pos.direction === 'long' ? lotsIn1000 : -lotsIn1000);
-      if (pos.entryRate > 0) {
-        diagPairs[idx].rate = pos.entryRate;
+      if (pos.currentRate > 0) {
+        diagPairs[idx].rate = pos.currentRate;
       }
     }
   });
 
-  // === Step 2: 現在のポートフォリオ診断（エントリーレートベース） ===
+  // === Step 2: 現在のポートフォリオ診断（ユーザー入力の現在レートベース） ===
   const lotValues = diagPairs.map(p => p.rate * OPTIMIZATION_UNIT);
   const lotVolatilities = diagPairs.map(p => (p.volatility / 100) * p.rate * OPTIMIZATION_UNIT);
 
   const currentResults = calculateResultsByLotsCorrect(diagPairs, currentLots, capital, lotValues, lotVolatilities);
-  const diagnosis = diagnoseCurrent(diagPairs, currentLots, currentResults, capital, lotValues, lotVolatilities);
+  const diagnosis = diagnoseCurrent(diagPairs, currentLots, currentResults, capital, lotValues, lotVolatilities, crashFullDefense);
   displayDiagnosis(diagnosis, capital);
 
   // === Step 3: 複利シミュの理想ロットを取得（口座残高に最も近い時点） ===
@@ -3716,11 +3960,12 @@ function applyRebalanceCrashDefense(results, capital, isFullDefense) {
   let totalUnrealizedLoss = 0;
   let postCrashNotional = 0;
 
+  const useDailyRebalance = document.querySelector('input[name="rebalanceCrashDuration"]:checked')?.value === 'daily';
   results.allocations.forEach(alloc => {
     if (alloc.lots === 0) return;
     const crashRate = isFullDefense
-      ? (alloc.pair.historicalWorstDrop || alloc.pair.maxDailyDrop || 10) / 100
-      : (alloc.pair.maxDailyDrop || 10) / 100;
+      ? ((useDailyRebalance ? alloc.pair.historicalWorstDailyDrop : alloc.pair.historicalWorstCrashDrop) || alloc.pair.maxCrashDrop || 10) / 100
+      : ((useDailyRebalance ? alloc.pair.maxDailyDrop : alloc.pair.maxCrashDrop) || 10) / 100;
     const absUnits = Math.abs(alloc.units);
     const currentNotional = absUnits * alloc.pair.rate;
     const unrealizedLoss = alloc.position === 'long'
@@ -3744,24 +3989,29 @@ function applyRebalanceCrashDefense(results, capital, isFullDefense) {
     results.totalAnnualSwap *= scale;
     results.totalMargin *= scale;
     if (results.riskYen) results.riskYen *= scale;
+    if (results.depreciationLoss) results.depreciationLoss *= scale;
+    if (results.netAnnualReturn) results.netAnnualReturn *= scale;
     if (results.weights) results.weights = results.weights.map(w => w * scale);
   }
 }
 
-function diagnoseCurrent(pairs, lots, results, capital, lotValues, lotVolatilities) {
+function diagnoseCurrent(pairs, lots, results, capital, lotValues, lotVolatilities, isFullDefense = false) {
   const annualToDailyFactor = Math.sqrt(252);
   const dailyRisk = results.riskYen ? results.riskYen / annualToDailyFactor : 0;
   const totalInvestment = results.allocations.reduce((sum, a) => sum + a.actualAmount, 0);
   const leverage = capital > 0 ? totalInvestment / capital : 0;
   const dailySwap = results.totalAnnualSwap / 365;
 
-  // 暴落シミュレーション（最大1日下落率ベース）
+  // 暴落シミュレーション
+  const useDailyDiag = document.querySelector('input[name="rebalanceCrashDuration"]:checked')?.value === 'daily';
   let totalCrashLoss = 0;
   let postCrashMargin = 0;
 
   results.allocations.forEach(alloc => {
     if (alloc.lots === 0) return;
-    const crashRate = (alloc.pair.maxDailyDrop || 10) / 100;
+    const crashRate = isFullDefense
+      ? ((useDailyDiag ? alloc.pair.historicalWorstDailyDrop : alloc.pair.historicalWorstCrashDrop) || alloc.pair.maxCrashDrop || 10) / 100
+      : ((useDailyDiag ? alloc.pair.maxDailyDrop : alloc.pair.maxCrashDrop) || 10) / 100;
     const absUnits = Math.abs(alloc.units);
     const notional = absUnits * alloc.pair.rate;
 
